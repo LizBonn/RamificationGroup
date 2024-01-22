@@ -13,3 +13,7 @@ class CompleteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends Valuat
   val_top : sorry
 
 class CompleteDiscreteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends DiscreteValuationRing R, CompleteValuationRing R
+
+open ValuationTopology
+variable [CommRing R] [IsDomain R] [ValuationRing R]
+#synth TopologicalRing R
