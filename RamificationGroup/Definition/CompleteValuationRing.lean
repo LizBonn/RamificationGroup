@@ -12,8 +12,15 @@ open Classical Uniformity Topology Filter Set
 class CompleteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends ValuationRing R, UniformSpace R, CompleteSpace R, TopologicalRing R where
   val_top : sorry
 
+/-
+-- `Bad Choice, not compatible with CDVF`
 class CompleteDiscreteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends DiscreteValuationRing R, CompleteValuationRing R
+-/
 
-open ValuationTopology
-variable [CommRing R] [IsDomain R] [ValuationRing R]
-#synth TopologicalRing R
+class CompleteDiscreteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends CompleteValuationRing R where
+  is_discrete : sorry
+
+-- these two definition is not so necessary
+class CompleteValuationField (R : Type*) [Field R] extends CompleteValuationRing R
+
+class CompleteDiscreteValuationField (R : Type*) [Field R] extends CompleteValuationRing R
