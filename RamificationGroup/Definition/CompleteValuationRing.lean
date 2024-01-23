@@ -22,7 +22,7 @@ class CompleteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends Valuat
 class CompleteDiscreteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends DiscreteValuationRing R, CompleteValuationRing R
 
 -- Or `ValuedField?`
--- Now I believe that the valuation structure on a field is never canonical, so its better to store information of the valuation ring.
+-- Now I believe that the valuation structure on a field is not canonical, so its better to store information of the valuation ring.
 -- use `mathcal{O}`?
 class CompleteValuationField (K : Type*) [Field K] where
   O : ValuationSubring K
