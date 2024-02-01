@@ -53,7 +53,7 @@ scoped instance : Valued R (ValuationRing.ValueMonoid R) := _
 -- `Valued` uses Group instead of Monoid... `Maybe the correct way is to generalize mathlib's valued to monoid instead of group???`
 -/
 
--- instance : Valued R (ValuationRing.ValueGroup R (FractionRing R)) := sorry
+instance : Valued R (ValuationRing.ValueGroup R (FractionRing R)) := sorry
 -- the topology not rfl to
 
 scoped instance : TopologicalRing R := sorry

@@ -24,11 +24,11 @@ class CompleteDiscreteValuationRing (R : Type*) [CommRing R] [IsDomain R] extend
 -- Or `ValuedField?`
 -- Now I believe that the valuation structure on a field is not canonical, so its better to store information of the valuation ring.
 -- use `mathcal{O}`?
-class CompleteValuationField (K : Type*) [Field K] where
+class CompleteValuedField (K : Type*) [Field K] where
   O : ValuationSubring K
   valuation_subring_is_complete : CompleteValuationRing O
 
-class CompleteDiscreteValuationField (K : Type*) [Field K] extends CompleteValuationField K where
+class CompleteDiscreteValuedField (K : Type*) [Field K] extends CompleteValuedField K where
   valuation_subring_is_dvr : DiscreteValuationRing O
 
 
