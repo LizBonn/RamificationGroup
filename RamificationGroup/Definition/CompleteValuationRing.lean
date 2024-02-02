@@ -9,7 +9,7 @@ In this file, we define
 
 
 open Classical Uniformity Topology Filter Set
-open ValuationTopology
+open ValuationRingTopology
 -- noncomputable
 -- section
 
@@ -30,16 +30,3 @@ class CompleteValuedField (K : Type*) [Field K] where
 
 class CompleteDiscreteValuedField (K : Type*) [Field K] extends CompleteValuedField K where
   valuation_subring_is_dvr : DiscreteValuationRing O
-
-
-
-
-/-
-class CompleteDiscreteValuationRing (R : Type*) [CommRing R] [IsDomain R] extends CompleteValuationRing R where
-  is_discrete : sorry
-
--- Maybe these two definition is not so necessary
-class CompleteValuationField (R : Type*) [Field R] extends CompleteValuationRing R
-
-class CompleteDiscreteValuationField (R : Type*) [Field R] extends CompleteValuationRing R
--/

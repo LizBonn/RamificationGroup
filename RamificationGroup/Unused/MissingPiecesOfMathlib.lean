@@ -13,7 +13,7 @@ In this file, we collect missing theorems, instances as prequisite of this proje
 variable (R: Type*)
 -- variable {Γ₀ : Type*} [LinearOrderedCommMonoidWithZero Γ₀]
 
-namespace ValuationRingTopology
+namespace ValuationTopology
 variable [CommRing R] [IsDomain R] [ValuationRing R]
 
 /-- The preorder of divisibility associated to a valuation ring, i.e. `a ≤ b` if there exist `c`, such that `a * c = b`. -/
@@ -22,17 +22,17 @@ scoped instance : Preorder R where
  le_refl _ := ⟨1, mul_one _⟩
  le_trans _ _ _ := fun ⟨u, h⟩ ⟨v, g⟩ => ⟨u * v, by rw [← g, ← h]; ring⟩
 
--- /-- The topology on a valuation ring `R` is defined to be the topology associated to the preorder of divisibility.-/
--- scoped instance : TopologicalSpace R := Preorder.topology R
+/-- The topology on a valuation ring `R` is defined to be the topology associated to the preorder of divisibility.-/
+scoped instance : TopologicalSpace R := Preorder.topology R
 
--- scoped instance : OrderTopology R := ⟨rfl⟩
+scoped instance : OrderTopology R := ⟨rfl⟩
 
--- scoped instance : UniformSpace R where
---   uniformity := sorry
---   refl := sorry
---   symm := sorry
---   comp := sorry
---   isOpen_uniformity := sorry
+scoped instance : UniformSpace R where
+  uniformity := sorry
+  refl := sorry
+  symm := sorry
+  comp := sorry
+  isOpen_uniformity := sorry
 
 
 /-!
@@ -53,19 +53,5 @@ scoped instance : Valued R (ValuationRing.ValueMonoid R) := _
 -- `Valued` uses Group instead of Monoid... `Maybe the correct way is to generalize mathlib's valued to monoid instead of group???`
 -/
 
-scoped instance : Valued R (ValuationRing.ValueGroup R (FractionRing R)) := sorry
 
-scoped instance : OrderTopology R where
-  topology_eq_generate_intervals := sorry
-
--- the topology not rfl to
-scoped instance : TopologicalRing R := sorry
-
-
-
-end ValuationRingTopology
-
-
--- open ValuationTopology
--- variable [CommRing R] [IsDomain R] [ValuationRing R]
--- #synth TopologicalRing R
+end ValuationTopology
