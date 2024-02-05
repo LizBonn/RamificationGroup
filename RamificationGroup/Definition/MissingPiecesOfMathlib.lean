@@ -4,12 +4,14 @@ import Mathlib.Topology.UniformSpace.Cauchy
 import Mathlib.Topology.Algebra.Ring.Basic
 import Mathlib.Topology.Order.Basic
 import Mathlib.Topology.Algebra.Valuation
+import Mathlib.Algebra.Order.Hom.Monoid
 /-!
 # Missing Pieces of Mathlib
 
 In this file, we collect missing theorems, instances as prequisite of this project. Theorems in this file should be added to mathlib file scatterly into each file.
 -/
 
+section ValuationTopology
 variable (R: Type*)
 -- variable {Γ₀ : Type*} [LinearOrderedCommMonoidWithZero Γ₀]
 
@@ -69,3 +71,27 @@ end ValuationRingTopology
 -- open ValuationTopology
 -- variable [CommRing R] [IsDomain R] [ValuationRing R]
 -- #synth TopologicalRing R
+
+end ValuationTopology
+
+
+section ValuationIdeal
+
+#check Valuation.integer
+
+notation:50 " 𝒪[" v "] " => Valuation.integer v
+
+-- Mathlib.RingTheory.Valuation.Integers
+def Valuation.leIdeal {R : Type u}  {Γ₀ : Type v}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+
+def Valuation.ltIdeal {R : Type u}  {Γ₀ : Type v}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+
+def Valuation.maximalIdeal {R : Type u}  {Γ₀ : Type v}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) : Ideal (Valuation.integer v) := Valuation.ltIdeal v 1 -- def use either localring.maximalideal or v < 1, then show the remaining one as theorem when K is a field
+
+notation:50 " 𝔪[" v "] " => Valuation.maximalIdeal v
+
+variable {R : Type u}  {Γ₀ : Type v}  [CommRing R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀)
+
+instance : (Valuation.maximalIdeal v).IsMaximal := sorry
+
+end ValuationIdeal
