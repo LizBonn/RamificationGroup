@@ -31,25 +31,14 @@ instance : ValuationRing vK.integer where
 end
 
 section
+
 open DiscreteValuation
-#check ℕₘ₀
-
-#synth LinearOrderedAddCommGroup ℤ
-
-#synth LinearOrderedCommMonoidWithZero ℤₘ₀
-#synth LinearOrderedCommGroupWithZero ℤₘ₀
-
-#synth LinearOrderedCommMonoid (Multiplicative ℤ)
-
-instance : LinearOrderedCommGroup (Multiplicative ℤ) := sorry
-
-#synth LinearOrderedCommGroupWithZero ℤₘ₀
 
 variable {K L : Type*} [Field K] [Field L] [Algebra K L] {vL : Valuation L ℤₘ₀}
 
 #check 𝔪[vL]
 
 -- O / m^i
--- vL ( a - s a) -- quotient action
+-- vL ( a - s a) -- quotient action, instance in some namespace?
 
 end

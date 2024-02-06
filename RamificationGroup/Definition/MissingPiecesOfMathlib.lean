@@ -10,6 +10,7 @@ import Mathlib.Algebra.Order.Hom.Monoid
 
 In this file, we collect missing theorems, instances as prequisite of this project. Theorems in this file should be added to mathlib file scatterly into each file.
 -/
+set_option autoImplicit false
 
 section ValuationTopology
 variable (R: Type*)
@@ -82,16 +83,45 @@ section ValuationIdeal
 notation:50 " 𝒪[" v "] " => Valuation.integer v
 
 -- Mathlib.RingTheory.Valuation.Integers
-def Valuation.leIdeal {R : Type u}  {Γ₀ : Type v}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+def Valuation.leIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
 
-def Valuation.ltIdeal {R : Type u}  {Γ₀ : Type v}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+def Valuation.ltIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
 
-def Valuation.maximalIdeal {R : Type u}  {Γ₀ : Type v}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) : Ideal (Valuation.integer v) := Valuation.ltIdeal v 1 -- def use either localring.maximalideal or v < 1, then show the remaining one as theorem when K is a field
+def Valuation.maximalIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) : Ideal (Valuation.integer v) := Valuation.ltIdeal v 1 -- def use either localring.maximalideal or v < 1, then show the remaining one as theorem when K is a field
 
 notation:50 " 𝔪[" v "] " => Valuation.maximalIdeal v
 
-variable {R : Type u}  {Γ₀ : Type v}  [CommRing R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀)
+variable {R : Type*}  {Γ₀ : Type*}  [CommRing R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀)
 
 instance : (Valuation.maximalIdeal v).IsMaximal := sorry
 
 end ValuationIdeal
+
+-- `Mathlib.Algebra.Order.Monoid.TypeTags`
+section LinearOrderedCommGroupWithZero
+variable {α : Type*}
+-- open DiscreteValuation
+-- #check ℕₘ₀
+
+-- #synth LinearOrderedAddCommGroup ℤ
+-- #synth LinearOrderedCommMonoidWithZero ℤₘ₀
+-- #synth LinearOrderedCommGroupWithZero ℤₘ₀ -- failed
+-- #synth LinearOrderedCommMonoid (Multiplicative ℤ)
+-- #synth CommGroup (Multiplicative ℤ)
+
+instance Multiplicative.orderedCommGroup [OrderedAddCommGroup α] :
+    OrderedCommGroup (Multiplicative α) :=
+  { Multiplicative.partialOrder, Multiplicative.commGroup with
+    mul_le_mul_left := @OrderedAddCommGroup.add_le_add_left α _}
+
+instance Multiplicative.linearOrderedCommGroup [LinearOrderedAddCommGroup α] :
+    LinearOrderedCommGroup (Multiplicative α) :=
+  { Multiplicative.linearOrder, Multiplicative.orderedCommGroup with }
+
+
+-- #synth LinearOrderedCommGroupWithZero ℤₘ₀
+
+-- `symmetric version from Mul to Add`
+
+-- `Instance of trivial group Unit being LinearOrderedCommGroupWithZero`
+end LinearOrderedCommGroupWithZero
