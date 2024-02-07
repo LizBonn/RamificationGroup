@@ -2,7 +2,12 @@ import Lake
 open Lake DSL
 
 package «RamificationGroup» where
-  -- add package configuration options here
+    leanOptions := #[
+    ⟨`pp.unicode.fun, true⟩, -- pretty-prints `fun a ↦ b`
+    ⟨`pp.proofs.withType, false⟩,
+    ⟨`autoImplicit, false⟩,
+    ⟨`relaxedAutoImplicit, false⟩
+  ]
 
 lean_lib «RamificationGroup» where
   -- add library configuration options here

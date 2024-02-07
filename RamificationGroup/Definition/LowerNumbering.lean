@@ -1,44 +1,92 @@
-import RamificationGroup.Definition.CompleteValuationRing
+import RamificationGroup.Definition.ExtensionOfValuation
+import Mathlib.Algebra.Group.WithOne.Defs
+import Mathlib.FieldTheory.Galois
 
 
-
-variable {R S T : Type*} [CommRing R] [CommRing S] [CommRing T] [Algebra R S] [Algebra S T]
-
--- #synth Algebra R T
-
-variable {R S : Type*} [CommRing R] [CommRing S] {I : Ideal R} {J : Ideal S} [Algebra R S] (h : I ≤ J.comap (algebraMap R S))
-
--- #synth Algebra (R⧸I) (S⧸J)
-
+-- rename this file to RamificationFiltration or something
 
 -- `Mathlib.RingTheory.Ideal.QuotientOperations`
 -- def AlgHom.QuotientLift {R S₁ S₂ : Type*} [CommRing R] [CommRing S₁] [CommRing S₂] [Algebra R S₁] [Algebra R S₂] {I : Ideal R} {J₁ : Ideal S₁} {J₂ : Ideal S₂} (h₁ : I ≤ J₁.comap (algebraMap R S₁)) (h₂ : I ≤ J₂.comap (algebraMap R S₂)) : S₁⧸J₁ →ₐ[R⧸I] S₂⧸J₂ := sorry
 
 
+
+open DiscreteValuation
+
 section
--- `move to MissingPieces`
-variable {K L : Type*} [Field K] [Field L] {ΓK ΓL : Type*} [LinearOrderedCommGroupWithZero ΓK][LinearOrderedCommGroupWithZero ΓL] [Algebra K L] {vK : Valuation K ΓK} {vL : Valuation L ΓL}
+-- An alternative thought on definition of ValuationExtension
 
-instance : ValuationRing vK.integer where
-  cond' := sorry
 
--- `the maximal ideal = the lt ideal`
+-- Maybe use `Valued` here is far better, Valued K + Finite K L will automatically create some ValuationExtension K L, However, this need to rewrite the definition of ValuationExtension
 
-#check 𝒪[vK]
-#check 𝔪[vK]
-#check 𝔪[vL]
+class ValuationExtension'' (K L : Type*) [Field K] [Field L] {ΓK: outParam (Type*)} {ΓL : outParam (Type*)} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [Valued K ΓK] [Valued L ΓL] where
+  toAlgebra : Algebra K L
+  val_extn : PreserveValuation Valued.v Valued.v (algebraMap K L)
+
+variable {K L : Type*} [Field K] [Field L] [Algebra K L] [Valued K ℤₘ₀] [Valued L ℤₘ₀]
+#check ValuationExtension'' K L
+
+-- And there is Valued instance on K L!
+-- Maybe ValuationExtension is not a good name...
+
+notation:max K:max " →ᵥ " L:max => ValuationExtension'' K L
+-- or "→+*ᵥ"
+
+-- divide into 2 parts,  ` →ᵥ ` and `ValuedAlgebra`, first is the set of all possible maps preserving valuation, second is when there is a canonical map
+
+instance : Coe (ValuationExtension'' K L) (Algebra K L) :=
+  ⟨fun f => f.toAlgebra⟩
+
+instance : CoeFun (ValuationExtension'' K L) (fun _ => K → L) := sorry
+
+variable (f : K →ᵥ L) (k : K)
+#check f k
+
+-- ValuedScalarTower, automated infered from other instances
+end
+
+section
+
+variable {K L : Type*} [Field K] [Field L] [Algebra K L] (vK : Valuation K ℤₘ₀) (vL : Valuation L ℤₘ₀) [ValuationExtension vK vL] --some more condition to make sure vL(pi) = 1, probably uniformizer, same as Maria's definition
+
+
+#check 𝓂[vL]
+
+-- `theorem TFAE`
+-- fix O / m^i
+-- ∀ a : 𝒪[vL], vL ( a - s a) >= i
+-- generator x, vL(x - sx) >= i
+
+instance: Coe ℤ (Multiplicative ℤ) := ⟨fun x => x⟩
+
+variable {G : Type*} [Group G]
+
+#synth CoeTC G (WithZero G)
+instance : Coe ℤ ℤₘ₀ := ⟨fun x => ((x : Multiplicative ℤ): WithZero ℤ) ⟩
+
+def RamificationGroup (i : ℤ) : Subgroup (L ≃ₐ[K] L) where
+  carrier := {s : L ≃ₐ[K] L | ∀ x : 𝒪[vL], vL (s.liftValuationInteger vK vL x - x) ≥ i + (1 : ℤ) }
+  mul_mem' := sorry
+  one_mem' := sorry
+  inv_mem' := sorry
+
+notation:max " G(" vL:max "/" vK:max ")_[" i "] " => RamificationGroup vK vL i
+
+#check G(vL/vK)_[1]
+
+-- Many properties
+-- `i <=1, = ⊤` `the filtration is complete`
+
+-- currently there is no subgroup filtration, only ideal filtration, maybe to define it is useful.
+-- `the filtration is decreasing, and seperable`
 
 end
 
 section
 
-open DiscreteValuation
+variable {K L : Type*} [Field K] [Field L] [Algebra K L] (K' : IntermediateField K L) [IsGalois K L] (vK : Valuation K ℤₘ₀) (vK' : Valuation K' ℤₘ₀) (vL : Valuation L ℤₘ₀) [ValuationExtension vK vL] [ValuationExtension vK' vL] --some more condition
 
-variable {K L : Type*} [Field K] [Field L] [Algebra K L] {vL : Valuation L ℤₘ₀}
+-- `key theorem : lower numbering is compatible with subgroup` restate this into a better form...
+theorem lower_numbering_inf (i : ℤ) : ((G(vL/vK)_[i]).subgroupOf K'.fixingSubgroup).map (IntermediateField.fixingSubgroupEquiv K') = G(vL/vK')_[i] := sorry
 
-#check 𝔪[vL]
-
--- O / m^i
--- vL ( a - s a) -- quotient action, instance in some namespace?
 
 end
