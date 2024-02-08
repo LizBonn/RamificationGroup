@@ -4,6 +4,7 @@ import Mathlib.Topology.UniformSpace.Cauchy
 import Mathlib.Topology.Algebra.Ring.Basic
 import Mathlib.Topology.Order.Basic
 import Mathlib.Topology.Algebra.Valuation
+import Mathlib.Data.Real.Basic
 /-!
 # Missing Pieces of Mathlib
 
