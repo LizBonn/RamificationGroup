@@ -66,21 +66,9 @@ scoped instance : OrderTopology R where
 scoped instance : TopologicalRing R := sorry
 
 
-
-end ValuationRingTopology
-
-
--- open ValuationTopology
--- variable [CommRing R] [IsDomain R] [ValuationRing R]
--- #synth TopologicalRing R
-
-end ValuationTopology
-
 section ValuationIdeal
 
-#check Valuation.integer
 
-notation:max " 𝒪[" v:max "] " => Valuation.integer v
 
 -- Mathlib.RingTheory.Valuation.Integers
 def Valuation.LEIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
@@ -91,13 +79,15 @@ def Valuation.LTIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommG
 
 def Valuation.maximalIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) : Ideal (Valuation.integer v) := Valuation.LTIdeal v 1 -- def use either localring.maximalideal or v < 1, then show the remaining one as theorem when K is a field
 
+notation:max " 𝒪[" v:max "] " => Valuation.integer v
+
 notation:max " 𝓂[" v:max "] " => Valuation.maximalIdeal v
 
 -- `In Discrete Valuation Ring, relation between LT LE Ideal`
 
 variable {R : Type*}  {Γ₀ : Type*}  [CommRing R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀)
 
--- may need field
+-- Need field
 instance : (Valuation.maximalIdeal v).IsMaximal := sorry
 
 end ValuationIdeal
@@ -121,23 +111,3 @@ notation:max " 𝓀[" v:max "] " => LocalRing.ResidueField ↥𝒪[v]
 end ValuationInteger
 
 -- `Instance of trivial group Unit being LinearOrderedCommGroupWithZero`
-
-section QuotientAlgebra
-
-variable {R S : Type*} [CommRing R] [CommRing S] {I : Ideal R} {J : Ideal S} [Algebra R S]
-
-def Ideal.quotientAlgebra' (h : I ≤ RingHom.ker (algebraMap R S)) : Algebra (R⧸I) S := (Ideal.Quotient.lift _ _ h).toAlgebra
-
--- Maybe we should just keep this ignored
-instance [h : Fact (I ≤ RingHom.ker (algebraMap R S))] : Algebra (R⧸I) S := Ideal.quotientAlgebra' h.out
-
--- variable {S₁ S₂ : Type*} [CommRing S₁] [CommRing S₂] [Algebra R S₁] [Algebra R S₂] {I : Ideal R} {J₁ : Ideal S₁} {J₂ : Ideal S₂}
-
--- def AlgHom.Quotient₂ (s : S₁ →ₐ[R] S₂) (h : J₁ ≤ J₂.comap s) : S₁⧸J₁ →ₐ[R] S₂⧸J₂ := Ideal.quotientMapₐ _ s h
-
-#check Ideal.quotientMapₐ
-
-
-
-
-end QuotientAlgebra
