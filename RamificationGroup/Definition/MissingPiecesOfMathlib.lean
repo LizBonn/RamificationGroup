@@ -83,6 +83,8 @@ notation:max " 𝒪[" v:max "] " => Valuation.integer v
 
 notation:max " 𝓂[" v:max "] " => Valuation.maximalIdeal v
 
+variable {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀)
+#check 𝒪[v]
 -- `In Discrete Valuation Ring, relation between LT LE Ideal`
 
 variable {R : Type*}  {Γ₀ : Type*}  [CommRing R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀)

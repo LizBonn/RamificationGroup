@@ -14,10 +14,11 @@ One thing I am not certain about is whether I should state a theorem in `â†’+*áµ
 
 Another issue is the ideal given be elements whose valuation is smaller than a certain value. I plan to define them for `Valuation`.
 
-More things I am not certain about (luckily we don't need them for present):
+More things I am not certain about (luckily I don't need to bother them for present):
 
 1. Whether an instance `Valued` for DVR should exist? It is quite cannoinical, but only up to equivalence. The answer to this question may involve a total rewrite of whole valuation theory that makes everything defines/holds up to equivalence.
-2. 
+2. I feel the notation of a filtered object is needed. This should be done as broad as possible, in category theory, in order to capture filtered groups/modules/rings/... together. However in local field case, the filtration of upper ramification group is indexed in `Rat` lower is indexed in `Int`.
+3. 
 
 ### Todo
 

@@ -5,11 +5,13 @@ import RamificationGroup.Preliminary.DiscreteValuation
 #check Valuation.integer
 
 -- Mathlib.RingTheory.Valuation.Integers
-def Valuation.LEIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+def Valuation.LEIdeal {R : Type*}  {Γ₀ : outParam Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
 -- when gamma < 1, the ideal is whole ring
 
-def Valuation.LTIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+def Valuation.LTIdeal {R : Type*}  {Γ₀ : outParam Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
 -- when gamma < 1, the ideal is whole ring
+
+-- inclusion relation,...
 
 namespace DiscreteValuation
 -- `In Discrete Valuation Ring, relation between LT LE Ideal`
