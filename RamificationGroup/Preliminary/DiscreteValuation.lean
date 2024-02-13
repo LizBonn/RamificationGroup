@@ -34,6 +34,7 @@ def ofZ : ℤ →o ℤₘ₀ where
 scoped instance : CoeTC ℤ ℤₘ₀ where
   coe := ofZ
 
--- lots of simp lemmas, try to copy from `Mathlib.Algebra.Order.Monoid.WithZero.Defs` (WithZero) and `Mathlib.Algebra.Group.TypeTags` (Multiplicative)
+-- lots of simp lemmas, related to ofZ, try to copy from `Mathlib.Algebra.Order.Monoid.WithZero.Defs` (WithZero) and `Mathlib.Algebra.Group.TypeTags` (Multiplicative)
+
 
 end DiscreteValuation

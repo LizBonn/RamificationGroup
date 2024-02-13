@@ -1,5 +1,5 @@
 import RamificationGroup.Valued.Definitions
-import RamificationGroup.Valued.Hom
+import RamificationGroup.Valued.Hom.Basic
 
 open DiscreteValuation
 
