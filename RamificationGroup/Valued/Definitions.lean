@@ -2,6 +2,12 @@ import RamificationGroup.Valuation.Integer
 import Mathlib.Topology.Algebra.Valuation
 import Mathlib.RingTheory.DiscreteValuationRing.Basic
 import Mathlib.RingTheory.Valuation.ValuationRing
+import Mathlib.Topology.Order.Basic
+
+
+instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := sorry
+
+instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: OrderTopology R := sorry
 
 open DiscreteValuation
 
@@ -12,6 +18,7 @@ class DiscretelyValued (R : Type*) [Ring R] extends Valued R ℤₘ₀ where
   /- This `v_is_surj` is the same as Maria and Phillip's is_discrete -/
   exist_val_one : ∃ x : R, Valued.v x = ofZ 1
   /- Is this definition OK? Wait for the theorems to decide -/
+  /- This is different but includes Nm0 case-/
 
 class CompleteDiscretelyValued (R : Type*) [Ring R] extends DiscretelyValued R, CompleteSpace R
 
