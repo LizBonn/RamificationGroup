@@ -14,9 +14,9 @@ open DiscreteValuation
 section DiscretelyValued
 
 class DiscretelyValued (R : Type*) [Ring R] extends Valued R ℤₘ₀ where
-  -- v_is_surj : (v.toFun).Surjective
+  v_is_surj : (v.toFun).Surjective
   /- This `v_is_surj` is the same as Maria and Phillip's is_discrete -/
-  exist_val_one : ∃ x : R, Valued.v x = ofZ 1
+  -- exist_val_one : ∃ x : R, Valued.v x = ofZ 1
   /- Is this definition OK? Wait for the theorems to decide -/
   /- This is different but includes Nm0 case-/
 
@@ -82,3 +82,11 @@ end DiscretelyValued
 -- `theorem: if two discrete valuations are equivalent, then they are equal`
 
 end DVF
+
+/-
+1. investigate Maria and Phillip's 今天
+2. If exist, copy
+  If not, state (今天明天) and proof (mimic 单扩张定理)
+
+  拆分成小定理去证明
+-/

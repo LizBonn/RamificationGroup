@@ -1,7 +1,6 @@
 import RamificationGroup.Valued.RamificationIndex
 import Mathlib.FieldTheory.Galois
 
-
 open DiscreteValuation Valued
 
 def ValAlgEquiv.lowerIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
@@ -20,12 +19,16 @@ notation:max " G(" L:max "/" K:max ")_[" n:max "] " => lowerRamificationGroup K 
 
 -- currently there is no subgroup filtration, only ideal filtration, maybe to define it is useful.
 -- `the filtration is decreasing, and seperable`
-
+variable {K L : Type*} [Field K] [Field L] [Algebra K L] (K' : IntermediateField K L)
+#check K'.isScalarTower_mid'
+#synth IsScalarTower K K' L
+instance : IsScalarTower K K' L := K'.isScalarTower_mid'
 
 variable {K L : Type*} [Field K] [Field L]  [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L] (K' : IntermediateField K L) [IsGalois K L] [DiscretelyValued K'] [FiniteDimensional K L] --some more condition
 
 #synth IsScalarTower K K' L
 
+-- should instances of Discretely Valued L, K' auto generated from K? also [ValAlgebra K L]
 instance : ValAlgebra K K' := sorry
 instance : ValAlgebra K' L := sorry
 -- `instance IsValScalarTower K K' L`

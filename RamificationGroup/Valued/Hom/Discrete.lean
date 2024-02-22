@@ -19,40 +19,21 @@ variable {K L : Type*} [Field K] [Field L] [DiscretelyValued K] [a : Algebra K L
 
 instance : DiscretelyValued L := sorry -- see Maria and Phillip
 
-instance : ValAlgebra K L := ValRingHom.toValAlgebra
-  {
-    toFun := a.toFun
-    map_one' := sorry
-    map_mul' := sorry
-    map_zero' := sorry
-    map_add' := sorry
-    monotone' := sorry
-    continuous_toFun := sorry
-    val_isEquiv_comap := sorry
-  }
+instance : ValAlgebra K L where
+  toFun := _
+  map_one' := _
+  map_mul' := _
+  map_zero' := _
+  map_add' := _
+  monotone' := sorry
+  continuous_toFun := sorry
+  val_isEquiv_comap := sorry
+  smul := a.smul
+  commutes' := a.commutes'
+  smul_def' := a.smul_def'
 
 
 variable (K' : IntermediateField K L) [IsGalois K L]
-#check ValAlgebra.toSMul
-
-variable (A B) [Field A] [DiscretelyValued A] [Ring B] [DiscretelyValued B] [h : ValAlgebra A B]
-
-example: (@Algebra.toSMul _ _ _ _ (ValAlgebra.toAlgebra) : SMul A B) = h.toSMul:= rfl
-
-#synth Algebra K K'
-#synth Algebra K' L
-#check IntermediateField.isScalarTower
-#synth SMul K K'
-#synth SMul K' L
-example : (ValAlgebra.toAlgebra : Algebra K K') = (IntermediateField.algebra K' : Algebra K K' ) := rfl
-example : (a : Algebra K L) = (algebraMap K L).toAlgebra := by
-  ext
-  simp
-
-
-example : (ValAlgebra.toSMul : SMul K K') = (Algebra.toSMul):= by rfl
-instance : IsScalarTower K K' L := K'.isScalarTower_mid'
-#synth IsScalarTower K K' L
 
 -- should instances of Discretely Valued L, K' auto generated from K? also [ValAlgebra K L]
 instance : ValAlgebra K K' := sorry
