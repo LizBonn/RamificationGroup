@@ -27,14 +27,14 @@ example : 0 = (⊥ : ℤₘ₀) := by rfl
 
 end examples
 
-def ofZ : ℤ →o ℤₘ₀ where
+def ofInt : ℤ →o ℤₘ₀ where
   toFun := .coe
   monotone' _ _ := WithZero.coe_le_coe.mpr
 
 scoped instance : CoeTC ℤ ℤₘ₀ where
-  coe := ofZ
+  coe := ofInt
 
--- lots of simp lemmas, related to ofZ, try to copy from `Mathlib.Algebra.Order.Monoid.WithZero.Defs` (WithZero) and `Mathlib.Algebra.Group.TypeTags` (Multiplicative)
+-- lots of simp lemmas, related to ofInt, try to copy from `Mathlib.Algebra.Order.Monoid.WithZero.Defs` (WithZero) and `Mathlib.Algebra.Group.TypeTags` (Multiplicative)
 
 
 end DiscreteValuation

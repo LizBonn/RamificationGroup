@@ -1,6 +1,6 @@
 # Generality of Definitons
 
-### LTIdeal and LEIdeal
+### ltIdeal and leIdeal
 
 Same as Valuation.integers. However, special notations are only defined for Valued instances.
 

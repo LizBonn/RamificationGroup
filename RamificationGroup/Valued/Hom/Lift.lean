@@ -21,9 +21,9 @@ instance : Coe (ValAlgHom K L L') (ValAlgHom 𝒪[K] 𝒪[L] 𝒪[L']) := ⟨Val
 
 
 /-
-def ValAlgHom.liftValuationIntegerQuotientLEIdeal (s : L →ₐv[K] L) (γ : ΓL') : 𝒪[L]⧸(vL'.v.LEIdeal γ) →ₐ[𝒪[K]] 𝒪[L']⧸(vL.LEIdeal γ) := sorry
+def ValAlgHom.liftValuationIntegerQuotientleIdeal (s : L →ₐv[K] L) (γ : ΓL') : 𝒪[L]⧸(vL'.v.leIdeal γ) →ₐ[𝒪[K]] 𝒪[L']⧸(vL.leIdeal γ) := sorry
 
-def ValAlgIso.liftValuationIntegerQuotientLEIdeal (s : L ≃ₐ[K] L) (γ : ΓL) : (𝒪[vL]⧸(vL.LEIdeal γ)) ≃ₐ[𝒪[vK]] (𝒪[vL]⧸(vL.LEIdeal γ)) := sorry
+def ValAlgIso.liftValuationIntegerQuotientleIdeal (s : L ≃ₐ[K] L) (γ : ΓL) : (𝒪[vL]⧸(vL.leIdeal γ)) ≃ₐ[𝒪[vK]] (𝒪[vL]⧸(vL.leIdeal γ)) := sorry
 
 -- `LT version`
 

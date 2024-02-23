@@ -71,13 +71,13 @@ section ValuationIdeal
 
 
 -- Mathlib.RingTheory.Valuation.Integers
-def Valuation.LEIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+def Valuation.leIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
 -- when gamma < 1, the ideal is whole ring
 
-def Valuation.LTIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
+def Valuation.ltIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := sorry
 -- when gamma < 1, the ideal is whole ring
 
-def Valuation.maximalIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) : Ideal (Valuation.integer v) := Valuation.LTIdeal v 1 -- def use either localring.maximalideal or v < 1, then show the remaining one as theorem when K is a field
+def Valuation.maximalIdeal {R : Type*}  {Γ₀ : Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) : Ideal (Valuation.integer v) := Valuation.ltIdeal v 1 -- def use either localring.maximalideal or v < 1, then show the remaining one as theorem when K is a field
 
 notation:max " 𝒪[" v:max "] " => Valuation.integer v
 

@@ -5,18 +5,16 @@ import Mathlib.RingTheory.Valuation.ValuationRing
 import Mathlib.Topology.Order.Basic
 
 
-instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := sorry
-
-instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: OrderTopology R := sorry
+instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := Preorder.lift Valued.v
 
 open DiscreteValuation
 
 section DiscretelyValued
 
 class DiscretelyValued (R : Type*) [Ring R] extends Valued R ℤₘ₀ where
-  v_is_surj : (v.toFun).Surjective
+  is_discrete : (v.toFun).Surjective
   /- This `v_is_surj` is the same as Maria and Phillip's is_discrete -/
-  -- exist_val_one : ∃ x : R, Valued.v x = ofZ 1
+  -- exist_val_one : ∃ x : R, Valued.v x = ofInt 1
   /- Is this definition OK? Wait for the theorems to decide -/
   /- This is different but includes Nm0 case-/
 
@@ -29,31 +27,47 @@ section DVF
 
 namespace Valued
 -- this def is the same as `Valuation.integer`, it only serves for notation `𝒪[K]`
-abbrev integer (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Subring K := (Valued.v).integer
+abbrev integer (K : Type*) [DivisionRing K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Subring K := (Valued.v).integer
 
 scoped notation:max " 𝒪[" K:max "] " => Valued.integer K
 
-instance (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Valued 𝒪[K] Γ := sorry
+instance (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vK : Valued K Γ] : Valued 𝒪[K] Γ := Valued.mk' (vK.v.comap (algebraMap 𝒪[K] K))
 
 -- Is this instance OK? Is it possible for K has many Valued instance for different Γ?
-def integerValuationRing (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : ValuationRing 𝒪[K] := sorry
+instance integerValuationRing (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vK : Valued K Γ] : ValuationRing 𝒪[K] where
+  cond' a b := by
+    by_cases triv : a = 0 ∨ b = 0
+    · use 0
+      simp only [mul_zero]
+      tauto
+    push_neg at triv
+    let c := (b : K) / a
+    have hc : c ≠ 0 := div_ne_zero ((Subring.coe_eq_zero_iff 𝒪[K]).not.mpr triv.2) ((Subring.coe_eq_zero_iff 𝒪[K]).not.mpr triv.1)
+    by_cases h : vK.v c ≤ 1
+    · use ⟨c, h⟩
+      left
+      ext
+      field_simp [triv.1]
+      ring
+    · push_neg at h
+      use ⟨c⁻¹, le_of_lt ((Valuation.one_lt_val_iff _ hc).mp h)⟩
+      right
+      ext
+      field_simp [triv.2]
+      ring
 
-abbrev maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := (Valued.v).LTIdeal 1
+abbrev maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
 
 scoped notation:max " 𝓂[" K:max "] " => maximalIdeal K
 
-theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : 𝓂[K] = @LocalRing.maximalIdeal 𝒪[K] _ ((integerValuationRing K).localRing) := sorry
+theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : 𝓂[K] = (Valued.v).ltIdeal 1 := sorry
 
-instance {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal.IsMaximal 𝓂[K] := maximalIdeal_eq (K := K) ▸ inferInstance
-
-abbrev residueField (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] := @LocalRing.ResidueField (𝒪[K]) _ (@ValuationRing.localRing _ _ _ (integerValuationRing K))
+abbrev residueField (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] := LocalRing.ResidueField (𝒪[K])
 
 scoped notation:max " 𝓀[" K:max "] " => residueField K
 
-def integerQuotientMaximalIdealEquiv {K : Type*} [Field K] [DiscretelyValued K] : (𝒪[K] ⧸ 𝓂[K]) ≃ₐ[𝒪[K]] 𝓀[K] := Ideal.quotientEquivAlgOfEq 𝒪[K] maximalIdeal_eq
-
 instance {K : Type*} [Field K] [DiscretelyValued K] : Coe 𝒪[K] 𝓀[K] where
-  coe := @LocalRing.residue 𝒪[K] _ (@ValuationRing.localRing _ _ _ (integerValuationRing K))
+  coe := LocalRing.residue 𝒪[K]
 
 end Valued
 
@@ -72,9 +86,9 @@ abbrev maximalIdeal (K : Type*) [Field K] [DiscretelyValued K] : Ideal 𝒪[K] :
 
 scoped notation:max " 𝓂[" K:max "] " => maximalIdeal K
 
-theorem xxx {K : Type*} [Field K] [DiscretelyValued K] : 𝓂[K] = (Valued.v).LTIdeal 1 := sorry
+theorem xxx {K : Type*} [Field K] [DiscretelyValued K] : 𝓂[K] = (Valued.v).ltIdeal 1 := sorry
 
-instance {K : Type*} [Field K] [DiscretelyValued K] : Ideal.IsMaximal ((Valued.v).LTIdeal (1:ℤₘ₀) : Ideal 𝒪[K]) := DiscretelyValued.xxx (K := K) ▸ inferInstance
+instance {K : Type*} [Field K] [DiscretelyValued K] : Ideal.IsMaximal ((Valued.v).ltIdeal (1:ℤₘ₀) : Ideal 𝒪[K]) := DiscretelyValued.xxx (K := K) ▸ inferInstance
 -/
 
 end DiscretelyValued
