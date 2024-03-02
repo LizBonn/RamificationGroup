@@ -25,6 +25,9 @@ variable {L : Type*} [Field L] [Algebra K L] [Module.Finite K L] [Algebra A L] [
 variable {B : Type*} [CommRing B] [Algebra B L] [Algebra A B] [Algebra K B] [IsIntegralClosure B A L]
                      [IsDomain B] [DiscreteValuationRing B] [SMulCommClass B K L] [IsScalarTower A B L]
 (va : HeightOneSpectrum A) (vb : HeightOneSpectrum B)
+[HMul PartENat ℕ PartENat]
+
+variable {a : A}
 
 theorem Prop18 {x : B} (h0 : Irreducible x) (h1 : ∀ a : A, (addVal A a) * (finrank K L) = addVal B (algebraMap A B a)) :
 (ker (aeval x)) = (Ideal.span {LinearMap.charpoly (lsmul A K L x)}) := by sorry
