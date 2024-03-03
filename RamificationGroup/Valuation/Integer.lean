@@ -7,7 +7,7 @@ import RamificationGroup.Preliminary.DiscreteValuation
 #check Valuation.ltAddSubgroup -- `Make use of this!!`
 
 -- Mathlib.RingTheory.Valuation.Integers
-def Valuation.leIdeal {R : Type*} {Γ₀ : outParam Type*}  [Ring R]
+def Valuation.leIdeal {R : Type*} {Γ₀ : outParam Type*}  [Ring R] 
   [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (v.integer) where
   carrier := {x : v.integer | v x ≤ γ}
   add_mem' ha hb := .trans (v.map_add_le_max' _ _) (max_le ha hb)
@@ -21,31 +21,27 @@ def Valuation.leIdeal {R : Type*} {Γ₀ : outParam Type*}  [Ring R]
       _ ≤ 1 * γ := mul_le_mul' c.2 ha
       _ = γ := one_mul _
 
-theorem Valuation.leIdeal_eq_top {R : Type*} {Γ₀ : outParam Type*}  [Ring R]
+theorem Valuation.leIdeal_eq_top {R : Type*} {Γ₀ : outParam Type*}  [Ring R] 
   [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀) {γ : Γ₀} (h : 1 ≤ γ) : v.leIdeal γ = ⊤ := sorry
 -- when gamma ≥ 1, the ideal is whole ring
 
--- special value for γ = 0
-def Valuation.ltIdeal {R : Type*}  {Γ₀ : outParam Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) where
-  carrier := if γ ≠ 0 then {x : v.integer | v x < γ} else ⊤
-  add_mem' ha hb := by
-    by_cases h : γ ≠ 0 <;> simp only [ne_eq, h, ↓reduceIte, Set.top_eq_univ, Set.mem_univ,
-      not_false_eq_true] at *
-    exact lt_of_le_of_lt (v.map_add_le_max' _ _) (max_lt ha hb)
+-- special value when γ = 0
+def Valuation.ltIdeal {R : Type*}  {Γ₀ : outParam Type*}  [Ring R] [LinearOrderedCommGroupWithZero Γ₀]  (v : Valuation R Γ₀) (γ : Γ₀) : Ideal (Valuation.integer v) := if h : γ = 0 then ⊥ else {  
+  carrier := {x : v.integer | v x < γ},
+  add_mem' := fun ha hb ↦ lt_of_le_of_lt (v.map_add_le_max' _ _) (max_lt ha hb),
   zero_mem' := by
-    by_cases h : γ ≠ 0 <;> simp only [ne_eq, h, ↓reduceIte, Set.top_eq_univ, Set.mem_univ]
-    simpa [zero_lt_iff]
-  smul_mem' c a ha := by
-    by_cases h : γ ≠ 0 <;> simp only [smul_eq_mul, ne_eq, h, ↓reduceIte, Set.top_eq_univ,
-      Set.mem_univ] at *
+    show v 0 < γ
+    simpa only [map_zero, zero_lt_iff],
+  smul_mem' := fun c a ha ↦ by
     show v (c * a) < γ
     calc
       _ = v c * v a := v.map_mul' _ _
       _ ≤ 1 * v a := mul_le_mul' c.2 (le_refl _)
       _ = v a := one_mul _
       _ < γ := ha
+  }
 
-theorem Valuation.ltIdeal_eq_top {R : Type*} {Γ₀ : outParam Type*}  [Ring R]
+theorem Valuation.ltIdeal_eq_top {R : Type*} {Γ₀ : outParam Type*}  [Ring R] 
   [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀) {γ : Γ₀} (h : 1 < γ) : v.ltIdeal γ = ⊤ := sorry
 -- when gamma < 1, the ideal is whole ring
 

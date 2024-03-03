@@ -75,9 +75,7 @@ open Valued
 
 namespace DiscretelyValued
 
-instance {K : Type*} [Field K] [DiscretelyValued K]: DiscretelyValued 𝒪[K] := sorry
-
-instance {K : Type*} [Field K] [DiscretelyValued K]: DiscreteValuationRing 𝒪[K] := sorry
+instance integerDiscreteValuationRing {K : Type*} [Field K] [DiscretelyValued K]: DiscreteValuationRing 𝒪[K] := sorry
 
 
 
@@ -94,6 +92,7 @@ instance {K : Type*} [Field K] [DiscretelyValued K] : Ideal.IsMaximal ((Valued.v
 end DiscretelyValued
 
 -- `theorem: if two discrete valuations are equivalent, then they are equal`
+
 
 end DVF
 
