@@ -84,3 +84,16 @@ class CompleteValuationField (R : Type*) [Field R] extends CompleteValuationRing
 
 class CompleteDiscreteValuationField (R : Type*) [Field R] extends CompleteValuationRing R
 -/
+
+
+
+
+open Subgroup
+section group_index
+
+variable {G : Type*} [Group G] (H L K : Subgroup G)
+
+def relindex' : ℚ :=
+  (K.index : ℚ) / (H.index: ℚ)
+
+end group_index

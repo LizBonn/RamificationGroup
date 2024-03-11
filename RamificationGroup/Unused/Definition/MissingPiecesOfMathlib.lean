@@ -6,6 +6,8 @@ import Mathlib.Topology.Order.Basic
 import Mathlib.Topology.Algebra.Valuation
 import Mathlib.Algebra.Order.Hom.Monoid
 import Mathlib.Algebra.Order.Group.TypeTags
+import Mathlib.GroupTheory.Index
+
 /-!
 # Missing Pieces of Mathlib
 
@@ -113,3 +115,15 @@ notation:max " 𝓀[" v:max "] " => LocalRing.ResidueField ↥𝒪[v]
 end ValuationInteger
 
 -- `Instance of trivial group Unit being LinearOrderedCommGroupWithZero`
+
+
+
+open Subgroup
+section group_index
+
+variable {G : Type*} [Group G] (H L K : Subgroup G)
+
+def relindex' : ℕ :=
+  (H.SubgroupOf K).index
+
+end group_index
