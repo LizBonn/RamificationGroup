@@ -21,7 +21,7 @@ class ValAlgebra (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] 
 variable {K L : Type*} [Field K] [Field L] [DiscretelyValued K] [a : Algebra K L] [FiniteDimensional K L]
 
 
-instance : DiscretelyValued L := sorry 
+instance : DiscretelyValued L := sorry
 
 instance : ValAlgebra K L where
   toFun := _
