@@ -1,9 +1,11 @@
 /-
-TODO: states `lemma 3`, i.e., express a basis of `B` over `A`.
+TODO: put the two cases of together to give PowerBasis in general.
 
 # of WARNINGs : 2
 
 does `Module.finite` implies `FiniteDimensional`?
+
+elim of `∨` ?
 
 -/
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
@@ -36,8 +38,9 @@ variable [Module.Finite A B] [IsSeparable (ResidueField A) (ResidueField B)]
 
 instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := sorry
 
-open IntermediateField Polynomial
+open IntermediateField Polynomial Classical
 
+variable {A} {B}
 -- `x` : a lift of a primitive element of `k_B/k_A`
 -- WARNING: `hx` might not be a good statement
 variable {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
@@ -51,7 +54,10 @@ theorem fx_ne_0 : f.eval₂ (algebraMap A B) x ≠ 0 := sorry
 /-some possibly useful thms are listed below-/
 #check Field.powerBasisOfFiniteOfSeparable (ResidueField A) (ResidueField B)
 #check Algebra.adjoin.powerBasis'
-#check Algebra.IsIntegral.of_finite
+#check IsIntegral.of_finite
+#check Algebra.adjoin
+-- #check IsPrimitiveRoot.adjoinEquivRingOfIntegers
+-- #check IsPrimitiveRoot.integralPowerBasis
 /-
 lemma 4 states that the lifting `x` could be choose so that `f x` is a uniformizer of `B`.
 Proof:
@@ -66,13 +72,34 @@ theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : 
 /-
 The following two theorem states that `B = A[x]` if `f x` is a uniformizer;
 otherwise `B = A[x + ϖ]`.
+However, this does not imply that `B` has a finite `A`-basis.
 -/
 theorem thm_val_1 (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x} = ⊤ := sorry
 
 theorem thm_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x + ϖ} = ⊤ := sorry
 
+def equiv_val_1' (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x} ≃ₐ[A] B := sorry
 
+def equiv_val_ge_2' (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x + ϖ} ≃ₐ[A] B := sorry
 
-def PowerBasisExtDVR : PowerBasis A B := sorry
+-- how to put the above two constructions TOGETHER?
+-- def equivAdjoinExtDVR : Algebra.adjoin A {x} ≃ₐ[A] B := sorry
+
+variable (A) (B)
+
+theorem thm_val_arbi : ∃x : B, Algebra.adjoin A {x} = ⊤ := sorry
+
+-- WARNING: inst conflict
+variable [NoZeroSMulDivisors A B]
+
+#check choose_spec
+def PowerBasisExtDVR_val_1 (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : PowerBasis A B :=
+  (Algebra.adjoin.powerBasis' (IsIntegral.of_finite A x) ).map (equiv_val_1' h_fx)
+
+def PowerBasisExtDVR : PowerBasis A B := by
+  let x := choose (thm_val_arbi A B)
+  apply (Algebra.adjoin.powerBasis' (IsIntegral.of_finite A x)).map
+  have : Algebra.adjoin A {x} = ⊤ := (choose_spec (thm_val_arbi A B))
+  sorry
 
 end ExtDVR
