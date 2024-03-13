@@ -1,7 +1,8 @@
 /-
 TODO:
-1. prove `instFiniteExtResidue`.
-2. prove `exists_f_of_x`
+1. (FIRST THING!!!) complete `x_and_f` to determine the necessary conditions
+2. prove `instFiniteExtResidue`.
+3. prove `exists_f_of_x`
 
 # of WARNINGs : 3
 
@@ -95,7 +96,9 @@ theorem lemma3_weak : Algebra.adjoin A {x, ϖ} = ⊤ := by
 theorem fx_ne_0 : f.eval₂ (algebraMap A B) x ≠ 0 := by
   sorry
 
-theorem residue_primitive_of_add_uniformizer (hx : (ResidueField A)⟮residue B x⟯ = ⊤) : (ResidueField A)⟮residue B (x + ϖ)⟯ = ⊤ := sorry
+theorem residue_primitive_of_add_uniformizer (hx : (ResidueField A)⟮residue B x⟯ = ⊤) : (ResidueField A)⟮residue B (x + ϖ)⟯ = ⊤ := by
+  rw [← residue_eq_add_irreducible]
+  exact hx
 
 /-
 this is part of lemma 4:
