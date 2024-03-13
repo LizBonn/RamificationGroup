@@ -1,4 +1,4 @@
-import RamificationGroup.Definition.CompleteValuationRing
+import RamificationGroup.Unused.Definition.CompleteValuationRing
 import Mathlib.RingTheory.Valuation.Basic
 
 section

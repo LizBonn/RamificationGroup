@@ -93,7 +93,7 @@ section group_index
 
 variable {G : Type*} [Group G] (H L K : Subgroup G)
 
-def relindex' : ℚ :=
+noncomputable def relindex' : ℚ :=
   (K.index : ℚ) / (H.index: ℚ)
 
 end group_index
