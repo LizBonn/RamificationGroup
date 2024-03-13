@@ -1,7 +1,7 @@
 /-
 TODO: put the two cases of together to give PowerBasis in general.
 
-# of WARNINGs : 2
+# of WARNINGs : 3
 
 does `Module.finite` implies `FiniteDimensional`?
 
@@ -11,7 +11,7 @@ elim of `∨` ?
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import Mathlib.FieldTheory.PrimitiveElement
 import Mathlib.NumberTheory.RamificationInertia
-import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
+import RamificationGroup.Valuation.SubAlgEquiv
 
 variable (A : Type*) [CommRing A] [LocalRing A]
 variable (B : Type*) [CommRing B] [LocalRing B]
@@ -78,28 +78,19 @@ theorem thm_val_1 (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.
 
 theorem thm_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x + ϖ} = ⊤ := sorry
 
-def equiv_val_1' (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x} ≃ₐ[A] B := sorry
-
-def equiv_val_ge_2' (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x + ϖ} ≃ₐ[A] B := sorry
-
--- how to put the above two constructions TOGETHER?
--- def equivAdjoinExtDVR : Algebra.adjoin A {x} ≃ₐ[A] B := sorry
-
 variable (A) (B)
 
-theorem thm_val_arbi : ∃x : B, Algebra.adjoin A {x} = ⊤ := sorry
+theorem exists_primitive : ∃x : B, Algebra.adjoin A {x} = ⊤ := sorry
 
 -- WARNING: inst conflict
 variable [NoZeroSMulDivisors A B]
 
-#check choose_spec
-def PowerBasisExtDVR_val_1 (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : PowerBasis A B :=
-  (Algebra.adjoin.powerBasis' (IsIntegral.of_finite A x) ).map (equiv_val_1' h_fx)
+-- #check choose_spec
+-- def PowerBasisExtDVR_val_1 (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : PowerBasis A B :=
+--   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite A x) ).map (equiv_val_1' h_fx)
 
-def PowerBasisExtDVR : PowerBasis A B := by
-  let x := choose (thm_val_arbi A B)
-  apply (Algebra.adjoin.powerBasis' (IsIntegral.of_finite A x)).map
-  have : Algebra.adjoin A {x} = ⊤ := (choose_spec (thm_val_arbi A B))
-  sorry
+def PowerBasisExtDVR : PowerBasis A B :=
+  (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
+    (AlgEquiv.ofTop (choose_spec (exists_primitive _ _)))
 
 end ExtDVR
