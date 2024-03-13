@@ -67,9 +67,9 @@ def AlgEquiv.liftValuationInteger (s : L ≃ₐ[K] L) : 𝒪[vL] ≃ₐ[𝒪[vK]
 
 -- `If preserve valuation is a class, this AlgHom.liftValuationInteger should be make into a Coe instance`
 
-def AlgHom.liftValuationIntegerQuotientleIdeal (s : L →ₐ[K] L) (γ : ΓL) : 𝒪[vL]⧸(vL.leIdeal γ) →ₐ[𝒪[vK]] 𝒪[vL]⧸(vL.leIdeal γ) := sorry
+--def AlgHom.liftValuationIntegerQuotientleIdeal (s : L →ₐ[K] L) (γ : ΓL) : 𝒪[vL]⧸(vL.leIdeal γ) →ₐ[𝒪[vK]] 𝒪[vL]⧸(vL.leIdeal γ) := sorry
 
-def AlgEquiv.liftValuationIntegerQuotientleIdeal (s : L ≃ₐ[K] L) (γ : ΓL) : (𝒪[vL]⧸(vL.leIdeal γ)) ≃ₐ[𝒪[vK]] (𝒪[vL]⧸(vL.leIdeal γ)) := sorry
+--def AlgEquiv.liftValuationIntegerQuotientleIdeal (s : L ≃ₐ[K] L) (γ : ΓL) : (𝒪[vL]⧸(vL.leIdeal γ)) ≃ₐ[𝒪[vK]] (𝒪[vL]⧸(vL.leIdeal γ)) := sorry
 
 -- `LT version`
 
