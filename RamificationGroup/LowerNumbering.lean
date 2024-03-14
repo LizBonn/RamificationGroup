@@ -24,12 +24,13 @@ def lowerRamificationGroup (K L) [Field K] [Field L] [DiscretelyValued K] [vL : 
 
 notation:max " G(" L:max "/" K:max ")_[" n:max "] " => lowerRamificationGroup K L n
 
-
+/-
 -- Many properties
 -- `i <=1, = ⊤` `the filtration is complete`
 
 -- currently there is no subgroup filtration, only ideal filtration, maybe to define it is useful.
 -- `the filtration is decreasing, and seperable`
+
 variable {K L : Type*} [Field K] [Field L] [Algebra K L] (K' : IntermediateField K L)
 #check K'.isScalarTower_mid'
 #synth IsScalarTower K K' L
@@ -63,3 +64,5 @@ instance : Coe (WithTop ℤ) (WithTop ℚ) := sorry
 #synth Mul (WithTop ℚ)
 theorem index_quotient_group (s₀ : L ≃ₐ[K] L) : i[vK'/vK] (s₀.restrictNormal K')  = ((1 / e(vL/vK) :ℚ) : (WithTop ℚ)) * ∑ s in {s : L ≃ₐ[K] L | s.restrictNormal K' = s₀.restrictNormal K'}.toFinite.toFinset, i[vL/vK] s := sorry
 -- do we need to def this index finset separately?
+
+-/
