@@ -3,7 +3,7 @@ import Mathlib.Topology.Algebra.Valuation
 import Mathlib.Algebra.Order.WithZero
 import Mathlib.Algebra.Order.Group.TypeTags
 import Mathlib.FieldTheory.Galois
-import LocalClassFieldTheory
+import LocalClassFieldTheory.LocalField
 
 open DiscreteValuation
 
