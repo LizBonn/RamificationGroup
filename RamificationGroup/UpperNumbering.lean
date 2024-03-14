@@ -19,7 +19,7 @@ variable {K L : Type*} [Field K][Field L] (vK : Valuation K ℤₘ₀) (vL : Val
 --{K'' : IntermediateField K L}
 
 --lemma 4
-theorem Varphi_With_i (σ : (L ≃ₐ[K] L) ⧸ H) :(varphi vL vK' (Sup (i[vL/vK'] ((mk' H)⁻¹' {σ})))) = (i[vL/vK'] σ) - 1:= by sorry
+theorem Varphi_With_i (σ : (L ≃ₐ[K] L) ⧸ H) :(varphi vL vK' (Sup (i[vL/vK'] ((mk' H)⁻¹' {σ})))) = (i[vL/vK'] σ) - (1 : WithTop ℤ):= by sorry
 
 --lemma 5
 theorem Herbrand_Thm {u : ℝ} {v : ℝ} (h : v = varphi vL vK u) {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H]: G(vL/vK')_[v] = (G(vL/vK)_[u] ⊔ H) ⧸ H:= by sorry
