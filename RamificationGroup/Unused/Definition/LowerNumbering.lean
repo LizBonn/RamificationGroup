@@ -1,4 +1,4 @@
-import RamificationGroup.Definition.ExtensionOfValuation
+import RamificationGroup.Unused.Definition.ExtensionOfValuation
 import Mathlib.Algebra.Group.WithOne.Defs
 import Mathlib.FieldTheory.Galois
 
@@ -7,8 +7,6 @@ import Mathlib.FieldTheory.Galois
 
 -- `Mathlib.RingTheory.Ideal.QuotientOperations`
 -- def AlgHom.QuotientLift {R S₁ S₂ : Type*} [CommRing R] [CommRing S₁] [CommRing S₂] [Algebra R S₁] [Algebra R S₂] {I : Ideal R} {J₁ : Ideal S₁} {J₂ : Ideal S₂} (h₁ : I ≤ J₁.comap (algebraMap R S₁)) (h₂ : I ≤ J₂.comap (algebraMap R S₂)) : S₁⧸J₁ →ₐ[R⧸I] S₂⧸J₂ := sorry
-
-
 
 open DiscreteValuation
 

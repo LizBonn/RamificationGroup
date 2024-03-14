@@ -61,13 +61,13 @@ end ValuationTopology
 
 section OrderHom
 
-class OrderMonoidHom (A B : Type*) [Preorder A] [Preorder B] [MulOneClass A] [MulOneClass B] extends OrderHom A B, MonoidHom A B
+--class OrderMonoidHom (A B : Type*) [Preorder A] [Preorder B] [MulOneClass A] [MulOneClass B] extends OrderHom A B, MonoidHom A B
 
 infix : 50 " →*o " => OrderMonoidHom
 
 #check MonoidWithZeroHom
 
-class OrderMonoidWithZeroHom (A B : Type*) [Preorder A] [Preorder B] [MulZeroOneClass A] [MulZeroOneClass B] extends OrderHom A B, MonoidWithZeroHom A B
+--class OrderMonoidWithZeroHom (A B : Type*) [Preorder A] [Preorder B] [MulZeroOneClass A] [MulZeroOneClass B] extends OrderHom A B, MonoidWithZeroHom A B
 
 variable {A B : Type*} [LinearOrderedCommMonoidWithZero A] [LinearOrderedCommMonoidWithZero B]
 #check OrderMonoidWithZeroHom A B
@@ -84,3 +84,16 @@ class CompleteValuationField (R : Type*) [Field R] extends CompleteValuationRing
 
 class CompleteDiscreteValuationField (R : Type*) [Field R] extends CompleteValuationRing R
 -/
+
+
+
+
+open Subgroup
+section
+
+variable {G : Type*} [Group G] (H L K : Subgroup G)
+
+noncomputable def relindex' : ℚ :=
+  (K.index : ℚ) / (H.index: ℚ)
+
+end
