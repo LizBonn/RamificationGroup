@@ -49,12 +49,14 @@ instance integerValuationRing (K : Type*) [Field K] {Γ : outParam Type*} [Linea
       ext
       field_simp [triv.1]
       ring
+      sorry
     · push_neg at h
       use ⟨c⁻¹, le_of_lt ((Valuation.one_lt_val_iff _ hc).mp h)⟩
       right
       ext
       field_simp [triv.2]
       ring
+      sorry
 
 abbrev maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
 
