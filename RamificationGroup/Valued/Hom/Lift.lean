@@ -12,11 +12,11 @@ variable {K L L' : Type*} [Field K] [Field L] [Field L'] {ΓK ΓL ΓL': Type*} [
 
 def ValAlgHom.liftInteger  (s : L →ₐv[K] L') : 𝒪[L] →ₐv[𝒪[K]] 𝒪[L']  := sorry
 
--- def ValAlgIso.liftInteger (s : L ≃ₐv[K] L) : 𝒪[L] ≃ₐv[𝒪[K]] 𝒪[L]  := sorry
+def ValAlgEquiv.liftInteger (s : L ≃ₐv[K] L') : 𝒪[L] ≃ₐv[𝒪[K]] 𝒪[L']  := sorry
 
-instance : Coe (ValAlgHom K L L') (ValAlgHom 𝒪[K] 𝒪[L] 𝒪[L']) := ⟨ValAlgHom.liftInteger⟩
+-- instance : Coe (ValAlgHom K L L') (ValAlgHom 𝒪[K] 𝒪[L] 𝒪[L']) := ⟨ValAlgHom.liftInteger⟩
 
--- instance : Coe (ValAlgIso K L L') (ValAlgIso 𝒪[K] 𝒪[L] 𝒪[L']) := ⟨ValAlgIso.liftInteger⟩
+-- instance : Coe (ValAlgEquiv K L L') (ValAlgEquiv 𝒪[K] 𝒪[L] 𝒪[L']) := ⟨ValAlgEquiv.liftInteger⟩
 
 
 

@@ -36,5 +36,4 @@ scoped instance : CoeTC ℤ ℤₘ₀ where
 
 -- lots of simp lemmas, related to ofInt, try to copy from `Mathlib.Algebra.Order.Monoid.WithZero.Defs` (WithZero) and `Mathlib.Algebra.Group.TypeTags` (Multiplicative)
 
-
 end DiscreteValuation
