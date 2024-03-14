@@ -4,6 +4,10 @@ import Mathlib.FieldTheory.Galois
 
 open DiscreteValuation Valued
 
+namespace ValAlgebra
+
+end ValAlgebra
+
 variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [Valued R ΓR] [Valued S ΓS]
 
 def ValAlgEquiv.lowerIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
