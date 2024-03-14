@@ -5,8 +5,19 @@ import Mathlib.FieldTheory.Galois
 open DiscreteValuation Valued
 
 namespace ValAlgebra
+variable (R S : Type*) {ΓR ΓS : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [vR : Valued R ΓR] [vS : Valued S ΓS] [ValAlgebra R S]
+
+def lowerRamificationGroup (γ : ΓS) : Subgroup (S ≃ₐv[R] S) where
+  carrier := if γ = 0 then ⊤ else {s : (S ≃ₐv[R] S) | ∀ x : vS.v.integer, vS.v (s x - x) ≤ γ⁻¹}
+  mul_mem' := sorry
+  one_mem' := sorry
+  inv_mem' := sorry
 
 end ValAlgebra
+
+namespace LocalField
+
+end LocalField
 
 variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [Valued R ΓR] [Valued S ΓS]
 
