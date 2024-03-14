@@ -57,5 +57,12 @@ notation:25 A " ≃ₐv[" R "] " B => ValAlgEquiv R A B
 
 -- `copy lemmas in MonoidWithZeroHom` or `OrderRingHom`
 -- -- coercions
+
+variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
+#synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
+instance : FunLike (ValAlgEquiv R A B) A B where
+  coe f := f.toFun
+  coe_injective' := sorry
+
 -- -- structures on ValRingHom/Iso
 instance {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B] : Group (ValAlgEquiv R A B) := sorry

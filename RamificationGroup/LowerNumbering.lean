@@ -1,15 +1,26 @@
 import RamificationGroup.Valued.RamificationIndex
+import RamificationGroup.Valued.Hom.lift
 import Mathlib.FieldTheory.Galois
 
 open DiscreteValuation Valued
 
+variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [Valued R ΓR] [Valued S ΓS]
+
 def ValAlgEquiv.lowerIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
   -- [FiniteDimensional K L] -- is this really needed?
   (s : L ≃ₐv[K] L) : WithTop ℕ := sorry
+  -- have require isup to work, Nm0 works but Zm0 failes, restrict to local field cases for now
 
-def lowerRamificationGroup (K L) [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
+def lowerRamificationGroup (K L) [Field K] [Field L] [DiscretelyValued K] [vL : DiscretelyValued L] [ValAlgebra K L]
   -- [FiniteDimensional K L] -- is this really needed?
-  (i : ℤ) : Subgroup (L ≃ₐv[K] L) := sorry
+  (i : ℤ) : Subgroup (L ≃ₐv[K] L) where
+    carrier := {s | ∀ x : 𝒪[L], vL.v ((s.liftInteger x) - x) ≤ (- i : ℤ) }
+    mul_mem' := sorry
+    one_mem' := by
+      simp
+      intro a h
+      sorry
+    inv_mem' := sorry
 
 notation:max " G(" L:max "/" K:max ")_[" n:max "] " => lowerRamificationGroup K L n
 
