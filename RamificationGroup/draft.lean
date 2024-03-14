@@ -13,6 +13,8 @@ import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.Charpoly.Basic
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Algebra.Algebra.Basic
+import Mathlib.FieldTheory.Galois
+import RamificationGroup.Unused.Definition.LowerNumbering
 
 section
 
@@ -33,3 +35,10 @@ theorem Prop18 {x : B} (h0 : Irreducible x) (h1 : ∀ a : A, (addVal A a) * (fin
 (ker (aeval x)) = (Ideal.span {LinearMap.charpoly (lsmul A K L x)}) := by sorry
 
 end
+
+open QuotientGroup IntermediateField
+variable {K L : Type*} [Field K] [Field L] [Algebra K L]
+variable {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H]
+variable {K' : fixedField H} (vK : Valuation K ℤₘ₀) (vL : Valuation L ℤₘ₀)
+example (t : (L ≃ₐ[K] L) ⧸ H) : ((mk' H)⁻¹' {t}) := by sorry
+theorem (t : (L ≃ₐ[K] L) ⧸ H)
