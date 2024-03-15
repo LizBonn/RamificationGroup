@@ -18,26 +18,27 @@ import Mathlib.FieldTheory.PrimitiveElement
 import Mathlib.NumberTheory.RamificationInertia
 import RamificationGroup.Valuation.SubAlgEquiv
 import RamificationGroup.Valuation.PolyTaylor
+import LocalClassFieldTheory.DiscreteValuationRing.Basic
 
-variable (A : Type*) [CommRing A] [LocalRing A]
-variable (B : Type*) [CommRing B] [LocalRing B]
+variable {A : Type*} [CommRing A] [LocalRing A]
+variable {B : Type*} [CommRing B] [LocalRing B]
 variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
 
 open LocalRing Classical
 
-noncomputable section
+noncomputable
 
 section local_ring
 namespace LocalRing
 
+variable (A) (B) in
 def ramificationIdx : ℕ := Ideal.ramificationIdx (algebraMap A B) (maximalIdeal A) (maximalIdeal B)
 
+variable (A) (B) in
 def inertiaDeg : ℕ := Ideal.inertiaDeg (algebraMap A B) (maximalIdeal A) (maximalIdeal B)
 
 /- WARNING : `Smul` of this `Algebra` might be incompatible -/
 instance instAlgebraResidue: Algebra (ResidueField A) (ResidueField B) := (ResidueField.map (algebraMap A B)).toAlgebra
-
-variable {A} {B}
 
 theorem algebraMap_residue_compat : (residue B).comp (algebraMap A B) = (algebraMap (ResidueField A) (ResidueField B)).comp (residue A) := LocalRing.ResidueField.map_comp_residue (algebraMap A B)
 
@@ -53,9 +54,23 @@ theorem residue_eq_add_irreducible {x ϖ : A} (h : Irreducible ϖ) : residue A x
 end LocalRing
 end local_ring
 
-namespace ExtDVR
-
 variable [IsDomain A] [DiscreteValuationRing A] [IsDomain B] [DiscreteValuationRing B]
+
+section dvr
+
+namespace DiscreteValuationRing
+
+-- BAD NAME, as it doesn't involve `addval`
+theorem irreducible_iff_val_eq_one {ϖ : A} : Irreducible ϖ ↔ (addVal A) ϖ = 1 := by
+  constructor
+  · exact addVal_uniformizer
+  · sorry
+
+end DiscreteValuationRing
+
+end dvr
+
+namespace ExtDVR
 
 variable [Module.Finite A B] [IsSeparable (ResidueField A) (ResidueField B)]
 
@@ -63,6 +78,7 @@ instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField
 
 open IntermediateField Polynomial Classical
 
+variable (A) (B) in
 theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
   let x := (Field.exists_primitive_element (ResidueField A) (ResidueField B)).choose
   use (Ideal.Quotient.mk_surjective x).choose
@@ -72,11 +88,10 @@ theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
 
 #check IsIntegral.of_finite
 #check RingHom.IsIntegralElem (algebraMap A B)
+variable (A) (B) in
 theorem exists_f_of_x (x : B) : ∃f : A[X], Monic f ∧ f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
   let f0 := minpoly (ResidueField A) (residue B x)
   sorry
-
-variable {A} {B}
 
 section x_and_f
 

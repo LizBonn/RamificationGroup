@@ -16,10 +16,6 @@ variable (f : A[X])
 variable {B : Type*} [CommSemiring B]
 variable (s : A →+* B)
 
-section map_deriv
-
-end map_deriv
-
 section taylor
 
 theorem taylor_order_one (h : A) :
