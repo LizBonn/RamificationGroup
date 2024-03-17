@@ -4,11 +4,9 @@ TODO:
 2. prove `instFiniteExtResidue`
 3. seek a better condition for `f`, then prove `exists_f_of_x`
 
-# of WARNINGs : 3
+# of WARNINGs : 2
 
 does `Module.finite` implies `FiniteDimensional`?
-
-elim of `∨` ?
 
 -/
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
@@ -122,6 +120,7 @@ theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
 variable (A) (B) in
 theorem exists_f_of_x (x : B) : ∃f : A[X], Monic f ∧ f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
   let f0 := minpoly (ResidueField A) (residue B x)
+  -- use surjectivity to choose a polynomial `f`
   sorry
 
 section x_and_f
@@ -141,8 +140,6 @@ variable {ϖ : B} (hϖ : Irreducible ϖ)
 -- #check IsPrimitiveRoot.adjoinEquivRingOfIntegers
 -- #check IsPrimitiveRoot.integralPowerBasis
 
--- Don't know if the following is true.
-theorem f_irreducible : Irreducible f := sorry
 /-
 lemma 3 states that `xⁱϖʲ`'s with finite many `i j`'s form a `A`-basis of `B`.
 The next theorem is an alternate and weaker version of lemma 3,
@@ -174,11 +171,11 @@ theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : 
   apply irreducible_of_irreducible_add_addVal_ge_two hϖ
   apply (irreducible_isUnit_mul _).mpr hϖ
   apply LocalRing.is_unit_iff_residue_ne_zero.mpr
-  rw [hom_eval₂]
-  -- need to convert `f` to `k_B[X]`?
+  rw [hom_eval₂, algebraMap_residue_compat, ← eval₂_map, ← derivative_map]
   apply Separable.eval₂_derivative_ne_zero
-  · sorry
-  · sorry
+  · rw [h_red]
+    apply IsSeparable.separable
+  · rw [← aeval_def, h_red, minpoly.aeval]
 
 end x_and_f
 
