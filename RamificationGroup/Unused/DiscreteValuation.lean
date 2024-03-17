@@ -30,8 +30,9 @@ end examples
 def ofInt : ℤ →o ℤₘ₀ where
   toFun := .coe
   monotone' _ _ := WithZero.coe_le_coe.mpr
-
-scoped instance : CoeTC ℤ ℤₘ₀ where
+example : ℤₘ₀ := .coe $ .ofAdd $ -3
+#check (.coe 1 : ℤₘ₀)
+scoped instance : Coe ℤ ℤₘ₀ where
   coe := ofInt
 
 -- lots of simp lemmas, related to ofInt, try to copy from `Mathlib.Algebra.Order.Monoid.WithZero.Defs` (WithZero) and `Mathlib.Algebra.Group.TypeTags` (Multiplicative)

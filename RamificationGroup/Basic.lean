@@ -47,7 +47,7 @@ variable (K' : IntermediateField K L) [IsGalois K L]
 
 #synth IsScalarTower K K' L
 
-instance intermediateField.valued : Valued K' ℤₘ₀ := sorry
+instance intermediateField.valued : Valued K' ℤₘ₀ := sorry -- should be scalar tower .valued?
 instance : IsDiscrete (intermediateField.valued K').v := sorry
 #synth ValAlgebra K K'
 #synth ValAlgebra K' L
