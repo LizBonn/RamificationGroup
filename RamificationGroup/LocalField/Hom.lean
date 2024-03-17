@@ -20,7 +20,7 @@ variable [Valued K ΓK] [CompleteSpace K] [Valued L ΓL] [ValAlgebra K L]
 def toValAlgEquiv : (L ≃ₐ[K] L) ≃* (L ≃ₐv[K] L) where
   toFun s := {
     toFun := s.toFun
-    invFun := 
+    invFun := _
     left_inv := _
     right_inv := _
     map_mul' := _

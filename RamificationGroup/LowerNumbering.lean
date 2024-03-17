@@ -2,7 +2,7 @@ import RamificationGroup.Valued.RamificationIndex
 import RamificationGroup.Valued.Hom.lift
 import Mathlib.FieldTheory.Galois
 
-open DiscreteValuation Valued
+open DiscreteValuation Valued Valuation
 
 namespace ValAlgebra
 variable (R S : Type*) {ΓR ΓS : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [vR : Valued R ΓR] [vS : Valued S ΓS] [ValAlgebra R S]
@@ -21,12 +21,12 @@ end LocalField
 
 variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [Valued R ΓR] [Valued S ΓS]
 
-def ValAlgEquiv.lowerIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
+def ValAlgEquiv.lowerIndex {K L} [Field K] [Field L] [vK : Valued K  ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [ValAlgebra K L]
   -- [FiniteDimensional K L] -- is this really needed?
   (s : L ≃ₐv[K] L) : WithTop ℕ := sorry
   -- have require isup to work, Nm0 works but Zm0 failes, restrict to local field cases for now
 
-def lowerRamificationGroup (K L) [Field K] [Field L] [DiscretelyValued K] [vL : DiscretelyValued L] [ValAlgebra K L]
+def lowerRamificationGroup (K L) [Field K] [Field L] [vK : Valued K  ℤₘ₀] [IsDiscrete vK.v] [vL : DiscretelyValued L] [ValAlgebra K L]
   -- [FiniteDimensional K L] -- is this really needed?
   (i : ℤ) : Subgroup (L ≃ₐv[K] L) where
     carrier := {s | ∀ x : 𝒪[L], vL.v ((s.liftInteger x) - x) ≤ (- i : ℤ) }
@@ -51,7 +51,7 @@ variable {K L : Type*} [Field K] [Field L] [Algebra K L] (K' : IntermediateField
 --#synth IsScalarTower K K' L
 --instance : IsScalarTower K K' L := K'.isScalarTower_mid'
 
-variable {K L : Type*} [Field K] [Field L]  [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L] (K' : IntermediateField K L) [IsGalois K L] [DiscretelyValued K'] [FiniteDimensional K L] --some more condition
+variable {K L : Type*} [Field K] [Field L]  [vK : Valued K  ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [ValAlgebra K L] (K' : IntermediateField K L) [IsGalois K L] [DiscretelyValued K'] [FiniteDimensional K L] --some more condition
 
 --#synth IsScalarTower K K' L
 

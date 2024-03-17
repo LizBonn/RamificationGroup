@@ -34,6 +34,7 @@ scoped notation:max " 𝒪[" K:max "] " => Valued.integer K
 instance (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vK : Valued K Γ] : Valued 𝒪[K] Γ := Valued.mk' (vK.v.comap (algebraMap 𝒪[K] K))
 
 -- Is this instance OK? Is it possible for K has many Valued instance for different Γ?
+-- `already in Maria's repo`
 instance integerValuationRing (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vK : Valued K Γ] : ValuationRing 𝒪[K] where
   cond' a b := by
     by_cases triv : a = 0 ∨ b = 0

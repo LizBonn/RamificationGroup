@@ -12,7 +12,7 @@ def DiscretelyValued.extensionFiniteDimension {K} (L) [Field K] [Field L] [Discr
 -- `key theorem: If L/K is a finite field extension + more conditions, then any 2 extension of valuations from K on L are equivalent`; Discrete Valuations are equal
 theorem Valuation.isEquiv_of_finiteDimensional {K L : Type*} [Field K] [Field L] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] [vK : DiscretelyValued K] [vL : Valued L Γ] [ValAlgebra K L] [FiniteDimensional K L]
  : vL.v.IsEquiv (vK.extensionFiniteDimension L).v := sorry
-
+-- DiscreteValuation.Extension.integralClosure_eq_integer see Maria
 
 variable {K L : Type*} [Field K] [Field L] [DiscretelyValued K] [a : Algebra K L] [FiniteDimensional K L]
 
