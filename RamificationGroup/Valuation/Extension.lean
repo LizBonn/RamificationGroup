@@ -1,12 +1,10 @@
 /-
 TODO:
 1. (FIRST THING!!!) complete `x_and_f` to determine the necessary conditions
-2. prove `instFiniteExtResidue`.
-3. prove `exists_f_of_x`
+2. prove `instFiniteExtResidue`
+3. seek a better condition for `f`, then prove `exists_f_of_x`
 
 # of WARNINGs : 3
-
-`isUnit_iff_ne_zero` is a bad name for me.
 
 does `Module.finite` implies `FiniteDimensional`?
 
@@ -51,6 +49,10 @@ theorem residue_eq_add_irreducible {x ϖ : A} (h : Irreducible ϖ) : residue A x
   rw [RingHom.map_add, self_eq_add_right, residue_irreducible_eq_zero]
   exact h
 
+theorem is_unit_of_unit_add_nonunit {x y : A} (hx : IsUnit x) (hy : y ∈ nonunits A) : IsUnit (x + y) := by
+  rw [eq_add_neg_iff_add_eq.mpr (show x + y = x + y by rfl)] at hx
+  exact (isUnit_or_isUnit_of_isUnit_add hx).resolve_right fun h ↦ hy ((IsUnit.neg_iff y).mp h)
+
 end LocalRing
 end local_ring
 
@@ -60,11 +62,40 @@ section dvr
 
 namespace DiscreteValuationRing
 
--- BAD NAME, as it doesn't involve `addval`
-theorem irreducible_iff_val_eq_one {ϖ : A} : Irreducible ϖ ↔ (addVal A) ϖ = 1 := by
-  constructor
-  · exact addVal_uniformizer
-  · sorry
+variable {ϖ x : A} (hϖ : Irreducible ϖ)
+
+theorem unit_mul_irreducible_of_irreducible (hx : Irreducible x) : ∃u : A, IsUnit u ∧ x = u * ϖ := by
+  obtain ⟨u, hu⟩ : ∃u : A, x = u * ϖ := by
+    refine exists_eq_mul_left_of_dvd (addVal_le_iff_dvd.mp ?_)
+    apply le_of_eq
+    rw [addVal_uniformizer hx, addVal_uniformizer hϖ]
+  have : IsUnit u := Or.resolve_right (Irreducible.isUnit_or_isUnit hx hu) hϖ.not_unit
+  use u
+
+theorem mul_irreducible_of_not_unit (h : ¬IsUnit x) : ∃y : A, x = y * ϖ := by
+  obtain ⟨y, hy⟩ : ∃y : A, y * ϖ = x := by
+    apply Ideal.mem_span_singleton'.mp
+    rw [← (irreducible_iff_uniformizer _).mp hϖ, mem_maximalIdeal]
+    assumption
+  use y
+  apply Eq.symm hy
+
+theorem mul_irreducible_square_of_not_unit_of_not_irreducible (h1 : ¬Irreducible x) (h2 : ¬IsUnit x) : ∃y : A, x = y * ϖ ^ 2 := by
+  obtain ⟨y, hy⟩ := mul_irreducible_of_not_unit hϖ h2
+  have : ¬IsUnit y := fun h ↦
+    h1 (Eq.mpr (id (congrArg (fun _a ↦ Irreducible _a) hy)) ((irreducible_isUnit_mul h).mpr hϖ))
+  obtain ⟨z, hz⟩ := mul_irreducible_of_not_unit hϖ this
+  use z
+  rw [hy, hz]
+  ring
+
+theorem irreducible_of_irreducible_add_addVal_ge_two (hx : Irreducible x) {y : A} : Irreducible (x + y * ϖ ^ 2) := by
+  rcases unit_mul_irreducible_of_irreducible hϖ hx with ⟨u, hu, hxu⟩
+  rw [hxu, pow_two, ← mul_assoc, ← add_mul]
+  apply (irreducible_isUnit_mul _).mpr hϖ
+  apply is_unit_of_unit_add_nonunit hu
+  simp only [mem_nonunits_iff, IsUnit.mul_iff, not_and]
+  exact fun _ ↦ Irreducible.not_unit hϖ
 
 end DiscreteValuationRing
 
@@ -76,7 +107,7 @@ variable [Module.Finite A B] [IsSeparable (ResidueField A) (ResidueField B)]
 
 instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := sorry
 
-open IntermediateField Polynomial Classical
+open IntermediateField Polynomial Classical DiscreteValuationRing
 
 variable (A) (B) in
 theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
@@ -110,6 +141,8 @@ variable {ϖ : B} (hϖ : Irreducible ϖ)
 -- #check IsPrimitiveRoot.adjoinEquivRingOfIntegers
 -- #check IsPrimitiveRoot.integralPowerBasis
 
+-- Don't know if the following is true.
+theorem f_irreducible : Irreducible f := sorry
 /-
 lemma 3 states that `xⁱϖʲ`'s with finite many `i j`'s form a `A`-basis of `B`.
 The next theorem is an alternate and weaker version of lemma 3,
@@ -135,20 +168,17 @@ this is part of lemma 4:
 If `f x` has valuation ≥ 2, then `f (x + ϖ)` is a uniformizer.
 -/
 theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Irreducible (f.eval₂ (algebraMap A B) (x + ϖ)) := by
-  rcases taylor_order_one_apply₂ f (algebraMap A B) x ϖ with ⟨b, exp⟩
-  have : IsUnit ((derivative f).eval₂ (algebraMap A B) x) := by
-    apply LocalRing.is_unit_iff_residue_ne_zero.mpr
-    sorry
-  sorry
-
-/-
-The following two theorem states that `B = A[x]` if `f x` is a uniformizer;
-otherwise `B = A[x + ϖ]`.
-However, this does not imply that `B` has a finite `A`-basis.
-Should use `lemma3_weak'` to prove.
--/
--- theorem thm_val_1' (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x} = ⊤ := sorry
--- theorem thm_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Algebra.adjoin A {x + ϖ} = ⊤ := sorry
+  obtain ⟨b, hb⟩ := taylor_order_one_apply₂ f (algebraMap A B) x ϖ
+  obtain ⟨y, hy⟩ := mul_irreducible_square_of_not_unit_of_not_irreducible hϖ h_fx (fx_not_unit h_red)
+  rw [hb, hy, mul_comm ϖ, ← mul_comm b, add_comm, ← add_assoc, ← add_mul, add_comm]
+  apply irreducible_of_irreducible_add_addVal_ge_two hϖ
+  apply (irreducible_isUnit_mul _).mpr hϖ
+  apply LocalRing.is_unit_iff_residue_ne_zero.mpr
+  rw [hom_eval₂]
+  -- need to convert `f` to `k_B[X]`?
+  apply Separable.eval₂_derivative_ne_zero
+  · sorry
+  · sorry
 
 end x_and_f
 
@@ -163,10 +193,12 @@ variable (A) (B)
 
 theorem exists_primitive : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
   rcases exists_x A B with ⟨x, hx⟩
-  rcases exists_f_of_x A B x with ⟨f, _, _⟩
+  rcases exists_f_of_x A B x with ⟨f, h_monic, h_red⟩
   exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
     then ⟨x, (thm_val_1 hx h)⟩
-    else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose, (thm_val_1 (residue_primitive_of_add_uniformizer hx) (lemma4_val_ge_2 h))⟩
+    else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,
+      (thm_val_1 (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
+        (lemma4_val_ge_2 h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
 /-
 WARNING: possible inst conflict
@@ -174,9 +206,9 @@ move higher?
 -/
 variable [NoZeroSMulDivisors A B]
 
-def PowerBasisExtDVR : PowerBasis A B :=
+noncomputable def PowerBasisExtDVR : PowerBasis A B :=
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
-    (AlgEquiv.ofTop (choose_spec (exists_primitive _ _)))
+    (AlgEquiv.ofTop (exists_primitive _ _).choose_spec)
 
 
 end ExtDVR
