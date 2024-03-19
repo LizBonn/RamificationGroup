@@ -215,7 +215,7 @@ instance : EquivLike (A ≃ₐv[R] B) A B where
     exact h
 
 -- -- structures on ValRingIso
-instance {A : Type*} [Ring A] {ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓA] [Valued A ΓA]: Group (A →+*v A) where
+instance {A : Type*} [Ring A] {ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓA] [Valued A ΓA]: Group (A ≃+*v A) where
   mul := sorry
   mul_assoc := sorry
   one := sorry
@@ -224,7 +224,7 @@ instance {A : Type*} [Ring A] {ΓA : outParam Type*} [LinearOrderedCommGroupWith
   inv := sorry
   mul_left_inv := sorry
 
-instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : Group (A →ₐv[R] A) where
+instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
   mul := sorry
   mul_assoc := sorry
   one := sorry
