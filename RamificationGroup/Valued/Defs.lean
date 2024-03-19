@@ -16,7 +16,7 @@ namespace Valued
 
 instance preorder {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := Preorder.lift Valued.v
 
-/-- An abbrevation for `Valuation.valuationSubring` of a `Valued` instance, it serves for notation `𝒪[K]` -/
+/-- An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]` -/
 @[reducible]
 def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : ValuationSubring K := (Valued.v).valuationSubring
 
@@ -28,7 +28,7 @@ variable (R K : Type*) [Ring R] [Field K] {Γ : outParam Type*} [LinearOrderedCo
 instance integer.valued: Valued vR.v.integer Γ := Valued.mk' (vR.v.comap vR.v.integer.subtype)
 
 -- need to add this, lean cannot infer this
--- `This will be fixed if Valuation.valuationSubring is with @[reducible] tag`, for now, every instance need to be written again for `𝒪[K]`
+-- `This will be auto infered once Valuation.valuationSubring is with @[reducible] tag`, for now, every instance need to be written again for `𝒪[K]`, in this file and Hom.lift file and more. This is also the reason that valuationSubring should with tag @[reducible]. Add this tag to `Valuation.valuationSubring` when impoet to mathlib!
 instance valuationSubring.valued: Valued 𝒪[K] Γ := inferInstanceAs (Valued vK.v.integer Γ)
 
 #synth Valued 𝒪[K] Γ
@@ -66,5 +66,8 @@ scoped notation:max " 𝓀[" K:max "] " => ResidueField K
 instance valuationSubring.coeResidueField {K : Type*} {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Field K] [Valued K Γ] : Coe 𝒪[K] 𝓀[K] where
   coe := LocalRing.residue 𝒪[K]
 -/
+
+-- TODO? : Should residue field be equipped with trivial valuation?
+-- A generalization of this could be : after a valued ring quotient a "upper-closed" value ideal, it is equipped with a quotient valuation
 
 end Valued
