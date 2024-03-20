@@ -53,16 +53,23 @@ theorem Varphi_eq_Sum {m : ℤ} {u : ℝ} (h1 : m > 1) (h2 : m ≤ u ∧ u ≤ m
 theorem psi_zero_eq_zero : psi vK vL 0 = 0 := by
   unfold psi
   simp only [invFun]
-  rcases ⟨h0, h1⟩
+
 
 
 theorem varphi_bij : Function.Bijective (varphi vK vL) := by
   constructor
   unfold varphi
-  apply?
+  intro a1 a2 ha
+  sorry
+  unfold varphi
+  intro b
+  sorry
 
 
-theorem psi_bij : Function.Bijective (psi vK vL) := by sorry
+theorem psi_bij : Function.Bijective (psi vK vL) := by
+  constructor
+  sorry
+  exact invFun_surjective
 
 --lemma 3
 theorem Varphi_eq_Sum_Inf (u : ℝ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in G(vL/vK)_[(Int.ceil u)] , min (u + 1) (i[vL/vK] x))- 1 := by sorry
