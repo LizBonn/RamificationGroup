@@ -28,7 +28,7 @@ theorem varphi_zero_eq_zero : varphi vK vL 0 = 0 := by
   unfold varphi
   simp
 
-theorem varphi_none_eq_none : varphi vK vL -1 = -1 := by
+theorem varphi_negone_eq_negone : varphi vK vL -1 = -1 := by
   sorry
 
 
@@ -69,7 +69,7 @@ theorem varphi_bij : Function.Bijective (varphi vK vL) := by
 theorem psi_bij : Function.Bijective (psi vK vL) := by
   constructor
   sorry
-  exact invFun_surjective
+  apply invFun_surjective
 
 --lemma 3
 theorem Varphi_eq_Sum_Inf (u : ℝ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in G(vL/vK)_[(Int.ceil u)] , min (u + 1) (i[vL/vK] x))- 1 := by sorry
