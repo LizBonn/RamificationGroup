@@ -3,40 +3,46 @@ import Mathlib.FieldTheory.Galois
 
 open DiscreteValuation Valued Valuation
 
-namespace ValAlgebra
-variable (R S : Type*) {ΓR ΓS : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [vR : Valued R ΓR] [vS : Valued S ΓS] [ValAlgebra R S]
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
-def lowerRamificationGroup (γ : ΓS) : Subgroup (S ≃ₐv[R] S) where
-  carrier := if γ = 0 then ⊤ else {s : (S ≃ₐv[R] S) | ∀ x : vS.v.integer, vS.v (s x - x) ≤ γ⁻¹}
-  mul_mem' := sorry
-  one_mem' := sorry
-  inv_mem' := sorry
-
-end ValAlgebra
-
-namespace LocalField
-
-end LocalField
-
-variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS] [Valued R ΓR] [Valued S ΓS]
-
-def ValAlgEquiv.lowerIndex {K L} [Field K] [Field L] [vK : Valued K  ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [ValAlgebra K L]
-  -- [FiniteDimensional K L] -- is this really needed?
-  (s : L ≃ₐv[K] L) : WithTop ℕ := sorry
-  -- have require isup to work, Nm0 works but Zm0 failes, restrict to local field cases for now
-
-def lowerRamificationGroup (K L) [Field K] [Field L] [vK : Valued K  ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [ValAlgebra K L]
-  -- [FiniteDimensional K L] -- is this really needed?
-  (i : ℤ) : Subgroup (L ≃ₐv[K] L) where
-    carrier := {s | ∀ x : 𝒪[L], vL.v ((s.liftInteger x) - x) ≤ (.coe $ .ofAdd (- i)) }
+def lowerRamificationGroup (i : ℤ) : (Subgroup (S ≃ₐv[R] S)) where
+    carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
     mul_mem' := sorry
-    one_mem' := by
-      simp
-      intro a h
-      sorry
+    one_mem' := sorry
     inv_mem' := sorry
 
--- notation:max " G(" L:max "/" K:max ")_[" n:max "] " => lowerRamificationGroup K L n
+theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := sorry
+
+-- -- Is such a bundled version better? OrderDual can be add at either source or target.
+-- def lowerRamificationGroup' : OrderHom ℤᵒᵈ (Subgroup (S ≃ₐv[R] S)) where
+--   toFun i := {
+--     carrier := {s | ∀ x : vS.v.integer, vS.v (s x - x) ≤ .coe (.ofAdd (- OrderDual.ofDual i - 1)) }
+--     mul_mem' := sorry
+--     one_mem' := sorry
+--     inv_mem' := sorry
+--   }
+--   monotone' := sorry
+
+-- this should be put into a suitable place
+instance {α} [LinearOrder α]: ConditionallyCompleteLinearOrder (WithTop α) := sorry
+
+-- this should be put into a suitable place, and a better way to deal with
+instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := sorry
+
+theorem ValAlgEquiv.exist_val_sub_id_pos {s : S ≃ₐv[R] S} (h : s ≠ .refl) : ∃ (x : vS.v.integer), 0 < (Valued.v (s.liftInteger x - x)) := sorry
+
+theorem ValAlgEquiv.iSup_val_sub_id_ne_zero (s : S ≃ₐv[R] S) : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) ≠ 0 := sorry
+
+open Classical
+noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ := if s = .refl then ⊤ else (- Multiplicative.toAdd (WithZero.unzero s.iSup_val_sub_id_ne_zero)).toNat
+
+scoped [DiscreteValuation] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
+
+scoped [DiscreteValuation] notation:max " i_[" S:max "/" R:max "]" => ValAlgEquiv.lowerIndex R S
+
+variable (n : ℤ) (s : S ≃ₐv[R] S)
+#check G(S/R)_[n]
+#check i_[S/R] s
 
 /-
 -- Many properties

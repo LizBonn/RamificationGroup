@@ -1,6 +1,6 @@
 import RamificationGroup.Valued.Defs
 
-open DiscreteValuation
+open DiscreteValuation Valuation
 
 section
 
@@ -45,6 +45,20 @@ def ValRingEquiv.mk' (f : R ≃+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R ≃+
 -- `copy lemmas in OrderRingHom`
 -- `id, comp`
 -- `OrderRingIso.symm`
+
+protected def ValRingHom.id : (R →+*v R) where
+  toOrderRingHom := .id R
+  continuous_toFun := continuous_id
+  val_isEquiv_comap := IsEquiv.refl
+
+@[refl]
+protected def ValRingEquiv.refl : (R ≃+*v R) where
+  toOrderRingIso := .refl R
+  continuous_toFun := continuous_id
+  continuous_invFun := continuous_id
+  val_isEquiv_comap := IsEquiv.refl
+
+
 attribute [coe] ValRingHom.toOrderRingHom
 
 /- @[coe]
@@ -186,7 +200,7 @@ variable {α β} [OrderedRing α] [OrderedRing β] (f : α ≃+*o β)
 
 end coercion
 
-variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
 
 #synth Algebra R A
 #synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
@@ -213,6 +227,20 @@ instance : EquivLike (A ≃ₐv[R] B) A B where
     congr
     apply DFunLike.coe_injective'
     exact h
+
+protected def ValAlgHom.id : (A →ₐv[R] A) where
+  toOrderRingHom := .id A
+  continuous_toFun := continuous_id
+  val_isEquiv_comap := IsEquiv.refl
+  commutes' _ := rfl
+
+@[refl]
+protected def ValAlgEquiv.refl : (A ≃ₐv[R] A) where
+  toOrderRingIso := .refl A
+  continuous_toFun := continuous_id
+  continuous_invFun := continuous_id
+  val_isEquiv_comap := IsEquiv.refl
+  commutes' _ := rfl
 
 -- -- structures on ValRingIso
 instance {A : Type*} [Ring A] {ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓA] [Valued A ΓA]: Group (A ≃+*v A) where

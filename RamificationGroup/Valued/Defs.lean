@@ -22,9 +22,10 @@ def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedC
 
 scoped notation:max " 𝒪[" K:max "] " => Valued.valuationSubring K
 
+
 variable (R K : Type*) [Ring R] [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vR : Valued R Γ] [vK : Valued K Γ]
 
--- is this instance OK?
+-- is this instance OK? or is it needed? If needed add simp lemmas saying `v (s.liftInteger x) = v (s x.val) `
 instance integer.valued: Valued vR.v.integer Γ := Valued.mk' (vR.v.comap vR.v.integer.subtype)
 
 -- need to add this, lean cannot infer this
@@ -35,6 +36,7 @@ instance valuationSubring.valued: Valued 𝒪[K] Γ := inferInstanceAs (Valued v
 #synth LocalRing 𝒪[K]
 #synth Algebra 𝒪[K] K
 
+
 /- -- For `Valued.liftInteger`
 theorem integer_valuation_eq : (Valued.integer.valued R).v = (vR.v.comap vR.v.integer.subtype) := rfl
 
@@ -43,6 +45,12 @@ theorem integerAlgebraMap.monotone : Monotone (algebraMap 𝒪[K] K) := sorry
 -- also value IsEquiv of O[K] and K -- they are equal!
 -- `First show val is equiv, then use theorem IsEquiv implies monotone and continuous!!!!!`
 -/
+
+@[simp]
+theorem integer_val_coe (x : vR.v.integer) : Valued.v x = Valued.v (x : R) := rfl
+
+#check mem_integer_iff
+
 
 /-- An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a `Valued` instance, it serves for notation `𝓂[K]` -/
 @[reducible]
