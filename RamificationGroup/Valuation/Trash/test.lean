@@ -31,8 +31,16 @@ noncomputable def varphi (u : ℚ) : ℚ :=
   else
     (-u) * (varphi' vK vL u)
 
+theorem varphi_bij : Function.Bijective (varphi vK vL) := by
+  constructor
+  sorry
+  sorry
+
 noncomputable def psi : ℚ → ℚ :=
   invFun (varphi vK vL)
+
+theorem psi_bij : Function.Bijective (psi vK vL) := by
+  apply?
 
 theorem varphi_zero_eq_zero : varphi vK vL 0 = 0 := by
   unfold varphi
@@ -47,12 +55,21 @@ noncomputable def psi' (v : ℚ): ℚ :=
 
 theorem psi_zero_eq_zero : psi vK vL 0 = 0 := by
   unfold psi
-  simp only [invFun]
+  have h : ∃ a , varphi vK vL a = 0 := by
+    use 0
+    apply varphi_zero_eq_zero
+  simp only [invFun, dif_pos h, h.choose_spec]
+  sorry
 
 
-theorem varphi_bij : Function.Bijective (varphi vK vL) := by sorry
 
-theorem psi_bij : Function.Bijective (psi vK vL) := by sorry
+
 
 --lemma 3
 theorem Varphi_eq_Sum_Inf (u : ℚ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in (Finset G(vL/vK)_[(Int.ceil u)]) , min (u + 1) ((i[vL/vK] x)))- 1 := by sorry
+
+
+variable {α β : Sort*} [Nonempty α] {f : α → β} {a : α} {b : β}
+
+theorem invFun_eq (h : ∃ a, f a = b) : f (invFun f b) = b :=
+  by simp only [invFun, dif_pos h, h.choose_spec]
