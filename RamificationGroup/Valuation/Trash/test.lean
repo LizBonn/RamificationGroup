@@ -31,6 +31,10 @@ noncomputable def varphi (u : ℚ) : ℚ :=
 theorem varphi_mono : ∀ a1 a2 : ℚ , a1 > a2 → (varphi vK vL a1) > (varphi vK vL a2) := by
   rintro a1 a2 h
   unfold varphi
+  by_cases h1 : Int.floor a1 > Int.floor a2
+  sorry
+  have hsub: (varphi vK vL a1) - (varphi vK vL a2) = (a1 - a2) * (varphi' vK vL a1) := by sorry
+  have hge: (varphi vK vL a1) - (varphi vK vL a2) > 0 := by sorry
   sorry
 
 theorem varphi_bij : Function.Bijective (varphi vK vL) := by
