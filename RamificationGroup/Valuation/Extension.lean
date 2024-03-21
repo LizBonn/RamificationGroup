@@ -51,6 +51,7 @@ theorem is_unit_of_unit_add_nonunit {x y : A} (hx : IsUnit x) (hy : y ∈ nonuni
   rw [eq_add_neg_iff_add_eq.mpr (show x + y = x + y by rfl)] at hx
   exact (isUnit_or_isUnit_of_isUnit_add hx).resolve_right fun h ↦ hy ((IsUnit.neg_iff y).mp h)
 
+theorem maximalIdeal_eq_jacobson_of_bot : maximalIdeal A ≤ Ideal.jacobson ⊥ := le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm
 end LocalRing
 end local_ring
 
@@ -115,7 +116,7 @@ theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
   congr
   apply (Ideal.Quotient.mk_surjective x).choose_spec
 
-variable (A) (B) in
+variable (A) in
 theorem exists_f_of_x (x : B) : ∃f : A[X], f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
   let f0 := minpoly (ResidueField A) (residue B x)
   have : (Polynomial.map (residue A)).Surjective := map_surjective (residue A) Ideal.Quotient.mk_surjective
@@ -124,9 +125,11 @@ theorem exists_f_of_x (x : B) : ∃f : A[X], f.map (residue A) = minpoly (Residu
 
 section x_and_f
 
+open Subalgebra
+
 -- `x` : a lift of a primitive element of `k_B/k_A`
 variable {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
--- `f` : a monic polynomial with `A`-coeff that reduces to the minpoly of `x : k_B` over `k_A`
+-- `f` : a polynomial with `A`-coeff that reduces to the minpoly of `x : k_B` over `k_A`
 variable {f : A[X]} (h_red : f.map (residue A) = minpoly (ResidueField A) (residue B x))
 -- `ϖ` : a uniformizer `ϖ` of `B`
 variable {ϖ : B} (hϖ : Irreducible ϖ)
@@ -141,14 +144,33 @@ variable {ϖ : B} (hϖ : Irreducible ϖ)
 -- #check IsPrimitiveRoot.adjoinEquivRingOfIntegers
 -- #check IsPrimitiveRoot.integralPowerBasis
 
-/-
+#check Submodule.le_of_le_smul_of_le_jacobson_bot
+#check Submodule.smul_le_of_le_smul_of_le_jacobson_bot
+
+-- change to `Ideal.span {ϖ}`?
+theorem lemma3_aux1 : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A = ⊤ := by
+  rw [eq_top_iff]
+  intro y _
+  sorry
+
+theorem lemma3_aux2 : maximalIdeal A • (⊤ : Submodule A B) = sorry := by
+  sorry
+
+#check Submodule.map_mkQ_eq_top
+open Submodule in
+/--
 lemma 3 states that `xⁱϖʲ`'s with finite many `i j`'s form a `A`-basis of `B`.
-The next theorem is an alternate and weaker version of lemma 3,
+This is an alternate and weaker version of lemma 3,
 stating that `A[x, ϖ] = B`.
 -/
 theorem lemma3_weak : Algebra.adjoin A {x, ϖ} = ⊤ := by
   -- use Nakayama lemma
-  rw [← Algebra.toSubmodule_eq_top]
+  rw [← Algebra.toSubmodule_eq_top, eq_top_iff]
+  apply le_of_le_smul_of_le_jacobson_bot _ (le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm)
+  · intro y _
+    sorry
+  · apply Module.finite_def.mp
+    assumption
 
 -- preparation for lemma 4
 theorem residue_primitive_of_add_uniformizer (hx : (ResidueField A)⟮residue B x⟯ = ⊤) : (ResidueField A)⟮residue B (x + ϖ)⟯ = ⊤ := by
@@ -197,7 +219,7 @@ variable (A) (B)
 
 theorem exists_primitive : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
   rcases exists_x A B with ⟨x, hx⟩
-  rcases exists_f_of_x A B x with ⟨f, h_red⟩
+  rcases exists_f_of_x A x with ⟨f, h_red⟩
   exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
     then ⟨x, (thm_val_1 hx h)⟩
     else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,

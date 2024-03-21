@@ -1,6 +1,7 @@
 import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
 import Mathlib.Data.Polynomial.Induction
 
+section semiring
 variable {A : Type _} {B : Type _} [CommSemiring A] [Semiring B] [Algebra A B]
 
 def AlgEquiv.ofTop {S : Subalgebra A B} (hS : S = ⊤) : S ≃ₐ[A] B := { S.val with
@@ -9,9 +10,8 @@ def AlgEquiv.ofTop {S : Subalgebra A B} (hS : S = ⊤) : S ≃ₐ[A] B := { S.va
     right_inv := fun _ ↦ rfl
   }
 
-namespace Algebra
-
 section adjoin
+namespace Algebra
 open Polynomial
 variable {x : B}
 
@@ -36,8 +36,7 @@ theorem aeval_mem_adjoin_singleton (f : A[X]) : aeval x f ∈ adjoin A {x} := by
     rw [pow_succ, mul_comm X, ← mul_assoc, aeval_mul, aeval_X]
     apply mul_mem h (self_mem_adjoin_singleton _ x)
 
-
-
+end Algebra
 end adjoin
 
-end Algebra
+end semiring
