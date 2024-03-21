@@ -64,7 +64,7 @@ theorem psi_zero_eq_zero : psi vK vL 0 = 0 := by
   sorry
 
 --lemma 3
-theorem Varphi_eq_Sum_Inf (u : ℚ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in (Finset G(vL/vK)_[(Int.ceil u)]) , min (u + 1) ((i[vL/vK] x)))- 1 := by sorry
+theorem Varphi_eq_Sum_Inf (u : ℚ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in (G(vL/vK)_[(Int.ceil u)]) , min (u + 1) ((i[vL/vK] x)))- 1 := by sorry
 
 
 variable {α β : Sort*} [Nonempty α] {f : α → β} {a : α} {b : β}
