@@ -23,18 +23,35 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
 --   }
 --   monotone' := sorry
 
--- this should be put into a suitable place
-instance {α} [LinearOrder α]: ConditionallyCompleteLinearOrder (WithTop α) := sorry
+-- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
+open Classical
+#check WithBot.linearOrder
+noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithBot α) where
+  toConditionallyCompleteLattice := WithBot.conditionallyCompleteLattice
+  le_total := WithBot.linearOrder.le_total
+  decidableLE := WithBot.decidableLE
+  decidableEq := WithBot.decidableEq
+  decidableLT := WithBot.decidableLT
+  csSup_of_not_bddAbove s h := by
+    by_cases hbot : s = {⊥}
+    simp only [WithBot.csSup_empty, hbot, csSup_singleton]
+    sorry
+  csInf_of_not_bddBelow := sorry
+  bot_le := WithBot.orderBot.bot_le
+  csSup_empty := by simp only [WithBot.csSup_empty]
 
--- this should be put into a suitable place, and a better way to deal with
-instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := sorry
+noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithZero α) := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithBot α))
 
-theorem ValAlgEquiv.exist_val_sub_id_pos {s : S ≃ₐv[R] S} (h : s ≠ .refl) : ∃ (x : vS.v.integer), 0 < (Valued.v (s.liftInteger x - x)) := sorry
+instance {α} [Add α] [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrder (Multiplicative α) := inferInstanceAs (ConditionallyCompleteLinearOrder α)
 
-theorem ValAlgEquiv.iSup_val_sub_id_ne_zero (s : S ≃ₐv[R] S) : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) ≠ 0 := sorry
+#synth Add ENat
+#check WithTop.untop
+-- instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
 
 open Classical
-noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ := if s = .refl then ⊤ else (- Multiplicative.toAdd (WithZero.unzero s.iSup_val_sub_id_ne_zero)).toNat
+noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
+  if h : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) = 0 then ⊤
+  else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
 
 scoped [DiscreteValuation] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
 
