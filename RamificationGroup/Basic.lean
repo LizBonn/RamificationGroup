@@ -16,7 +16,7 @@ instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZ
 structure ValRingHom (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
   [vR : Valued R ΓR] [vS : Valued S ΓS] extends OrderRingHom R S, ContinuousMap R S where
-  val_isEquiv_comap : vR.v.IsEquiv (vS.v.comap toOrderRingHom.toRingHom)
+  val_isEquiv_comap' : vR.v.IsEquiv (vS.v.comap toOrderRingHom.toRingHom)
 
 class ValAlgebra (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [vR : Valued R ΓR] [vA : Valued A ΓA] extends ValRingHom R A, Algebra R A
 
@@ -37,7 +37,7 @@ instance : ValAlgebra K L where -- this uses the uniquess of extension of valuat
   map_add' := _
   monotone' := sorry
   continuous_toFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
   smul := a.smul
   commutes' := a.commutes'
   smul_def' := a.smul_def'

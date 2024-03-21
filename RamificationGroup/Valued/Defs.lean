@@ -49,8 +49,9 @@ theorem integerAlgebraMap.monotone : Monotone (algebraMap 𝒪[K] K) := sorry
 @[simp]
 theorem integer_val_coe (x : vR.v.integer) : Valued.v x = Valued.v (x : R) := rfl
 
-#check mem_integer_iff
+theorem integer_val_le_one (x : vR.v.integer) : Valued.v x ≤ 1 := (mem_integer_iff vR.v x.1).mp x.2
 
+#check mem_integer_iff
 
 /-- An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a `Valued` instance, it serves for notation `𝓂[K]` -/
 @[reducible]

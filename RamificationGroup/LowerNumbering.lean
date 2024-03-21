@@ -25,6 +25,8 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
 
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
 open Classical
+
+-- there is no `ConditionallyCompleteLinearOrderTop` in mathlib ...
 #check WithBot.linearOrder
 noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithBot α) where
   toConditionallyCompleteLattice := WithBot.conditionallyCompleteLattice
@@ -33,9 +35,12 @@ noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : Conditionall
   decidableEq := WithBot.decidableEq
   decidableLT := WithBot.decidableLT
   csSup_of_not_bddAbove s h := by
-    by_cases hbot : s = {⊥}
-    simp only [WithBot.csSup_empty, hbot, csSup_singleton]
-    sorry
+    by_cases hbot : s ⊆ {⊥}
+    · simp [sSup, sInf]
+      sorry
+    · simp [sSup, sInf]
+      intro x hxs hx
+      sorry
   csInf_of_not_bddBelow := sorry
   bot_le := WithBot.orderBot.bot_le
   csSup_empty := by simp only [WithBot.csSup_empty]

@@ -32,7 +32,7 @@ def liftInteger (f : R →+*v S) : vR.v.integer →+*v vS.v.integer where
   map_add' _ _ := by ext; exact f.map_add _ _
   monotone' := sorry -- a theorem saying O[K] to K is order preserving
   continuous_toFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
 
 variable {K L : Type*} [Field K] [Field L] {ΓK ΓL: outParam Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL] [ValAlgebra K L]
 
@@ -65,7 +65,7 @@ def liftInteger (f : R ≃+*v S) : vR.v.integer ≃+*v vS.v.integer where
   map_le_map_iff' := sorry
   continuous_toFun := sorry
   continuous_invFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
 
 
 variable {K L : Type*} [Field K] [Field L] {ΓK ΓL: outParam Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL] [ValAlgebra K L]

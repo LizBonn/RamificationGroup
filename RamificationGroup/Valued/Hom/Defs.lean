@@ -2,23 +2,161 @@ import RamificationGroup.Valued.Defs
 
 open DiscreteValuation Valuation
 
-section
+section Hom
 
-variable (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+/-- `ValRingHom A B` is the type of ring homomorphisms that preserves valuation from valued ring `A` to valued ring `B`.
+
+When possible, instead of parametrizing results over `(f : ValRingHom α β)`,
+you should parametrize over `(F : Type*) [ValRingHomClass F α β] (f : F)`.
+
+When you extend this structure, make sure to extend `ValRingHomClass`.
+-/ -- mimicked from `OrderRingHom`
+structure ValRingHom (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+  [vR : Valued R ΓR] [vS : Valued S ΓS]
+  extends OrderRingHom R S, ContinuousMap R S where
+  /-- The proposition that the ring map preserves valuation. -/
+  val_isEquiv_comap' : vR.v.IsEquiv (vS.v.comap toRingHom)
+
+/-- Reinterpret a valued ring homomorphism into a ordered ring homomorphism. -/
+add_decl_doc ValRingHom.toOrderRingHom
+
+@[inherit_doc]
+infixr:25 " →+*v " => ValRingHom -- 25 = Binding power of `→+*`
+
+/-- `ValRingEquiv A B` is the type of ring isomorphisms that preserves valuation from valued ring `A` to valued ring `B`.
+
+When possible, instead of parametrizing results over `(f : ValRingEquiv α β)`,
+you should parametrize over `(F : Type*) [ValRingEquivClass F α β] (f : F)`.
+
+When you extend this structure, make sure to extend `ValRingEquivClass`.
+-/
+structure ValRingEquiv (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+  [vR : Valued R ΓR] [vS : Valued S ΓS]
+  extends OrderRingIso R S, Homeomorph R S where
+  val_isEquiv_comap' : vR.v.IsEquiv (vS.v.comap toRingEquiv)
+
+@[inherit_doc]
+infixr:25 " ≃+*v " => ValRingEquiv
+
+end Hom
+
+section Class
+
+/-- `ValHomClass F α b` asserts that `F` is a type of valuation-preserving morphisms. -/
+class ValRingHomClass (F R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+  [vR : Valued R ΓR] [vS : Valued S ΓS] [FunLike F R S] extends RelHomClass F ((· ≤ ·) : R → R → Prop) ((· ≤ ·) : S → S → Prop), RingHomClass F R S, ContinuousMapClass F R S where
+  val_isEquiv_comap (f : F) : vR.v.IsEquiv (vS.v.comap f)
+
+export ValRingHomClass (val_isEquiv_comap)
+
+class ValRingEquivClass (F R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+  [vR : Valued R ΓR] [vS : Valued S ΓS] [EquivLike F R S] extends OrderIsoClass F R S, RingEquivClass F R S, ContinuousMapClass F R S where
+  inv_continuous (f : F) : Continuous (EquivLike.inv f)
+  val_isEquiv_comap (f : F) : vR.v.IsEquiv (vS.v.comap f)
+
+
+variable {F R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
   [vR : Valued R ΓR] [vS : Valued S ΓS]
 
-structure ValRingHom extends OrderRingHom R S, ContinuousMap R S where
-  val_isEquiv_comap : vR.v.IsEquiv (vS.v.comap toRingHom)
+/-- Turn an element of a type `F` satisfying `ValRingHomClass F R S` into an actual
+`ValRingHom`. This is declared as the default coercion from `F` to `R →+*v S`. -/
+@[coe]
+def ValRingHomClass.toValRingHom [FunLike F R S] [ValRingHomClass F R S] (f : F) :
+    R →+*v S :=
+  { OrderHomClass.toOrderHom f, RingHomClass.toRingHom f, toContinuousMap f with val_isEquiv_comap' := ValRingHomClass.val_isEquiv_comap f}
 
-infixr:25 " →+*v " => ValRingHom -- 25 = Binding power of `→+*`
+/-- Any type satisfying `ValRingHomClass` can be cast into `ValRingHom` via
+`ValRingHomClass.toValRingHom`. -/
+instance [FunLike F R S] [ValRingHomClass F R S] : CoeTC F (R →+*v S) :=
+  ⟨ValRingHomClass.toValRingHom⟩
 
-structure ValRingEquiv extends OrderRingIso R S, Homeomorph R S where
-  val_isEquiv_comap : vR.v.IsEquiv (vS.v.comap toRingEquiv)
+/-- Turn an element of a type `F` satisfying `ValRingEquivClass F R S` into an actual
+`ValRingEquiv`. This is declared as the default coercion from `F` to `R ≃+*v S`. -/
+@[coe]
+def ValRingEquivClass.toValRingEquiv [EquivLike F R S] [ValRingEquivClass F R S] (f : F) :
+    R ≃+*v S :=
+  { OrderIsoClass.toOrderIso f, RingEquivClass.toRingEquiv f, toContinuousMap f with
+    val_isEquiv_comap' := ValRingEquivClass.val_isEquiv_comap f
+    map_le_map_iff' := map_le_map_iff f
+    continuous_invFun := ValRingEquivClass.inv_continuous f
+    }
 
-infixr:25 " ≃+*v " => ValRingEquiv
+/-- Any type satisfying `ValRingHomClass` can be cast into `ValRingHom` via
+`ValRingHomClass.toValRingHom`. -/
+instance [FunLike F R S] [ValRingHomClass F R S] : CoeTC F (R →+*v S) :=
+  ⟨ValRingHomClass.toValRingHom⟩
 
-end
+/-- Any type satisfying `ValRingEquivClass` can be cast into `ValRingEquiv` via
+`ValRingEquivClass.toValRingEquiv`. -/
+instance [EquivLike F R S] [ValRingEquivClass F R S] : CoeTC F (R ≃+*v S) :=
+  ⟨ValRingEquivClass.toValRingEquiv⟩
+
+-- See note [lower instance priority]
+instance (priority := 100) ValRingEquivClass.toValRingHomClass
+    [EquivLike F R S] [ValRingEquivClass F R S] : ValRingHomClass F R S :=
+  { OrderIsoClass.toOrderHomClass with
+    val_isEquiv_comap := ValRingEquivClass.val_isEquiv_comap }
+
+end Class
+
+-- `theorem of ValRingEquivClass, about inv preserves valuation, in section class `
+
+/-
+section LE
+
+variable [LE α] [LE β] [EquivLike F α β] [OrderIsoClass F α β]
+
+-- Porting note: needed to add explicit arguments to map_le_map_iff
+@[simp]
+theorem map_inv_le_iff (f : F) {a : α} {b : β} : EquivLike.inv f b ≤ a ↔ b ≤ f a := by
+  convert (map_le_map_iff f (a := EquivLike.inv f b) (b := a)).symm
+  exact (EquivLike.right_inv f _).symm
+#align map_inv_le_iff map_inv_le_iff
+
+-- Porting note: needed to add explicit arguments to map_le_map_iff
+@[simp]
+theorem le_map_inv_iff (f : F) {a : α} {b : β} : a ≤ EquivLike.inv f b ↔ f a ≤ b := by
+  convert (map_le_map_iff f (a := a) (b := EquivLike.inv f b)).symm
+  exact (EquivLike.right_inv _ _).symm
+#align le_map_inv_iff le_map_inv_iff
+
+end LE
+-/
+
+-- `relation between v and f, in section class`
+
+/-
+variable [Preorder α] [Preorder β] [EquivLike F α β] [OrderIsoClass F α β]
+
+theorem map_lt_map_iff (f : F) {a b : α} : f a < f b ↔ a < b :=
+  lt_iff_lt_of_le_iff_le' (map_le_map_iff f) (map_le_map_iff f)
+#align map_lt_map_iff map_lt_map_iff
+
+@[simp]
+theorem map_inv_lt_iff (f : F) {a : α} {b : β} : EquivLike.inv f b < a ↔ b < f a := by
+  rw [← map_lt_map_iff f]
+  simp only [EquivLike.apply_inv_apply]
+#align map_inv_lt_iff map_inv_lt_iff
+
+@[simp]
+theorem lt_map_inv_iff (f : F) {a : α} {b : β} : a < EquivLike.inv f b ↔ f a < b := by
+  rw [← map_lt_map_iff f]
+  simp only [EquivLike.apply_inv_apply]
+#align lt_map_inv_iff lt_map_inv_iff
+-/
+
+namespace ValRingHom
+
+end ValRingHom
+
+namespace ValRingEquiv
+
+end ValRingEquiv
 
 section
 
@@ -29,7 +167,7 @@ variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
 def ValRingHom.mk' (f : R →+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R →+*v S where
   toRingHom := f
   monotone' := sorry -- add a theorem for this at the begining
-  val_isEquiv_comap := hf
+  val_isEquiv_comap' := hf
   continuous_toFun := sorry -- add a theorem for this at the begining
 
 def ValRingEquiv.mk' (f : R ≃+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R ≃+*v S where
@@ -37,7 +175,7 @@ def ValRingEquiv.mk' (f : R ≃+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R ≃+
   map_le_map_iff' := sorry
   continuous_toFun := sorry
   continuous_invFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
 
 -- ValRingHomClass
 -- ValRingIsoClass
@@ -49,14 +187,14 @@ def ValRingEquiv.mk' (f : R ≃+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R ≃+
 protected def ValRingHom.id : (R →+*v R) where
   toOrderRingHom := .id R
   continuous_toFun := continuous_id
-  val_isEquiv_comap := IsEquiv.refl
+  val_isEquiv_comap' := IsEquiv.refl
 
 @[refl]
 protected def ValRingEquiv.refl : (R ≃+*v R) where
   toOrderRingIso := .refl R
   continuous_toFun := continuous_id
   continuous_invFun := continuous_id
-  val_isEquiv_comap := IsEquiv.refl
+  val_isEquiv_comap' := IsEquiv.refl
 
 
 attribute [coe] ValRingHom.toOrderRingHom
@@ -70,7 +208,7 @@ instance : Coe (R →+*v S) (R →+*o S) := ⟨ValRingHom.toOrderRingHom⟩
 instance : Coe (R →+*v S) (R →+* S) := ⟨fun f => f.toRingHom⟩
 
 @[coe]
-def ValRingEquiv.toValRingHom (f : R ≃+*v S) : R →+*v S := ⟨f.toOrderRingHom, f.continuous_toFun, f.val_isEquiv_comap⟩
+def ValRingEquiv.toValRingHom (f : R ≃+*v S) : R →+*v S := ⟨f.toOrderRingHom, f.continuous_toFun, f.val_isEquiv_comap'⟩
 
 instance : Coe (R ≃+*v S) (R →+*v S) := ⟨ValRingEquiv.toValRingHom⟩ -- `This is temporory, should Mimic instCoeTCOrderRingHom, use ValRingHomClass to implement this`
 /-
@@ -155,7 +293,7 @@ noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.coma
   map_zero' := f.map_zero
   map_add' := f.map_add'
   monotone' := sorry
-  val_isEquiv_comap := h
+  val_isEquiv_comap' := h
   commutes' := sorry
   continuous_toFun := sorry
 
@@ -187,7 +325,7 @@ def ValAlgEquiv.toValAlgHom (f : A ≃ₐv[R] B) : (A →ₐv[R] B) where
   map_add' := f.map_add
   monotone' := f.toValRingHom.monotone'
   continuous_toFun := f.toValRingHom.continuous_toFun
-  val_isEquiv_comap := f.toValRingHom.val_isEquiv_comap
+  val_isEquiv_comap' := f.toValRingHom.val_isEquiv_comap'
   commutes' := f.commutes'
 
 instance : CoeTC (A ≃ₐv[R] B) (A →ₐv[R] B) := ⟨ValAlgEquiv.toValAlgHom⟩
@@ -231,7 +369,7 @@ instance : EquivLike (A ≃ₐv[R] B) A B where
 protected def ValAlgHom.id : (A →ₐv[R] A) where
   toOrderRingHom := .id A
   continuous_toFun := continuous_id
-  val_isEquiv_comap := IsEquiv.refl
+  val_isEquiv_comap' := IsEquiv.refl
   commutes' _ := rfl
 
 @[refl]
@@ -239,7 +377,7 @@ protected def ValAlgEquiv.refl : (A ≃ₐv[R] A) where
   toOrderRingIso := .refl A
   continuous_toFun := continuous_id
   continuous_invFun := continuous_id
-  val_isEquiv_comap := IsEquiv.refl
+  val_isEquiv_comap' := IsEquiv.refl
   commutes' _ := rfl
 
 -- -- structures on ValRingIso
