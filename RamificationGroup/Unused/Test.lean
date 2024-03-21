@@ -10,7 +10,11 @@ open DiscreteValuation
 variable {K L} [Field K] [Field L] [Algebra K L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀]
 -- and some more instances
 
-
+#check vK.v.valuationSubring -- Use this! this has valuation
+#synth ValuationRing vK.v.valuationSubring
+-- #synth ValuationRing vK.v.integer -- failed
+#check vK.v.integer
+example : vK.v.valuationSubring.toSubring = vK.v.integer := rfl
 
 variable (h : vK.v.IsEquiv (vL.v.comap (algebraMap K L)))
 

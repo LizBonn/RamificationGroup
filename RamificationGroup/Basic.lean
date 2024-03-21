@@ -3,13 +3,15 @@ import Mathlib.RingTheory.DiscreteValuationRing.Basic
 import Mathlib.FieldTheory.Galois
 import Mathlib.Algebra.Order.Group.TypeTags
 import Mathlib.Algebra.Order.Hom.Ring
+import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 
-open DiscreteValuation
+open DiscreteValuation Valuation
 
-class DiscretelyValued (R : Type*) [Ring R] extends Valued R ℤₘ₀ where
-  v_is_surj : (v.toFun).Surjective
+-- this is the same as `[Valued R ℤₘ₀]` `[IsDiscrete hv.v]` use Maria's
+-- class DiscretelyValued (R : Type*) [Ring R] extends Valued R ℤₘ₀ where
+--   v_is_surj : (v.toFun).Surjective
 
-instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := sorry
+instance {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [vR : Valued R Γ]: Preorder R := Preorder.lift vR.v
 
 structure ValRingHom (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
@@ -18,12 +20,16 @@ structure ValRingHom (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
 
 class ValAlgebra (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [vR : Valued R ΓR] [vA : Valued A ΓA] extends ValRingHom R A, Algebra R A
 
-variable {K L : Type*} [Field K] [Field L] [DiscretelyValued K] [a : Algebra K L] [FiniteDimensional K L]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [a : Algebra K L] [FiniteDimensional K L]
 
+#check DiscreteValuation.Extension.valued
+-- #synth Valued L ℤₘ₀
+-- noncomputable instance : Valued L ℤₘ₀ :=  DiscreteValuation.Extension.valued K L
+-- this is a def and not an instance because K cannot be infered
 
-instance : DiscretelyValued L := sorry
+variable [vL : Valued L ℤₘ₀] [IsDiscrete vL.v]
 
-instance : ValAlgebra K L where
+instance : ValAlgebra K L where -- this uses the uniquess of extension of valuation
   toFun := _
   map_one' := _
   map_mul' := _
@@ -40,6 +46,9 @@ instance : ValAlgebra K L where
 variable (K' : IntermediateField K L) [IsGalois K L]
 
 #synth IsScalarTower K K' L
+
+instance intermediateField.valued : Valued K' ℤₘ₀ := sorry -- should be scalar tower .valued?
+instance : IsDiscrete (intermediateField.valued K').v := sorry
 #synth ValAlgebra K K'
 #synth ValAlgebra K' L
 

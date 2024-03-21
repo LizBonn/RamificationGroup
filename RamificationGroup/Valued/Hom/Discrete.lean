@@ -1,20 +1,22 @@
-import RamificationGroup.Valued.Hom.Basic
+import RamificationGroup.Valued.Hom.Defs
 import Mathlib.FieldTheory.Galois
+
+open DiscreteValuation Valuation
 
 section
 
 -- `key def : If L/K  a finite field extension of local field, then there exist a extension of valuation`, see Maria and Phillip, `discrete_valuation_ring.extensions`
 
-def DiscretelyValued.extensionFiniteDimension {K} (L) [Field K] [Field L] [DiscretelyValued K] [Algebra K L] [FiniteDimensional K L] : DiscretelyValued L  := sorry
+def DiscretelyValued.extensionFiniteDimension {K} (L) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [Algebra K L] [FiniteDimensional K L] : Valued L ℤₘ₀  := sorry
 
 -- instance : Valued L
 
 -- `key theorem: If L/K is a finite field extension + more conditions, then any 2 extension of valuations from K on L are equivalent`; Discrete Valuations are equal
-theorem Valuation.isEquiv_of_finiteDimensional {K L : Type*} [Field K] [Field L] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] [vK : DiscretelyValued K] [vL : Valued L Γ] [ValAlgebra K L] [FiniteDimensional K L]
+theorem Valuation.isEquiv_of_finiteDimensional {K L : Type*} [Field K] [Field L] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L Γ] [ValAlgebra K L] [FiniteDimensional K L]
  : vL.v.IsEquiv (vK.extensionFiniteDimension L).v := sorry
+-- DiscreteValuation.Extension.integralClosure_eq_integer see Maria
 
-
-variable {K L : Type*} [Field K] [Field L] [DiscretelyValued K] [a : Algebra K L] [FiniteDimensional K L]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v]  [a : Algebra K L] [FiniteDimensional K L]
 
 
 instance : DiscretelyValued L := sorry -- see Maria and Phillip

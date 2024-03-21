@@ -18,17 +18,7 @@ section
 variable [Valued K ΓK] [CompleteSpace K] [Valued L ΓL] [ValAlgebra K L]
 
 def toValAlgEquiv : (L ≃ₐ[K] L) ≃* (L ≃ₐv[K] L) where
-  toFun s := {
-    toFun := s.toFun
-    invFun := 
-    left_inv := _
-    right_inv := _
-    map_mul' := _
-    map_add' := _
-    map_le_map_iff' := _
-    val_isEquiv_comap := _
-    commutes' := _
-  }
+  toFun s := sorry
   invFun := (↑)
   left_inv := _
   right_inv := _
