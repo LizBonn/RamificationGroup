@@ -70,8 +70,9 @@ theorem psi_bij : Function.Bijective (psi vK vL) := by
   constructor
   sorry
   apply invFun_surjective
+  sorry
 
 --lemma 3
-theorem Varphi_eq_Sum_Inf (u : ℝ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in G(vL/vK)_[(Int.ceil u)] , min (u + 1) (i[vL/vK] x))- 1 := by sorry
+theorem Varphi_eq_Sum_Inf (u : ℝ) : (varphi vK vL u) = (1 / Nat.card G(vL/vK)_[0]) * (∑ x in G(vL/vK)_[(Int.ceil u)] , min (u + 1) ((i[vL/vK] x)))- 1 := by sorry
 
 --lemma 4
