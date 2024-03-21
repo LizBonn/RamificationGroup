@@ -4,7 +4,7 @@ TODO:
 2. prove `instFiniteExtResidue`
 3. seek a better condition for `f`, then prove `exists_f_of_x`
 
-# of WARNINGs : 2
+# of WARNINGs : 1
 
 does `Module.finite` implies `FiniteDimensional`?
 
@@ -51,6 +51,7 @@ theorem is_unit_of_unit_add_nonunit {x y : A} (hx : IsUnit x) (hy : y ∈ nonuni
   rw [eq_add_neg_iff_add_eq.mpr (show x + y = x + y by rfl)] at hx
   exact (isUnit_or_isUnit_of_isUnit_add hx).resolve_right fun h ↦ hy ((IsUnit.neg_iff y).mp h)
 
+theorem maximalIdeal_eq_jacobson_of_bot : maximalIdeal A ≤ Ideal.jacobson ⊥ := le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm
 end LocalRing
 end local_ring
 
@@ -115,24 +116,27 @@ theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
   congr
   apply (Ideal.Quotient.mk_surjective x).choose_spec
 
-#check IsIntegral.of_finite
-#check RingHom.IsIntegralElem (algebraMap A B)
-variable (A) (B) in
-theorem exists_f_of_x (x : B) : ∃f : A[X], Monic f ∧ f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
+variable (A) in
+theorem exists_f_of_x (x : B) : ∃f : A[X], f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
   let f0 := minpoly (ResidueField A) (residue B x)
-  -- use surjectivity to choose a polynomial `f`
-  sorry
+  have : (Polynomial.map (residue A)).Surjective := map_surjective (residue A) Ideal.Quotient.mk_surjective
+  use (this f0).choose
+  rw [(this f0).choose_spec]
 
 section x_and_f
 
+open Subalgebra
+
 -- `x` : a lift of a primitive element of `k_B/k_A`
 variable {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
--- `f` : a monic polynomial with `A`-coeff that reduces to the minpoly of `x : k_B` over `k_A`
-variable {f : A[X]} (h_monic : Monic f) (h_red : f.map (residue A) = minpoly (ResidueField A) (residue B x))
+-- `f` : a polynomial with `A`-coeff that reduces to the minpoly of `x : k_B` over `k_A`
+variable {f : A[X]} (h_red : f.map (residue A) = minpoly (ResidueField A) (residue B x))
 -- `ϖ` : a uniformizer `ϖ` of `B`
 variable {ϖ : B} (hϖ : Irreducible ϖ)
 
 /-some possibly useful thms are listed below-/
+#check IsIntegral.of_finite
+#check RingHom.IsIntegralElem (algebraMap A B)
 #check minpoly.aeval
 #check Algebra.adjoin.powerBasis'
 #check IsIntegral.of_finite
@@ -140,15 +144,33 @@ variable {ϖ : B} (hϖ : Irreducible ϖ)
 -- #check IsPrimitiveRoot.adjoinEquivRingOfIntegers
 -- #check IsPrimitiveRoot.integralPowerBasis
 
-/-
+#check Submodule.le_of_le_smul_of_le_jacobson_bot
+#check Submodule.smul_le_of_le_smul_of_le_jacobson_bot
+
+-- change to `Ideal.span {ϖ}`?
+theorem lemma3_aux1 : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A = ⊤ := by
+  rw [eq_top_iff]
+  intro y _
+  sorry
+
+theorem lemma3_aux2 : maximalIdeal A • (⊤ : Submodule A B) = sorry := by
+  sorry
+
+#check Submodule.map_mkQ_eq_top
+open Submodule in
+/--
 lemma 3 states that `xⁱϖʲ`'s with finite many `i j`'s form a `A`-basis of `B`.
-The next theorem is an alternate and weaker version of lemma 3,
+This is an alternate and weaker version of lemma 3,
 stating that `A[x, ϖ] = B`.
 -/
 theorem lemma3_weak : Algebra.adjoin A {x, ϖ} = ⊤ := by
-  apply Algebra.eq_top_iff.mpr
-  intro y
-  sorry
+  -- use Nakayama lemma
+  rw [← Algebra.toSubmodule_eq_top, eq_top_iff]
+  apply le_of_le_smul_of_le_jacobson_bot _ (le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm)
+  · intro y _
+    sorry
+  · apply Module.finite_def.mp
+    assumption
 
 -- preparation for lemma 4
 theorem residue_primitive_of_add_uniformizer (hx : (ResidueField A)⟮residue B x⟯ = ⊤) : (ResidueField A)⟮residue B (x + ϖ)⟯ = ⊤ := by
@@ -160,7 +182,7 @@ theorem fx_not_unit : ¬IsUnit (f.eval₂ (algebraMap A B) x) := by
     hom_eval₂, algebraMap_residue_compat, ← eval₂_map,
     ← aeval_def, h_red, minpoly.aeval]
 
-/-
+/--
 this is part of lemma 4:
 If `f x` has valuation ≥ 2, then `f (x + ϖ)` is a uniformizer.
 -/
@@ -179,29 +201,32 @@ theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : 
 
 end x_and_f
 
-/-`B = A[x]` if `k_B = k_A[x]` AND `f x` is a uniformizer.
-Should use `lemma3_weak` to prove.-/
+/--`B = A[x]` if `k_B = k_A[x]` AND `f x` is a uniformizer.-/
 theorem thm_val_1 {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
     {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) :
     Algebra.adjoin A {x} = ⊤ := by
-  sorry
+  apply Algebra.adjoin_eq_of_le
+  · simp only [Algebra.coe_top, Set.subset_univ]
+  let fx := f.eval₂ (algebraMap A B) x
+  rw [← lemma3_weak (x := x) (ϖ := fx)]
+  rw [show ({x, fx} : Set B) = {x} ∪ {fx} by rfl, Algebra.adjoin_union]
+  simp only [sup_le_iff, le_refl, true_and, ge_iff_le]
+  rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
+  apply aeval_mem_adjoin_singleton
+
 
 variable (A) (B)
 
 theorem exists_primitive : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
   rcases exists_x A B with ⟨x, hx⟩
-  rcases exists_f_of_x A B x with ⟨f, h_monic, h_red⟩
+  rcases exists_f_of_x A x with ⟨f, h_red⟩
   exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
     then ⟨x, (thm_val_1 hx h)⟩
     else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,
       (thm_val_1 (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
         (lemma4_val_ge_2 h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
-/-
-WARNING: possible inst conflict
-move higher?
--/
-variable [NoZeroSMulDivisors A B]
+variable [NoZeroSMulDivisors A B] -- cannot be inferred if `A → B` is not injective
 
 noncomputable def PowerBasisExtDVR : PowerBasis A B :=
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
