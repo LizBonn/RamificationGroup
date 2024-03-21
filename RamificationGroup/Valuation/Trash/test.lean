@@ -32,15 +32,17 @@ noncomputable def varphi (u : ℚ) : ℚ :=
     (-u) * (varphi' vK vL u)
 
 theorem varphi_bij : Function.Bijective (varphi vK vL) := by
+  unfold varphi varphi'
   constructor
-  sorry
-  sorry
+  rintro a1 a2
+  norm_num
+  rintro b
+
 
 noncomputable def psi : ℚ → ℚ :=
   invFun (varphi vK vL)
 
-theorem psi_bij : Function.Bijective (psi vK vL) := by
-  sorry
+theorem psi_bij : Function.Bijective (psi vK vL) := by sorry
 
 theorem varphi_zero_eq_zero : varphi vK vL 0 = 0 := by
   unfold varphi
