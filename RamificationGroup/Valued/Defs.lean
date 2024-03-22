@@ -14,7 +14,10 @@ end check
 
 namespace Valued
 
-instance preorder {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := Preorder.lift Valued.v
+-- the preoder lift from valuation is different from the proorder of divisibility -- there is a preorder on the valuations, called specialization?
+instance preorder {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := Valuation.toPreorder Valued.v
+
+-- `theorems that x ≤ y iff v x ≤ v y`
 
 /-- An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]` -/
 @[reducible]
@@ -52,6 +55,8 @@ theorem integer_val_coe (x : vR.v.integer) : Valued.v x = Valued.v (x : R) := rf
 theorem integer_val_le_one (x : vR.v.integer) : Valued.v x ≤ 1 := (mem_integer_iff vR.v x.1).mp x.2
 
 #check mem_integer_iff
+
+-- `theorems about the relation between order and valuation?`
 
 /-- An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a `Valued` instance, it serves for notation `𝓂[K]` -/
 @[reducible]

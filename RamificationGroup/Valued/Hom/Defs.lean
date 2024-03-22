@@ -1,13 +1,19 @@
 import RamificationGroup.Valued.Defs
 
-open DiscreteValuation Valuation
+-- `Big Question: Should be ValRingHom only requires v x ≤ v y → v f x ≤ v f y , or iff???` Maybe first is better?
+-- `Consider K → K [[X]] , K is a local field, K[X] with valuation trivial on K, valuation ideal given by (X). This satisfies v x ≤ v y → v f x ≤ v f y`
+-- if the first definition K of local field K can have many valuation on L. second  will pin down the valuation on L
+-- if as first choice, order preserving <=> valuation preserving <=> continuous (v(x) < 1 -> v f x < 1, by x^n -> 0 -> f x ^n -> 0)
+-- preorder on the set of valuations? not a type, IsSpecialization
+open DiscreteValuation Valuation Valued
 
 section Hom
 
-/-- `ValRingHom A B` is the type of ring homomorphisms that preserves valuation from valued ring `A` to valued ring `B`.
+-- Valuation on B is an extension of valuation on A.
+/-- `ValRingHom R S` is the type of ring homomorphisms that preserves valuation from valued ring `A` to valued ring `B`. Please note that the definition requires `v x ≤ v y ↔ v (f x) ≤ v (f y)` instead of `v x ≤ v y → v (f x) ≤ v (f y)`. For the latter case, one can use order-preserving ring homomorphisms.
 
-When possible, instead of parametrizing results over `(f : ValRingHom α β)`,
-you should parametrize over `(F : Type*) [ValRingHomClass F α β] (f : F)`.
+When possible, instead of parametrizing results over `(f : ValRingHom R S)`,
+you should parametrize over `(F : Type*) [ValRingHomClass F R S] (f : F)`.
 
 When you extend this structure, make sure to extend `ValRingHomClass`.
 -/ -- mimicked from `OrderRingHom`
@@ -21,13 +27,15 @@ structure ValRingHom (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
 /-- Reinterpret a valued ring homomorphism into a ordered ring homomorphism. -/
 add_decl_doc ValRingHom.toOrderRingHom
 
+attribute [coe] ValRingHom.toOrderRingHom
+
 @[inherit_doc]
 infixr:25 " →+*v " => ValRingHom -- 25 = Binding power of `→+*`
 
-/-- `ValRingEquiv A B` is the type of ring isomorphisms that preserves valuation from valued ring `A` to valued ring `B`.
+/-- `ValRingEquiv R S` is the type of ring isomorphisms that preserves valuation from valued ring `R` to valued ring `S`.
 
-When possible, instead of parametrizing results over `(f : ValRingEquiv α β)`,
-you should parametrize over `(F : Type*) [ValRingEquivClass F α β] (f : F)`.
+When possible, instead of parametrizing results over `(f : ValRingEquiv R S)`,
+you should parametrize over `(F : Type*) [ValRingEquivClass F R S] (f : F)`.
 
 When you extend this structure, make sure to extend `ValRingEquivClass`.
 -/
@@ -44,7 +52,7 @@ end Hom
 
 section Class
 
-/-- `ValHomClass F α b` asserts that `F` is a type of valuation-preserving morphisms. -/
+/-- `ValHomClass F R S` asserts that `F` is a type of valuation-preserving morphisms. -/
 class ValRingHomClass (F R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
   [vR : Valued R ΓR] [vS : Valued S ΓS] [FunLike F R S] extends RelHomClass F ((· ≤ ·) : R → R → Prop) ((· ≤ ·) : S → S → Prop), RingHomClass F R S, ContinuousMapClass F R S where
@@ -102,61 +110,120 @@ instance (priority := 100) ValRingEquivClass.toValRingHomClass
   { OrderIsoClass.toOrderHomClass with
     val_isEquiv_comap := ValRingEquivClass.val_isEquiv_comap }
 
+section Hom
+
+variable [FunLike F R S] [ValRingHomClass F R S]
+
+@[simp]
+theorem val_map_le_iff (f : F) {x y : R} : v (f x) ≤ v (f y) ↔ v x ≤ v y := (val_isEquiv_comap f x y).symm
+
+@[simp]
+theorem val_map_lt_iff (f : F) {x y : R} : v (f x) < v (f y) ↔ v x < v y := by
+  convert (val_map_le_iff f).not <;>
+  push_neg <;> rfl
+
+@[simp]
+theorem val_map_le_one_iff (f : F) {x : R} : v (f x) ≤ 1 ↔ v x ≤ 1 := by
+  convert val_map_le_iff f (x := x) (y := 1) <;>
+  simp only [_root_.map_one]
+
+@[simp]
+theorem val_map_lt_one_iff (f : F) {x : R} : v (f x) < 1 ↔ v x < 1 := by
+  convert val_map_lt_iff f (x := x) (y := 1) <;>
+  simp only [_root_.map_one]
+
+end Hom
+
+section Equiv
+
+variable [EquivLike F R S] [ValRingEquivClass F R S]
+
+@[simp]
+theorem val_map_inv_le_val_iff (f : F) {x : R} {y : S} : v (EquivLike.inv f y) ≤ v x ↔ v y ≤ v (f x) := by
+  convert (val_map_le_iff f).symm
+  exact (EquivLike.right_inv f _).symm
+
+@[simp]
+theorem val_le_val_map_inv_iff (f : F) {x : R} {y : S} : v x ≤ v (EquivLike.inv f y) ↔ v (f x) ≤ v y := by
+  convert (val_map_le_iff f).symm
+  exact (EquivLike.right_inv _ _).symm
+
+@[simp]
+theorem val_map_inv_lt_val_iff (f : F) {x : R} {y : S} : v (EquivLike.inv f y) < v x ↔ v y < v (f x) := by
+  convert (val_le_val_map_inv_iff f (x := x) (y := y)).not <;>
+  push_neg <;> rfl
+
+@[simp]
+theorem val_lt_val_map_inv_iff (f : F) {x : R} {y : S} : v x < v (EquivLike.inv f y) ↔ v (f x) < v y := by
+  convert (val_map_inv_le_val_iff f (x := x) (y := y)).not <;>
+  push_neg <;> rfl
+
+end Equiv
+
 end Class
 
--- `theorem of ValRingEquivClass, about inv preserves valuation, in section class `
+section
+
+variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+  [vR : Valued R ΓR] [vS : Valued S ΓS]
+
+-- variable {F} [EquivLike F R S] [ValRingEquivClass F R S] {f : F}
 
 /-
-section LE
-
-variable [LE α] [LE β] [EquivLike F α β] [OrderIsoClass F α β]
-
--- Porting note: needed to add explicit arguments to map_le_map_iff
-@[simp]
-theorem map_inv_le_iff (f : F) {a : α} {b : β} : EquivLike.inv f b ≤ a ↔ b ≤ f a := by
-  convert (map_le_map_iff f (a := EquivLike.inv f b) (b := a)).symm
-  exact (EquivLike.right_inv f _).symm
-#align map_inv_le_iff map_inv_le_iff
-
--- Porting note: needed to add explicit arguments to map_le_map_iff
-@[simp]
-theorem le_map_inv_iff (f : F) {a : α} {b : β} : a ≤ EquivLike.inv f b ↔ f a ≤ b := by
-  convert (map_le_map_iff f (a := a) (b := EquivLike.inv f b)).symm
-  exact (EquivLike.right_inv _ _).symm
-#align le_map_inv_iff le_map_inv_iff
-
-end LE
+#synth ValRingEquivClass (ValRingEquiv R S) R S
+#synth ValRingHomClass (ValRingHom R S) R S
 -/
+-- `for ValRingEquiv`
 
--- `relation between v and f, in section class`
+instance : FunLike (ValRingHom R S) R S where
+  coe f := f.toFun
+  coe_injective' f g h := by
+    rcases f with ⟨⟨_, _⟩, _⟩
+    rcases g with ⟨⟨_, _⟩, _⟩
+    dsimp at h
+    congr
+    apply DFunLike.coe_injective' h
 
-/-
-variable [Preorder α] [Preorder β] [EquivLike F α β] [OrderIsoClass F α β]
+instance : ValRingHomClass (ValRingHom R S) R S where
+  map_rel f _ _ h:= f.monotone' h
+  map_mul f := f.map_mul
+  map_one f := f.map_one
+  map_add f := f.map_add
+  map_zero f := f.map_zero
+  map_continuous f := f.toContinuousMap.continuous_toFun
+  val_isEquiv_comap f := f.val_isEquiv_comap'
 
-theorem map_lt_map_iff (f : F) {a b : α} : f a < f b ↔ a < b :=
-  lt_iff_lt_of_le_iff_le' (map_le_map_iff f) (map_le_map_iff f)
-#align map_lt_map_iff map_lt_map_iff
+instance : EquivLike (ValRingEquiv R S) R S where
+  coe f := f.toFun
+  inv f := f.invFun
+  left_inv f := f.left_inv
+  right_inv f := f.right_inv
+  coe_injective' f g h _ := by
+    rcases f with ⟨⟨_, _⟩, _⟩
+    rcases g with ⟨⟨_, _⟩, _⟩
+    dsimp at h
+    congr
+    apply DFunLike.coe_injective' h
 
-@[simp]
-theorem map_inv_lt_iff (f : F) {a : α} {b : β} : EquivLike.inv f b < a ↔ b < f a := by
-  rw [← map_lt_map_iff f]
-  simp only [EquivLike.apply_inv_apply]
-#align map_inv_lt_iff map_inv_lt_iff
+instance : ValRingEquivClass (ValRingEquiv R S) R S where
+  map_le_map_iff f := f.toOrderRingIso.map_le_map_iff'
+  map_mul f := f.map_mul
+  map_add f := f.map_add
+  map_continuous f := f.toHomeomorph.continuous_toFun
+  inv_continuous f := f.toHomeomorph.continuous_invFun
+  val_isEquiv_comap f := f.val_isEquiv_comap'
 
-@[simp]
-theorem lt_map_inv_iff (f : F) {a : α} {b : β} : a < EquivLike.inv f b ↔ f a < b := by
-  rw [← map_lt_map_iff f]
-  simp only [EquivLike.apply_inv_apply]
-#align lt_map_inv_iff lt_map_inv_iff
+end
+
+/- ` Add these `
+#check ValRingHom.ext
+#check ValRingHom.val_isEquiv_comap
+
+Low TODO : canlift
+
+Low TODO :coe simp lemmas
 -/
-
-namespace ValRingHom
-
-end ValRingHom
-
-namespace ValRingEquiv
-
-end ValRingEquiv
 
 section
 
@@ -195,56 +262,6 @@ protected def ValRingEquiv.refl : (R ≃+*v R) where
   continuous_toFun := continuous_id
   continuous_invFun := continuous_id
   val_isEquiv_comap' := IsEquiv.refl
-
-
-attribute [coe] ValRingHom.toOrderRingHom
-
-/- @[coe]
-def ValRingHom.toRingHom' (f : R →+*v S) : (R →+* S) := f.toRingHom
--/
-
-instance : Coe (R →+*v S) (R →+*o S) := ⟨ValRingHom.toOrderRingHom⟩
-
-instance : Coe (R →+*v S) (R →+* S) := ⟨fun f => f.toRingHom⟩
-
-@[coe]
-def ValRingEquiv.toValRingHom (f : R ≃+*v S) : R →+*v S := ⟨f.toOrderRingHom, f.continuous_toFun, f.val_isEquiv_comap'⟩
-
-instance : Coe (R ≃+*v S) (R →+*v S) := ⟨ValRingEquiv.toValRingHom⟩ -- `This is temporory, should Mimic instCoeTCOrderRingHom, use ValRingHomClass to implement this`
-/-
-variable {α β} [OrderedRing α] [OrderedRing β] (f : α ≃+*o β)
-#synth CoeTC (α ≃+*o β)  (α →+*o β) -- instCoeTCOrderRingHom
-#check (f : OrderRingHom α β)
--/
-
-instance : Coe (R ≃+*v S) (R ≃+*o S) := ⟨ValRingEquiv.toOrderRingIso⟩
-
-instance : Coe (R ≃+*v S) (R ≃+* S) := ⟨fun f => f.toRingEquiv⟩
-
--- `for ValRingEquiv`
-
-instance : FunLike (ValRingHom R S) R S where
-  coe f := f.toFun
-  coe_injective' f g h := by
-    rcases f with ⟨⟨_, _⟩, _⟩
-    rcases g with ⟨⟨_, _⟩, _⟩
-    dsimp at h
-    congr
-    apply DFunLike.coe_injective'
-    exact h
-
-instance : EquivLike (ValRingEquiv R S) R S where
-  coe f := f.toFun
-  inv f := f.invFun
-  left_inv f := f.left_inv
-  right_inv f := f.right_inv
-  coe_injective' f g h _ := by
-    rcases f with ⟨⟨_, _⟩, _⟩
-    rcases g with ⟨⟨_, _⟩, _⟩
-    dsimp at h
-    congr
-    apply DFunLike.coe_injective'
-    exact h
 
 end
 
@@ -323,9 +340,9 @@ def ValAlgEquiv.toValAlgHom (f : A ≃ₐv[R] B) : (A →ₐv[R] B) where
   map_mul' := f.map_mul
   map_zero' := f.map_zero
   map_add' := f.map_add
-  monotone' := f.toValRingHom.monotone'
-  continuous_toFun := f.toValRingHom.continuous_toFun
-  val_isEquiv_comap' := f.toValRingHom.val_isEquiv_comap'
+  monotone' := by exact OrderHom.monotone (f.toValRingEquiv : A →o B)
+  continuous_toFun := f.toValRingEquiv.continuous_toFun
+  val_isEquiv_comap' := f.toValRingEquiv.val_isEquiv_comap'
   commutes' := f.commutes'
 
 instance : CoeTC (A ≃ₐv[R] B) (A →ₐv[R] B) := ⟨ValAlgEquiv.toValAlgHom⟩
