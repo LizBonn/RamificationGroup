@@ -108,10 +108,12 @@ theorem varphi_mono : ∀a1 a2 : ℚ , a1 > a2 → (varphi R S a1) > (varphi R S
       have hfleqfl : Int.floor a1 = Int.floor a2 := by
         sorry
       contradiction
+    sorry
     have hphiclltfl : varphi R S (Int.ceil a2) < varphi R S (Int.floor a1) := by
       apply varphi_mono_int
-      assumption
-    rw [heqceil]
+      sorry
+--      assumption
+--    rw [heqceil]
     simp [hphiclltfl]
     have hflcl : varphi R S (Int.ceil a2) ≤ varphi R S (Int.floor a1) := by
       by_cases hfleqcl : Int.ceil a2 = Int.floor a1
@@ -146,6 +148,9 @@ theorem varphi_bij : Function.Bijective (varphi R S) := by
     exact lt_of_le_of_ne h1 h
   apply ne_of_lt hlt
   rintro b
+  unfold varphi varphi'
+  by_cases hb : b < 0
+  sorry
   sorry
 
 noncomputable def psi : ℚ → ℚ :=
@@ -186,6 +191,7 @@ variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
 
 open scoped Classical
 
---theorem Varphi_eq_Sum_Inf (u : ℚ) : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : G(S/R)_[(Int.ceil u)] , min (u + 1) ((i[S/R] x)))- 1 := by sorry
-
+theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
+  unfold varphi
+  apply mul_eq_mul_right_iff.1 (Nat.card G(S/R)_[0])
 #check WithTop ℤ
