@@ -192,6 +192,7 @@ variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
 open scoped Classical
 
 theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
-  unfold varphi
-  apply mul_eq_mul_right_iff.1 (Nat.card G(S/R)_[0])
-#check WithTop ℤ
+  unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
+  by_cases h : u ≥ 1
+  simp [h]
+  sorry
