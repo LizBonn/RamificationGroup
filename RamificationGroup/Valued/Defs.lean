@@ -14,10 +14,26 @@ end check
 
 namespace Valued
 
--- the preoder lift from valuation is different from the proorder of divisibility -- there is a preorder on the valuations, called specialization?
-instance preorder {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]: Preorder R := Valuation.toPreorder Valued.v
+section Preorder
 
--- `theorems that x ≤ y iff v x ≤ v y`
+variable {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]
+
+-- the preoder lift from valuation is different from the proorder of divisibility -- there is a preorder on the valuations, called specialization?
+instance preorder : Preorder R := Valuation.toPreorder Valued.v
+
+theorem le_iff_val_le (x y : R) : x ≤ y ↔ v x ≤ v y := sorry
+
+theorem lt_iff_val_lt (x y : R) : x < y ↔ v x < v y := sorry
+
+theorem le_one_iff_val_le_one (x y : R) : x ≤ 1 ↔ v x ≤ 1 := sorry
+
+theorem lt_one_iff_val_lt_one (x y : R) : x < 1 ↔ v x < 1 := sorry
+
+theorem zero_le (x y : R) : 0 ≤ x := sorry
+
+-- lower TODO : `theorems that x + y ≤ x, x + y < x,...`
+
+end Preorder
 
 /-- An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]` -/
 @[reducible]
