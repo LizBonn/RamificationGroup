@@ -7,6 +7,8 @@ import RamificationGroup.Valued.Defs
 -- preorder on the set of valuations? not a type, IsSpecialization
 open DiscreteValuation Valuation Valued
 
+section ValRingHom_ValRingEquiv
+
 section Hom
 
 -- Valuation on B is an extension of valuation on A.
@@ -494,6 +496,7 @@ end ValRingEquiv
 
 end Composition
 
+end ValRingHom_ValRingEquiv
 
 section
 
