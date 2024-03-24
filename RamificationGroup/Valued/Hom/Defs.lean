@@ -1,11 +1,35 @@
 import RamificationGroup.Valued.Defs
 
--- `Big Question: Should be ValRingHom only requires v x ≤ v y → v f x ≤ v f y , or iff???` Maybe first is better?
+/-!
+# ValRingHom and ValAlgebra
+
+In this file we define the type of ring homomorphisms that respect the valuation structure. We require such a homomorphism from valued ring `R` to valued ring `S` to satisfy the condition that the valuation on `R` is equivalent to the pullback of the valuation on `S`. This is strictly stronger than merely requiring `v x ≤ v y → v (f x) ≤ v (f y)`.
+
+## Main definitions
+
+* `ValRingHom` : Valued ring homomorphisms.
+* `ValRingEquiv` : Valued ring isomorphisms.
+
+## Notation
+
+* `→+*v`: Valued ring homomorphisms.
+* `≃+*v`: Valued ring isomorphisms.
+
+## Implementation notes
+
+
+## Tags
+
+valued ring homomorphism, valued homomorphism
+
+-/
+
 -- `Consider K → K [[X]] , K is a local field, K[X] with valuation trivial on K, valuation ideal given by (X). This satisfies v x ≤ v y → v f x ≤ v f y`
 -- if the first definition K of local field K can have many valuation on L. second  will pin down the valuation on L
 -- if as first choice, order preserving <=> valuation preserving <=> continuous (v(x) < 1 -> v f x < 1, by x^n -> 0 -> f x ^n -> 0)
 -- preorder on the set of valuations? not a type, IsSpecialization
 open DiscreteValuation Valuation Valued
+#check OrderRingHom
 
 section ValRingHom_ValRingEquiv
 
