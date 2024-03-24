@@ -498,12 +498,12 @@ end Composition
 
 end ValRingHom_ValRingEquiv
 
-section
+section ValAlgebra
 
-class ValAlgebra (R A : Type*) {ΓR TA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [vR : Valued R ΓR] [vA : Valued A TA] extends ValRingHom R A, Algebra R A
+class ValAlgebra (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [vR : Valued R ΓR] [vA : Valued A ΓA] extends ValRingHom R A, Algebra R A
 
 -- do not use this... definitional equal problems
-def ValRingHom.toValAlgebra {R A : Type*} {ΓR TA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [Valued R ΓR] [Valued A TA] (f : R →+*v A) : ValAlgebra R A where
+def ValRingHom.toValAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] (f : R →+*v A) : ValAlgebra R A where
   toValRingHom := f
   smul := f.toRingHom.toAlgebra.smul
   smul_def' := f.toRingHom.toAlgebra.smul_def'
@@ -511,13 +511,13 @@ def ValRingHom.toValAlgebra {R A : Type*} {ΓR TA : outParam Type*} [CommRing R]
 
 -- `copy more lemmas in Algebra`
 
-def valAlgebraMap (R A : Type*) {ΓR TA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [Valued R ΓR] [Valued A TA] [ValAlgebra R A] : R →+*v A := ValAlgebra.toValRingHom (R := R) (A := A)
+def valAlgebraMap (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : R →+*v A := ValAlgebra.toValRingHom (R := R) (A := A)
 
-end
+end ValAlgebra
 
 section
 
-variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [vA : Valued A TA] [vB : Valued B TB] [ValAlgebra R A] [ValAlgebra R B]
+variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
 
 structure ValAlgHom extends ValRingHom A B, AlgHom R A B
 
@@ -534,7 +534,7 @@ end
 
 section
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [vA : Valued A TA] [vB : Valued B TB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
 
 noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B where
   toFun := f
@@ -552,7 +552,7 @@ noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.coma
 section coercion
 -- -- coercions
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [Valued A TA] [Valued B TB] [ValAlgebra R A] [ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
 
 instance ValAlgHom.algHom : Coe (A →ₐv[R] B) (A →ₐ[R] B) := ⟨ValAlgHom.toAlgHom⟩
 
@@ -588,7 +588,7 @@ variable {R S} [OrderedRing R] [OrderedRing S] (f : R ≃+*o S)
 
 end coercion
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [Valued A TA] [Valued B TB] [ValAlgebra R A] [ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
 
 #synth Algebra R A
 #synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
@@ -631,7 +631,7 @@ protected def ValAlgEquiv.refl : (A ≃ₐv[R] A) where
   commutes' _ := rfl
 
 
-instance {R A : Type*} [CommRing R] [Ring A] {ΓR TA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [Valued R ΓR] [Valued A TA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
+instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
   mul := sorry
   mul_assoc := sorry
   one := sorry
