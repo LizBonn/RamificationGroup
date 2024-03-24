@@ -109,5 +109,4 @@ noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : �
   else if (i_[S/R] s).untop h > u then u
   else (i_[S/R] s).untop h
 
-
 #check ValAlgEquiv.truncatedLowerIndex

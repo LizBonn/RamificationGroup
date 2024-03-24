@@ -95,39 +95,39 @@ theorem varphi_mono : ∀a1 a2 : ℚ , a1 > a2 → (varphi R S a1) > (varphi R S
         simp [h]
       apply (LE.le.ge_iff_eq hfloorle).1 hfloorge
     contradiction
-  have ha2 : varphi R S (Int.floor a1) > varphi R S a2 := by
-    have hcllefl : Int.ceil a2 ≤ Int.floor a1 := by
-      apply Int.ceil_le.2
-      apply le_of_lt h''
-    by_cases heqceil : a2 = Int.ceil a2
-    have hclltfl : Int.ceil a2 < Int.floor a1 := by
-      by_contra hn
-      push_neg at hn
-      have hcleqfl : Int.ceil a2 = Int.floor a1 := by
-        apply (LE.le.ge_iff_eq hcllefl).1 hn
-      have hfleqfl : Int.floor a1 = Int.floor a2 := by
-        sorry
-      contradiction
-    sorry
-    have hphiclltfl : varphi R S (Int.ceil a2) < varphi R S (Int.floor a1) := by
-      apply varphi_mono_int
-      sorry
---      assumption
---    rw [heqceil]
-    simp [hphiclltfl]
-    have hflcl : varphi R S (Int.ceil a2) ≤ varphi R S (Int.floor a1) := by
-      by_cases hfleqcl : Int.ceil a2 = Int.floor a1
-      simp [hfleqcl]
-      have hflgtcl : Int.ceil a2 < Int.floor a1 := by
-        push_neg at hfleqcl
-        apply lt_of_le_of_ne hcllefl hfleqcl
-      apply le_of_lt
-      apply varphi_mono_int
-      exact hflgtcl
-    have hcl : varphi R S a2 < varphi R S (Int.ceil a2) := by
-      push_neg at heqceil
-      apply varphi_lt_int_ceil
-      assumption
+  have ha2 : varphi R S (Int.floor a1) > varphi R S a2 := by sorry
+    -- have hcllefl : Int.ceil a2 ≤ Int.floor a1 := by
+    --   apply Int.ceil_le.2
+    --   apply le_of_lt h''
+    -- by_cases heqceil : a2 = Int.ceil a2
+    -- have hclltfl : Int.ceil a2 < Int.floor a1 := by
+    --   by_contra hn
+    --   push_neg at hn
+    --   have hcleqfl : Int.ceil a2 = Int.floor a1 := by
+    --     apply (LE.le.ge_iff_eq hcllefl).1 hn
+    --   have hfleqfl : Int.floor a1 = Int.floor a2 := by
+    --     sorry
+    --   contradiction
+    -- sorry
+--     have hphiclltfl : varphi R S (Int.ceil a2) < varphi R S (Int.floor a1) := by
+--       apply varphi_mono_int
+--       sorry
+-- --      assumption
+-- --    rw [heqceil]
+--     simp [hphiclltfl]
+--     have hflcl : varphi R S (Int.ceil a2) ≤ varphi R S (Int.floor a1) := by
+--       by_cases hfleqcl : Int.ceil a2 = Int.floor a1
+--       simp [hfleqcl]
+--       have hflgtcl : Int.ceil a2 < Int.floor a1 := by
+--         push_neg at hfleqcl
+--         apply lt_of_le_of_ne hcllefl hfleqcl
+--       apply le_of_lt
+--       apply varphi_mono_int
+--       exact hflgtcl
+--     have hcl : varphi R S a2 < varphi R S (Int.ceil a2) := by
+--       push_neg at heqceil
+--       apply varphi_lt_int_ceil
+--       assumption
   apply gt_of_ge_of_gt
   apply ha1
   apply ha2
@@ -195,4 +195,5 @@ theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) 
   unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
   by_cases h : u ≥ 1
   simp [h]
+  sorry
   sorry
