@@ -1,8 +1,7 @@
 /-
 TODO:
-1. (FIRST THING!!!) complete `x_and_f` to determine the necessary conditions
-2. prove `instFiniteExtResidue`
-3. seek a better condition for `f`, then prove `exists_f_of_x`
+1. prove `instFiniteExtResidue`
+2. complete `PolyTaylor.lean`
 
 # of WARNINGs : 1
 
@@ -14,7 +13,7 @@ import Mathlib.FieldTheory.PrimitiveElement
 import Mathlib.NumberTheory.RamificationInertia
 import RamificationGroup.Valuation.SubAlgEquiv
 import RamificationGroup.Valuation.PolyTaylor
-import LocalClassFieldTheory.DiscreteValuationRing.Basic
+import LocalClassFieldTheory.DiscreteValuationRing.ResidueField
 
 variable {A : Type*} [CommRing A] [LocalRing A]
 variable {B : Type*} [CommRing B] [LocalRing B]
@@ -107,13 +106,7 @@ namespace ExtDVR
 
 variable [Module.Finite A B] [IsSeparable (ResidueField A) (ResidueField B)]
 
-theorem ramificationIdx_finite (h_inj : Function.Injective (algebraMap A B)) : ramificationIdx A B ≠ 0 := by
-  sorry
-
-theorem ramificationIdx_eq (h_inj : Function.Injective (algebraMap A B)) : (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^ ramificationIdx A B := by
-  sorry
-
-instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := sorry
+instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
 
 open IntermediateField Polynomial Classical DiscreteValuationRing
 
@@ -215,21 +208,27 @@ theorem lemma3_aux2 (i : ℕ) : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maxi
       use w
       rw [mul_comm, pow_succ, mul_comm ϖ]
 
-theorem lemma3_aux3 : maximalIdeal A • (⊤ : Submodule A B) = (maximalIdeal B ^ e).restrictScalars A := by
-  sorry
+theorem lemma3_aux3 (h_inj : Function.Injective (algebraMap A B)) : (maximalIdeal A).map (algebraMap A B) ≠ ⊥ := by
+  intro h
+  rw [Ideal.map_eq_bot_iff_of_injective h_inj] at h
+  apply DiscreteValuationRing.not_a_field' (R := A) h
 
 #check Submodule.map_mkQ_eq_top
-open Submodule in
+
 /--
 lemma 3 states that `xⁱϖʲ`'s with finite many `i j`'s form a `A`-basis of `B`.
 This is an alternate and weaker version of lemma 3,
 stating that `A[x, ϖ] = B`.
 -/
-theorem lemma3_weak : Algebra.adjoin A {x, ϖ} = ⊤ := by
-  -- use Nakayama lemma
+theorem lemma3_weak (h_inj : Function.Injective (algebraMap A B)) : Algebra.adjoin A {x, ϖ} = ⊤ := by
   rw [← Algebra.toSubmodule_eq_top, eq_top_iff]
-  apply le_of_le_smul_of_le_jacobson_bot _ (le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm)
-  · rw [lemma3_aux3, lemma3_aux2 hx hϖ]
+  apply Submodule.le_of_le_smul_of_le_jacobson_bot _ (le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm) -- Nakayama's lemma
+  · rw [Ideal.smul_top_eq_map]
+    obtain ⟨n, hn⟩ : ∃n : ℕ, (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^ n := by
+      rcases (TFAE B (not_isField B)).out 0 6 with ⟨h, _⟩
+      apply h; assumption
+      apply lemma3_aux3 h_inj
+    rw [hn, lemma3_aux2 hx hϖ]
   · apply Module.finite_def.mp
     assumption
 
@@ -263,13 +262,13 @@ theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : 
 end x_and_f
 
 /--`B = A[x]` if `k_B = k_A[x]` AND `f x` is a uniformizer.-/
-theorem thm_val_1 {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
+theorem thm_val_1 (h_inj : Function.Injective (algebraMap A B)) {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
     {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) :
     Algebra.adjoin A {x} = ⊤ := by
   apply Algebra.adjoin_eq_of_le
   · simp only [Algebra.coe_top, Set.subset_univ]
   let fx := f.eval₂ (algebraMap A B) x
-  rw [← lemma3_weak (x := x) (ϖ := fx)]
+  rw [← lemma3_weak hx h_fx h_inj]
   rw [show ({x, fx} : Set B) = {x} ∪ {fx} by rfl, Algebra.adjoin_union]
   simp only [sup_le_iff, le_refl, true_and, ge_iff_le]
   rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
@@ -278,20 +277,20 @@ theorem thm_val_1 {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
 
 variable (A) (B)
 
-theorem exists_primitive : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
+theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
   rcases exists_x A B with ⟨x, hx⟩
   rcases exists_f_of_x A x with ⟨f, h_red⟩
   exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
-    then ⟨x, (thm_val_1 hx h)⟩
+    then ⟨x, (thm_val_1 h_inj hx h)⟩
     else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,
-      (thm_val_1 (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
+      (thm_val_1 h_inj (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
         (lemma4_val_ge_2 h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
 variable [NoZeroSMulDivisors A B] -- cannot be inferred if `A → B` is not injective
 
-noncomputable def PowerBasisExtDVR : PowerBasis A B :=
+noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
-    (AlgEquiv.ofTop (exists_primitive _ _).choose_spec)
+    (AlgEquiv.ofTop (exists_primitive _ _ h).choose_spec)
 
 
 end ExtDVR
