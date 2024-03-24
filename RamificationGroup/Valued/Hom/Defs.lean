@@ -45,6 +45,11 @@ structure ValRingEquiv (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S
   extends OrderRingIso R S, Homeomorph R S where
   val_isEquiv_comap' : vR.v.IsEquiv (vS.v.comap toRingEquiv)
 
+/-- Reinterpret a valued ring isomorphism into a ordered ring isomorphism. -/
+add_decl_doc ValRingEquiv.toOrderRingIso
+
+attribute [coe] ValRingEquiv.toOrderRingIso
+
 @[inherit_doc]
 infixr:25 " ≃+*v " => ValRingEquiv
 
@@ -162,19 +167,14 @@ end Equiv
 
 end Class
 
-section
+variable {R S T: Type*} {ΓR ΓS ΓT : outParam Type*}
+  [Ring R] [Ring S] [Ring T]
+  [LinearOrderedCommGroupWithZero ΓR]
+  [LinearOrderedCommGroupWithZero ΓS]
+  [LinearOrderedCommGroupWithZero ΓT]
+  [vR : Valued R ΓR] [vS : Valued S ΓS] [vT : Valued T ΓT]
 
-variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-  [vR : Valued R ΓR] [vS : Valued S ΓS]
-
--- variable {F} [EquivLike F R S] [ValRingEquivClass F R S] {f : F}
-
-/-
-#synth ValRingEquivClass (ValRingEquiv R S) R S
-#synth ValRingHomClass (ValRingHom R S) R S
--/
--- `for ValRingEquiv`
+section HomIsClass
 
 instance : FunLike (ValRingHom R S) R S where
   coe f := f.toFun
@@ -207,70 +207,300 @@ instance : EquivLike (ValRingEquiv R S) R S where
     apply DFunLike.coe_injective' h
 
 instance : ValRingEquivClass (ValRingEquiv R S) R S where
-  map_le_map_iff f := f.toOrderRingIso.map_le_map_iff'
+  map_le_map_iff f := f.map_le_map_iff'
   map_mul f := f.map_mul
   map_add f := f.map_add
   map_continuous f := f.toHomeomorph.continuous_toFun
   inv_continuous f := f.toHomeomorph.continuous_invFun
   val_isEquiv_comap f := f.val_isEquiv_comap'
 
-end
+end HomIsClass
+
+section coe_and_lemma
+
+-- `How should one organize coe lemmas???`
+namespace ValRingHom
+
+-- theorem val_isEquiv_comap (R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
+--   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+--   [vR : Valued R ΓR] [vS : Valued S ΓS] (f : R →+*v S) : vR.v.IsEquiv (vS.v.comap f) := f.val_isEquiv_comap'
+
+-- @[simp]
+-- theorem toOrderRingHom_eq_coe (f : R →+*v S) : f.toOrderRingHom = f := rfl
+
+-- @[simp]
+-- theorem toFun_eq_coe (f : R →+*v S) : f.toFun = f := rfl
+
+@[ext]
+theorem ext (f g : R →+*v S) (h : (f : R → S) = g) : f = g := DFunLike.coe_injective h
+
+-- @[simp]
+-- theorem coe_eq (f : R →+*v S) : ValRingHomClass.toValRingHom f = f := rfl
+
+end ValRingHom
+
+-- @[simp]
+-- theorem ValRingHomClass.coe_coe {F} [FunLike F R S] [ValRingHomClass F R S] (f : F) : ⇑(f : R →+*v S) = f := rfl
+
+-- @[simp]
+-- theorem ValRingHomClass.coe_toOrderRingIso {F} [FunLike F R S] [ValRingHomClass F R S] (f : F) : ⇑(f : R →+*o S) = f := rfl
+
+namespace ValRingEquiv
+
+-- @[simp]
+-- theorem toFun_eq_coe (f : R ≃+*v S) : f.toFun = f := rfl
+
+-- @[simp]
+-- theorem toRingEquiv_toOrderRingIso_eq_coe (f : R ≃+*v S) : ((f.toOrderRingIso) : R ≃+* S) = f := rfl
+
+-- @[simp]
+-- theorem coe_toOrderRingIso_eq_coe (f : R ≃+*v S) : ⇑(f.toOrderRingIso) = f := rfl
+
+@[ext]
+theorem ext (f g : R ≃+*v S) (h : (f : R → S) = g) : f = g := DFunLike.coe_injective h
+
+theorem bijective (f : R ≃+*v S) : Function.Bijective f := f.toEquiv.bijective
+
+theorem injective (f : R ≃+*v S) : Function.Injective f := f.toEquiv.injective
+
+theorem surjective (f : R ≃+*v S) : Function.Surjective f := f.toEquiv.surjective
+
+-- @[simp]
+-- theorem coe_eq (f : R ≃+*v S) : ValRingEquivClass.toValRingEquiv f = f := rfl
+
+end ValRingEquiv
+
+-- @[simp]
+-- theorem ValRingEquivClass.coe_coe {F} [EquivLike F R S] [ValRingEquivClass F R S] (f : F) : ⇑(f : R ≃+*v S) = f := rfl
+
+-- @[simp]
+-- theorem ValRingEquivClass.coe_toOrderRingIso {F} [EquivLike F R S] [ValRingEquivClass F R S] (f : F) : ⇑(f : R ≃+*o S) = f := rfl
 
 /- ` Add these `
-#check ValRingHom.ext
-#check ValRingHom.val_isEquiv_comap
-
 Low TODO : canlift
 
-Low TODO :coe simp lemmas
+Low TODO :coe simp lemmas, such as
+
+toOrderRingIso coe_mk coe_mk' toFun_eq_coe
+
+How should these coe lemma be organized??
+
+`refl symm trans group`
 -/
 
-section
+end coe_and_lemma
 
-variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-  [vR : Valued R ΓR] [vS : Valued S ΓS]
+section mk'
 
-def ValRingHom.mk' (f : R →+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R →+*v S where
+theorem map_le_map_iff_of_val_isEquiv_comap {f : R ≃+* S} {x y : R} (hf : vR.v.IsEquiv (vS.v.comap f)) : f x ≤ f y ↔ x ≤ y := by
+    rw [le_iff_val_le, le_iff_val_le]
+    exact (hf x y).symm
+
+theorem monotone_of_val_isEquiv_comap {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : Monotone f := by
+  intro x y h
+  rw [le_iff_val_le] at h ⊢
+  exact (hf x y).1 h
+
+theorem continuous_of_val_isEquiv_comap {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : Continuous f := sorry -- difficult
+
+-- lower TODO : stronger version, f is topological embedding
+
+protected theorem val_isEquiv_comap.symm {f : R ≃+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : vS.v.IsEquiv (vR.v.comap f.symm) := by
+  intro x y
+  convert (hf (f.invFun x) (f.invFun y)).symm <;>
+  simp only [RingEquiv.toEquiv_eq_coe, Equiv.invFun_as_coe, comap_apply, RingHom.coe_coe,
+    EquivLike.apply_coe_symm_apply]
+
+def ValRingHom.mk' {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : R →+*v S where
   toRingHom := f
-  monotone' := sorry -- add a theorem for this at the begining
+  monotone' := monotone_of_val_isEquiv_comap hf
   val_isEquiv_comap' := hf
-  continuous_toFun := sorry -- add a theorem for this at the begining
+  continuous_toFun := continuous_of_val_isEquiv_comap hf
 
-def ValRingEquiv.mk' (f : R ≃+* S) (hf : vR.v.IsEquiv (vS.v.comap f)) : R ≃+*v S where
+def ValRingEquiv.mk' {f : R ≃+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : R ≃+*v S where
   toRingEquiv := f
-  map_le_map_iff' := sorry
-  continuous_toFun := sorry
-  continuous_invFun := sorry
-  val_isEquiv_comap' := sorry
+  map_le_map_iff' := map_le_map_iff_of_val_isEquiv_comap hf
+  continuous_toFun := continuous_of_val_isEquiv_comap hf
+  continuous_invFun := continuous_of_val_isEquiv_comap (val_isEquiv_comap.symm hf)
+  val_isEquiv_comap' := hf
 
--- ValRingHomClass
--- ValRingIsoClass
+-- TODO: coe lemmas of mk', @[simp]
 
--- `copy lemmas in OrderRingHom`
--- `id, comp`
--- `OrderRingIso.symm`
+end mk'
 
-protected def ValRingHom.id : (R →+*v R) where
-  toOrderRingHom := .id R
-  continuous_toFun := continuous_id
-  val_isEquiv_comap' := IsEquiv.refl
+section Composition
 
+namespace ValRingHom
+
+/-- The identity function as bundled valuation ring homomorphism. -/
+def id : R →+*v R :=
+  ⟨.id R, continuous_id , IsEquiv.refl⟩
+
+instance : Inhabited (R →+*v R) := ⟨ ValRingHom.id ⟩
+
+def comp (g : S →+*v T) (f : R →+*v S) : R →+*v T where
+  toOrderRingHom := (↑g : OrderRingHom S T).comp f
+  continuous_toFun := by
+    simp only [OrderRingHom.comp]
+    dsimp
+    exact Continuous.comp g.continuous_toFun f.continuous_toFun
+  val_isEquiv_comap' := by
+    intro x y
+    convert f.val_isEquiv_comap' x y
+    exact (g.val_isEquiv_comap' (f x) (f y)).symm
+
+@[simp]
+theorem id_comp (f : R →+*v S) : id.comp f = f := by
+  ext
+  rfl
+
+@[simp]
+theorem comp_id (f : R →+*v S) : f.comp id = f := by
+  ext
+  rfl
+
+end ValRingHom
+
+namespace ValRingEquiv
+
+variable (R) in
+/-- Identity valued ring isomorphism. -/
 @[refl]
-protected def ValRingEquiv.refl : (R ≃+*v R) where
+def refl : (R ≃+*v R) where
   toOrderRingIso := .refl R
   continuous_toFun := continuous_id
   continuous_invFun := continuous_id
   val_isEquiv_comap' := IsEquiv.refl
 
-end
+@[simp]
+theorem coe_refl : (refl R : R →+*v R) = .id :=
+  rfl
+
+@[simp]
+theorem refl_apply (x : R) : refl R x = x :=
+  rfl
+
+@[simp]
+theorem refl_toEquiv : (refl R).toEquiv = Equiv.refl R :=
+  rfl
+
+/-- Inverse of an valued ring isomorphism. -/
+def symm (f : R ≃+*v S) : S ≃+*v R where
+  toOrderRingIso := OrderRingIso.symm f
+  continuous_toFun := f.continuous_invFun
+  continuous_invFun := f.continuous_toFun
+  val_isEquiv_comap' := by
+    intro x y
+    convert IsEquiv.symm (val_isEquiv_comap f) (f.invFun x) (f.invFun y) <;>
+    simp only [comap_apply] <;>
+    congr <;>
+    exact (f.right_inv _).symm
+
+@[simp]
+theorem apply_symm_apply (f : R ≃+*v S) (x : S) : f (f.symm x) = x :=
+  f.toEquiv.apply_symm_apply x
+
+@[simp]
+theorem symm_apply_apply (f : R ≃+*v S) (x : R) : f.symm (f x) = x :=
+  f.toEquiv.symm_apply_apply x
+
+@[simp]
+theorem symm_refl : (ValRingEquiv.refl R).symm = .refl R := rfl
+
+theorem apply_eq_iff_eq_symm_apply (f : R ≃+*v S) (x : R) (y : S) : f x = y ↔ x = f.symm y :=
+  f.toEquiv.apply_eq_iff_eq_symm_apply
+
+theorem symm_apply_eq (f : R ≃+*v S) {x : R} {y : S} : f.symm y = x ↔ y = f x :=
+  f.toEquiv.symm_apply_eq
+
+@[simp]
+theorem symm_symm (f : R ≃+*v S) : f.symm.symm = f := rfl
+
+theorem symm_bijective : Function.Bijective (.symm : (R ≃+*v S) → S ≃+*v R) :=
+  Function.bijective_iff_has_inverse.mpr ⟨_, symm_symm, symm_symm⟩
+
+theorem symm_injective : Function.Injective (.symm : (R ≃+*v S) → S ≃+*v R) :=
+  symm_bijective.injective
+
+theorem symm_surjective : Function.Surjective (.symm : (R ≃+*v S) → S ≃+*v R) :=
+  symm_bijective.surjective
+
+@[simp]
+theorem toEquiv_symm (f : R ≃+*v S) : f.toEquiv.symm = f.symm.toEquiv :=
+  rfl
+
+/-- Composition of two valued ring isomorphisms is an order isomorphism. -/
+@[trans]
+def trans (f : R ≃+*v S) (f' : S ≃+*v T) : R ≃+*v T where -- trans has different order comparing with comp
+  toOrderRingIso := OrderRingIso.trans (β := S) f f'
+  continuous_toFun := by
+    apply Continuous.comp (Y := S)
+    exact f'.continuous_toFun
+    exact f.continuous_toFun
+  continuous_invFun := by
+    apply Continuous.comp (Y := S)
+    exact f.continuous_invFun
+    exact f'.continuous_invFun
+  val_isEquiv_comap' := by
+    intro x y
+    convert f.val_isEquiv_comap' x y
+    exact (f'.val_isEquiv_comap' (f x) (f y)).symm
+
+@[simp]
+theorem coe_trans (e : R ≃+*v S) (e' : S ≃+*v T) : ⇑(e.trans e') = e' ∘ e :=
+  rfl
+
+@[simp]
+theorem trans_apply (e : R ≃+*v S) (e' : S ≃+*v T) (x : R) : e.trans e' x = e' (e x) :=
+  rfl
+
+@[simp]
+theorem refl_trans (e : R ≃+*v S) : (refl R).trans e = e := by
+  ext x
+  rfl
+
+@[simp]
+theorem trans_refl (e : R ≃+*v S) : e.trans (refl S) = e := by
+  ext x
+  rfl
+
+@[simp]
+theorem symm_trans_apply (e₁ : R ≃+*v S) (e₂ : S ≃+*v T) (c : T) :
+    (e₁.trans e₂).symm c = e₁.symm (e₂.symm c) :=
+  rfl
+
+theorem symm_trans (e₁ : R ≃+*v S) (e₂ : S ≃+*v T) : (e₁.trans e₂).symm = e₂.symm.trans e₁.symm :=
+  rfl
+
+@[simp]
+theorem self_trans_symm (e : R ≃+*v S) : e.trans e.symm = .refl R := by
+  ext; apply Equiv.left_inv
+
+@[simp]
+theorem self_symm_trans (e : R ≃+*v S) : e.symm.trans e = .refl S := by
+  ext; apply Equiv.right_inv
+
+-- -- structures on ValRingIso
+instance group : Group (R ≃+*v R) where
+  mul := .trans
+  mul_assoc := by intros; rfl
+  one := .refl R
+  one_mul := by intros; rfl
+  mul_one := by intros; rfl
+  inv := .symm
+  mul_left_inv := self_symm_trans
+
+end ValRingEquiv
+
+end Composition
+
 
 section
 
-class ValAlgebra (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [vR : Valued R ΓR] [vA : Valued A ΓA] extends ValRingHom R A, Algebra R A
+class ValAlgebra (R A : Type*) {ΓR TA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [vR : Valued R ΓR] [vA : Valued A TA] extends ValRingHom R A, Algebra R A
 
 -- do not use this... definitional equal problems
-def ValRingHom.toValAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] (f : R →+*v A) : ValAlgebra R A where
+def ValRingHom.toValAlgebra {R A : Type*} {ΓR TA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [Valued R ΓR] [Valued A TA] (f : R →+*v A) : ValAlgebra R A where
   toValRingHom := f
   smul := f.toRingHom.toAlgebra.smul
   smul_def' := f.toRingHom.toAlgebra.smul_def'
@@ -278,13 +508,13 @@ def ValRingHom.toValAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R
 
 -- `copy more lemmas in Algebra`
 
-def valAlgebraMap (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : R →+*v A := ValAlgebra.toValRingHom (R := R) (A := A)
+def valAlgebraMap (R A : Type*) {ΓR TA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [Valued R ΓR] [Valued A TA] [ValAlgebra R A] : R →+*v A := ValAlgebra.toValRingHom (R := R) (A := A)
 
 end
 
 section
 
-variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
+variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [vA : Valued A TA] [vB : Valued B TB] [ValAlgebra R A] [ValAlgebra R B]
 
 structure ValAlgHom extends ValRingHom A B, AlgHom R A B
 
@@ -301,7 +531,7 @@ end
 
 section
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [vA : Valued A TA] [vB : Valued B TB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
 
 noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B where
   toFun := f
@@ -319,7 +549,7 @@ noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.coma
 section coercion
 -- -- coercions
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [Valued A TA] [Valued B TB] [ValAlgebra R A] [ValAlgebra R B]
 
 instance ValAlgHom.algHom : Coe (A →ₐv[R] B) (A →ₐ[R] B) := ⟨ValAlgHom.toAlgHom⟩
 
@@ -348,14 +578,14 @@ def ValAlgEquiv.toValAlgHom (f : A ≃ₐv[R] B) : (A →ₐv[R] B) where
 instance : CoeTC (A ≃ₐv[R] B) (A →ₐv[R] B) := ⟨ValAlgEquiv.toValAlgHom⟩
 -- `This is temporory, should Mimic instCoeTCOrderRingHom, use ValAlgHomClass to implement this coe instance`
 /-
-variable {α β} [OrderedRing α] [OrderedRing β] (f : α ≃+*o β)
-#synth CoeTC (α ≃+*o β)  (α →+*o β) -- instCoeTCOrderRingHom
-#check (f : OrderRingHom α β)
+variable {R S} [OrderedRing R] [OrderedRing S] (f : R ≃+*o S)
+#synth CoeTC (R ≃+*o S)  (R →+*o S) -- instCoeTCOrderRingHom
+#check (f : OrderRingHom R S)
 -/
 
 end coercion
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR TA TB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [LinearOrderedCommGroupWithZero TB] [Valued R ΓR] [Valued A TA] [Valued B TB] [ValAlgebra R A] [ValAlgebra R B]
 
 #synth Algebra R A
 #synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
@@ -397,17 +627,8 @@ protected def ValAlgEquiv.refl : (A ≃ₐv[R] A) where
   val_isEquiv_comap' := IsEquiv.refl
   commutes' _ := rfl
 
--- -- structures on ValRingIso
-instance {A : Type*} [Ring A] {ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓA] [Valued A ΓA]: Group (A ≃+*v A) where
-  mul := sorry
-  mul_assoc := sorry
-  one := sorry
-  one_mul := sorry
-  mul_one := sorry
-  inv := sorry
-  mul_left_inv := sorry
 
-instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
+instance {R A : Type*} [CommRing R] [Ring A] {ΓR TA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero TA] [Valued R ΓR] [Valued A TA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
   mul := sorry
   mul_assoc := sorry
   one := sorry
