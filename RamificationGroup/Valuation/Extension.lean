@@ -96,6 +96,9 @@ theorem irreducible_of_irreducible_add_addVal_ge_two (hx : Irreducible x) {y : A
   simp only [mem_nonunits_iff, IsUnit.mul_iff, not_and]
   exact fun _ ↦ Irreducible.not_unit hϖ
 
+theorem maximalIdeal_pow_eq_span_irreducible_pow (n : ℕ) : maximalIdeal A ^ n = Ideal.span {ϖ ^ n} := by
+  rw [Irreducible.maximalIdeal_eq hϖ, Ideal.span_singleton_pow]
+
 end DiscreteValuationRing
 
 end dvr
@@ -103,6 +106,12 @@ end dvr
 namespace ExtDVR
 
 variable [Module.Finite A B] [IsSeparable (ResidueField A) (ResidueField B)]
+
+theorem ramificationIdx_finite (h_inj : Function.Injective (algebraMap A B)) : ramificationIdx A B ≠ 0 := by
+  sorry
+
+theorem ramificationIdx_eq (h_inj : Function.Injective (algebraMap A B)) : (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^ ramificationIdx A B := by
+  sorry
 
 instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := sorry
 
@@ -147,13 +156,66 @@ variable {ϖ : B} (hϖ : Irreducible ϖ)
 #check Submodule.le_of_le_smul_of_le_jacobson_bot
 #check Submodule.smul_le_of_le_smul_of_le_jacobson_bot
 
--- change to `Ideal.span {ϖ}`?
+local notation : max "e" => ramificationIdx A B
+
+/-- can be strenthened to `A[x] ⊔ m_B = B`-/
 theorem lemma3_aux1 : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A = ⊤ := by
   rw [eq_top_iff]
   intro y _
-  sorry
+  obtain ⟨g0, hg0⟩ : ∃g : (ResidueField A)[X], aeval (residue B x) g = residue B y := by
+    rw [← AlgHom.mem_range, ← Algebra.adjoin_singleton_eq_range_aeval,
+      ← IntermediateField.adjoin_simple_toSubalgebra_of_integral (IsIntegral.of_finite _ _), hx]
+    simp only[top_toSubalgebra, Algebra.mem_top]
+  -- rcases this with ⟨g0, hg0⟩
+  let g : A[X] := (map_surjective (residue A) Ideal.Quotient.mk_surjective g0).choose
+  rw [show y = g.eval₂ (algebraMap A B) x + (y - g.eval₂ (algebraMap A B) x) by rw [add_sub_cancel'_right]]
+  apply Submodule.add_mem_sup
+  · rw [Subalgebra.mem_toSubmodule]
+    apply Algebra.adjoin_mono (show ({x} : Set B) ⊆ {x, ϖ} by simp only [Set.singleton_subset_iff,
+      Set.mem_insert_iff, Set.mem_singleton_iff, true_or])
+    apply aeval_mem_adjoin_singleton
+  · rw [Submodule.restrictScalars_mem, ← Ideal.Quotient.eq_zero_iff_mem,
+      show Ideal.Quotient.mk (maximalIdeal B) = residue B by rfl,
+      map_sub]
+    erw [hom_eval₂, algebraMap_residue_compat, ← eval₂_map,
+      (map_surjective (residue A) Ideal.Quotient.mk_surjective g0).choose_spec,
+      ← aeval_def, hg0, sub_self]
 
-theorem lemma3_aux2 : maximalIdeal A • (⊤ : Submodule A B) = sorry := by
+theorem lemma3_aux2 (i : ℕ) : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B ^ i).restrictScalars A = ⊤ := by
+  induction' i with i hi
+  · simp only [Nat.zero_eq, pow_zero, Ideal.one_eq_top, Submodule.restrictScalars_top, ge_iff_le,
+    le_top, sup_of_le_right]
+  · rw [eq_top_iff, ← hi]
+    intro y hy
+    obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp hy
+    obtain ⟨c, hc⟩ : ∃c : B, b = ϖ ^ i * c := by
+      rw [maximalIdeal_pow_eq_span_irreducible_pow hϖ, Submodule.restrictScalars_mem, Ideal.mem_span_singleton'] at hb
+      rcases hb with ⟨c, hc⟩
+      use c
+      rw [← hc, mul_comm]
+    have : c ∈ toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A := by
+      rw [lemma3_aux1 hx]
+      apply Submodule.mem_top
+    obtain ⟨u, hu, v, hv, huv⟩ := Submodule.mem_sup.mp this
+    obtain ⟨w, hw⟩ : ∃w : B, v = ϖ * w := by
+      rw [Irreducible.maximalIdeal_eq hϖ, Submodule.restrictScalars_mem, Ideal.mem_span_singleton'] at hv
+      rcases hv with ⟨c, hc⟩
+      use c
+      rw [← hc, mul_comm]
+    rw [← hab, hc, ← huv, mul_add, ← add_assoc, hw, ← mul_assoc]
+    apply Submodule.add_mem_sup
+    · apply Submodule.add_mem
+      · assumption
+      · rw [Subalgebra.mem_toSubmodule]
+        apply mul_mem
+        · apply Algebra.adjoin_mono (show ({ϖ} : Set B) ⊆ {x, ϖ} by simp only [Set.subset_insert])
+          apply Algebra.pow_mem_adjoin_singleton
+        · assumption
+    · rw [Submodule.restrictScalars_mem, maximalIdeal_pow_eq_span_irreducible_pow hϖ, Ideal.mem_span_singleton']
+      use w
+      rw [mul_comm, pow_succ, mul_comm ϖ]
+
+theorem lemma3_aux3 : maximalIdeal A • (⊤ : Submodule A B) = (maximalIdeal B ^ e).restrictScalars A := by
   sorry
 
 #check Submodule.map_mkQ_eq_top
@@ -167,8 +229,7 @@ theorem lemma3_weak : Algebra.adjoin A {x, ϖ} = ⊤ := by
   -- use Nakayama lemma
   rw [← Algebra.toSubmodule_eq_top, eq_top_iff]
   apply le_of_le_smul_of_le_jacobson_bot _ (le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm)
-  · intro y _
-    sorry
+  · rw [lemma3_aux3, lemma3_aux2 hx hϖ]
   · apply Module.finite_def.mp
     assumption
 
