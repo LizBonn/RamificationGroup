@@ -2,15 +2,15 @@
 import RamificationGroup.LowerNumbering
 import Mathlib.FieldTheory.Galois
 import Mathlib.RingTheory.Valuation.Basic
-import RamificationGroup.Unused.Definition.Herbrand
+import RamificationGroup.Herbrand
 
-open QuotientGroup IntermediateField
+open QuotientGroup IntermediateField DiscreteValuation
 
-def ValAlgEquiv.upperIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
-(s : L ≃ₐv[K] L) : WithTop ℕ := sorry
+-- def ValAlgEquiv.upperIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
+-- (s : L ≃ₐv[K] L) : WithTop ℕ := sorry
 
-def upperRamificationGroup {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
-(i : ℝ) : Subgroup (L ≃ₐv[K] L) := sorry
+def upperRamificationGroup (K L) [Field K] [Field L] [Valued K ℤₘ₀] [Valued L ℤₘ₀] [ValAlgebra K L]
+(i : ℚ) : Subgroup (L ≃ₐv[K] L) := lowerRamificationGroup K L (Int.ceil (HerbrandPhi i))
 
 notation : max "G(" L:max "/" K:max ")^[" n:max "]" => upperRamificationGroup K L n
 
