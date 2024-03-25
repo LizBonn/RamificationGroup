@@ -1,12 +1,4 @@
 /-
-TODO:
-1. prove `instFiniteExtResidue`
-2. complete `PolyTaylor.lean`
-
-# of WARNINGs : 1
-
-does `Module.finite` implies `FiniteDimensional`?
-
 -/
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import Mathlib.FieldTheory.PrimitiveElement
@@ -17,13 +9,14 @@ import LocalClassFieldTheory.DiscreteValuationRing.ResidueField
 
 variable {A : Type*} [CommRing A] [LocalRing A]
 variable {B : Type*} [CommRing B] [LocalRing B]
-variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
+variable [Algebra A B] [is_local : IsLocalRingHom (algebraMap A B)]
 
 open LocalRing Classical
 
 noncomputable
 
 section local_ring
+
 namespace LocalRing
 
 variable (A) (B) in
@@ -32,8 +25,8 @@ def ramificationIdx : ℕ := Ideal.ramificationIdx (algebraMap A B) (maximalIdea
 variable (A) (B) in
 def inertiaDeg : ℕ := Ideal.inertiaDeg (algebraMap A B) (maximalIdeal A) (maximalIdeal B)
 
-/- WARNING : `Smul` of this `Algebra` might be incompatible -/
-instance instAlgebraResidue: Algebra (ResidueField A) (ResidueField B) := (ResidueField.map (algebraMap A B)).toAlgebra
+instance instAlgebraResidue : Algebra (ResidueField A) (ResidueField B) :=
+  Ideal.Quotient.algebraQuotientOfLEComap <| le_of_eq (((local_hom_TFAE <| algebraMap A B).out 0 4 rfl rfl).mp is_local).symm
 
 theorem algebraMap_residue_compat : (residue B).comp (algebraMap A B) = (algebraMap (ResidueField A) (ResidueField B)).comp (residue A) := LocalRing.ResidueField.map_comp_residue (algebraMap A B)
 
@@ -111,7 +104,8 @@ instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField
 open IntermediateField Polynomial Classical DiscreteValuationRing
 
 variable (A) (B) in
-theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
+/--exists `x : B` generating `k_B` over `k_A` -/
+theorem exists_lift_residue_primitive : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
   let x := (Field.exists_primitive_element (ResidueField A) (ResidueField B)).choose
   use (Ideal.Quotient.mk_surjective x).choose
   rw [← (Field.exists_primitive_element (ResidueField A) (ResidueField B)).choose_spec]
@@ -119,7 +113,8 @@ theorem exists_x : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
   apply (Ideal.Quotient.mk_surjective x).choose_spec
 
 variable (A) in
-theorem exists_f_of_x (x : B) : ∃f : A[X], f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
+/-- For any `x : k_B`, there eixsts `f : A[X]` that reduces to the minimal polynomial of `x` over `k_A` -/
+theorem exists_lift_polynomial_of_residue (x : B) : ∃f : A[X], f.map (residue A) = minpoly (ResidueField A) (residue B x) := by
   let f0 := minpoly (ResidueField A) (residue B x)
   have : (Polynomial.map (residue A)).Surjective := map_surjective (residue A) Ideal.Quotient.mk_surjective
   use (this f0).choose
@@ -136,30 +131,14 @@ variable {f : A[X]} (h_red : f.map (residue A) = minpoly (ResidueField A) (resid
 -- `ϖ` : a uniformizer `ϖ` of `B`
 variable {ϖ : B} (hϖ : Irreducible ϖ)
 
-/-some possibly useful thms are listed below-/
-#check IsIntegral.of_finite
-#check RingHom.IsIntegralElem (algebraMap A B)
-#check minpoly.aeval
-#check Algebra.adjoin.powerBasis'
-#check IsIntegral.of_finite
-#check Algebra.adjoin
--- #check IsPrimitiveRoot.adjoinEquivRingOfIntegers
--- #check IsPrimitiveRoot.integralPowerBasis
-
-#check Submodule.le_of_le_smul_of_le_jacobson_bot
-#check Submodule.smul_le_of_le_smul_of_le_jacobson_bot
-
-local notation : max "e" => ramificationIdx A B
-
-/-- can be strenthened to `A[x] ⊔ m_B = B`-/
-theorem lemma3_aux1 : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A = ⊤ := by
+/-- Auxiliary lemma: `A[x, ϖ] ⊔ m_B = ⊤`. Can be strenthened to `A[x] ⊔ m_B = B`-/
+lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A = ⊤ := by
   rw [eq_top_iff]
   intro y _
   obtain ⟨g0, hg0⟩ : ∃g : (ResidueField A)[X], aeval (residue B x) g = residue B y := by
     rw [← AlgHom.mem_range, ← Algebra.adjoin_singleton_eq_range_aeval,
       ← IntermediateField.adjoin_simple_toSubalgebra_of_integral (IsIntegral.of_finite _ _), hx]
     simp only[top_toSubalgebra, Algebra.mem_top]
-  -- rcases this with ⟨g0, hg0⟩
   let g : A[X] := (map_surjective (residue A) Ideal.Quotient.mk_surjective g0).choose
   rw [show y = g.eval₂ (algebraMap A B) x + (y - g.eval₂ (algebraMap A B) x) by rw [add_sub_cancel'_right]]
   apply Submodule.add_mem_sup
@@ -174,7 +153,8 @@ theorem lemma3_aux1 : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B
       (map_surjective (residue A) Ideal.Quotient.mk_surjective g0).choose_spec,
       ← aeval_def, hg0, sub_self]
 
-theorem lemma3_aux2 (i : ℕ) : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B ^ i).restrictScalars A = ⊤ := by
+/-- Auxiliary lemma: `A[x, ϖ] ⊔ m_B ^ i = ⊤` for any `i : ℕ`-/
+lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top (i : ℕ) : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B ^ i).restrictScalars A = ⊤ := by
   induction' i with i hi
   · simp only [Nat.zero_eq, pow_zero, Ideal.one_eq_top, Submodule.restrictScalars_top, ge_iff_le,
     le_top, sup_of_le_right]
@@ -187,7 +167,7 @@ theorem lemma3_aux2 (i : ℕ) : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maxi
       use c
       rw [← hc, mul_comm]
     have : c ∈ toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A := by
-      rw [lemma3_aux1 hx]
+      rw [adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top hx]
       apply Submodule.mem_top
     obtain ⟨u, hu, v, hv, huv⟩ := Submodule.mem_sup.mp this
     obtain ⟨w, hw⟩ : ∃w : B, v = ϖ * w := by
@@ -208,27 +188,26 @@ theorem lemma3_aux2 (i : ℕ) : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maxi
       use w
       rw [mul_comm, pow_succ, mul_comm ϖ]
 
-theorem lemma3_aux3 (h_inj : Function.Injective (algebraMap A B)) : (maximalIdeal A).map (algebraMap A B) ≠ ⊥ := by
+/-- `m_A • B ≠ ⊥` -/
+theorem maximalIdeal_map_ne_bot_of_injective (h_inj : Function.Injective (algebraMap A B)) : (maximalIdeal A).map (algebraMap A B) ≠ ⊥ := by
   intro h
   rw [Ideal.map_eq_bot_iff_of_injective h_inj] at h
   apply DiscreteValuationRing.not_a_field' (R := A) h
 
-#check Submodule.map_mkQ_eq_top
-
 /--
 lemma 3 states that `xⁱϖʲ`'s with finite many `i j`'s form a `A`-basis of `B`.
-This is an alternate and weaker version of lemma 3,
+This is an alternative and weaker version of lemma 3,
 stating that `A[x, ϖ] = B`.
 -/
-theorem lemma3_weak (h_inj : Function.Injective (algebraMap A B)) : Algebra.adjoin A {x, ϖ} = ⊤ := by
+theorem adjoin_lift_residue_primitive_and_irreducible_eq_top (h_inj : Function.Injective (algebraMap A B)) : Algebra.adjoin A {x, ϖ} = ⊤ := by
   rw [← Algebra.toSubmodule_eq_top, eq_top_iff]
   apply Submodule.le_of_le_smul_of_le_jacobson_bot _ (le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm) -- Nakayama's lemma
   · rw [Ideal.smul_top_eq_map]
     obtain ⟨n, hn⟩ : ∃n : ℕ, (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^ n := by
       rcases (TFAE B (not_isField B)).out 0 6 with ⟨h, _⟩
       apply h; assumption
-      apply lemma3_aux3 h_inj
-    rw [hn, lemma3_aux2 hx hϖ]
+      apply maximalIdeal_map_ne_bot_of_injective h_inj
+    rw [hn, adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top hx hϖ]
   · apply Module.finite_def.mp
     assumption
 
@@ -237,18 +216,18 @@ theorem residue_primitive_of_add_uniformizer (hx : (ResidueField A)⟮residue B 
   rw [← residue_eq_add_irreducible hϖ]
   exact hx
 
-theorem fx_not_unit : ¬IsUnit (f.eval₂ (algebraMap A B) x) := by
+theorem not_unit_aeval_lift_residue_primitive : ¬IsUnit (f.eval₂ (algebraMap A B) x) := by
   rw [is_unit_iff_residue_ne_zero, ne_eq, not_not,
     hom_eval₂, algebraMap_residue_compat, ← eval₂_map,
     ← aeval_def, h_red, minpoly.aeval]
 
 /--
-this is part of lemma 4:
+This is the first part of lemma 4:
 If `f x` has valuation ≥ 2, then `f (x + ϖ)` is a uniformizer.
 -/
-theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Irreducible (f.eval₂ (algebraMap A B) (x + ϖ)) := by
+theorem irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Irreducible (f.eval₂ (algebraMap A B) (x + ϖ)) := by
   obtain ⟨b, hb⟩ := taylor_order_one_apply₂ f (algebraMap A B) x ϖ
-  obtain ⟨y, hy⟩ := mul_irreducible_square_of_not_unit_of_not_irreducible hϖ h_fx (fx_not_unit h_red)
+  obtain ⟨y, hy⟩ := mul_irreducible_square_of_not_unit_of_not_irreducible hϖ h_fx (not_unit_aeval_lift_residue_primitive h_red)
   rw [hb, hy, mul_comm ϖ, ← mul_comm b, add_comm, ← add_assoc, ← add_mul, add_comm]
   apply irreducible_of_irreducible_add_addVal_ge_two hϖ
   apply (irreducible_isUnit_mul _).mpr hϖ
@@ -261,14 +240,16 @@ theorem lemma4_val_ge_2 (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : 
 
 end x_and_f
 
-/--`B = A[x]` if `k_B = k_A[x]` AND `f x` is a uniformizer.-/
-theorem thm_val_1 (h_inj : Function.Injective (algebraMap A B)) {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
+/--
+This is the second part of lemma 4:
+`B = A[x]` if `k_B = k_A[x]` and `f x` is a uniformizer.-/
+theorem adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive (h_inj : Function.Injective (algebraMap A B)) {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
     {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) :
     Algebra.adjoin A {x} = ⊤ := by
   apply Algebra.adjoin_eq_of_le
   · simp only [Algebra.coe_top, Set.subset_univ]
   let fx := f.eval₂ (algebraMap A B) x
-  rw [← lemma3_weak hx h_fx h_inj]
+  rw [← adjoin_lift_residue_primitive_and_irreducible_eq_top hx h_fx h_inj]
   rw [show ({x, fx} : Set B) = {x} ∪ {fx} by rfl, Algebra.adjoin_union]
   simp only [sup_le_iff, le_refl, true_and, ge_iff_le]
   rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
@@ -277,17 +258,20 @@ theorem thm_val_1 (h_inj : Function.Injective (algebraMap A B)) {x : B} (hx : (R
 
 variable (A) (B)
 
+/-- For a finite extension of DVR `A ↪ B` with seperable residue field extension,
+there exists `x : B` s.t. `B = A[x]`-/
 theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
-  rcases exists_x A B with ⟨x, hx⟩
-  rcases exists_f_of_x A x with ⟨f, h_red⟩
+  rcases exists_lift_residue_primitive A B with ⟨x, hx⟩
+  rcases exists_lift_polynomial_of_residue A x with ⟨f, h_red⟩
   exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
-    then ⟨x, (thm_val_1 h_inj hx h)⟩
+    then ⟨x, (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive h_inj hx h)⟩
     else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,
-      (thm_val_1 h_inj (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
-        (lemma4_val_ge_2 h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
+      (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive h_inj (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
+        (irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
 variable [NoZeroSMulDivisors A B] -- cannot be inferred if `A → B` is not injective
 
+/-- A power basis of finite extension of DVR `A ↪ B` with seperable residue field extension.-/
 noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
     (AlgEquiv.ofTop (exists_primitive _ _ h).choose_spec)
