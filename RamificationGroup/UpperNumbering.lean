@@ -1,7 +1,6 @@
 --import RamificationGroup.Unused.Definition.LowerNumbering
 import RamificationGroup.LowerNumbering
 import Mathlib.FieldTheory.Galois
-import Mathlib.RingTheory.Valuation.Basic
 import RamificationGroup.Herbrand
 
 open QuotientGroup IntermediateField DiscreteValuation
@@ -14,8 +13,7 @@ def upperRamificationGroup (K L) [Field K] [Field L] [Valued K ℤₘ₀] [Value
 
 notation : max "G(" L:max "/" K:max ")^[" n:max "]" => upperRamificationGroup K L n
 
-variable {K L : Type*} [Field K][Field L] (vK : Valuation K ℤₘ₀) (vL : Valuation L ℤₘ₀)
-[Algebra K L] [ValuationExtension vK vL] {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H] (vK' : Valuation (fixedField H) ℤₘ₀) [ValuationExtension vK' vL]
+variable {K L : Type*} [Field K][Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [ValAlgebra K L] {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H] (vK' : Valuation (fixedField H) ℤₘ₀) [ValuationExtension vK' vL]
 --{K'' : IntermediateField K L}
 
 --lemma 4

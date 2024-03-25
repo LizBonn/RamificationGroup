@@ -28,15 +28,22 @@ valued ring homomorphism, valued homomorphism
 -- if the first definition K of local field K can have many valuation on L. second  will pin down the valuation on L
 -- if as first choice, order preserving <=> valuation preserving <=> continuous (v(x) < 1 -> v f x < 1, by x^n -> 0 -> f x ^n -> 0)
 -- preorder on the set of valuations? not a type, IsSpecialization
+
+-- TODO : SubValRing SubValAlgebra, SubValAlgebraClass, intermediate field shoul be SubValAlgebraClass instance.
+-- Question : whether the order should be included as part of the data of Valued instance? not an instance derived from Valued.
+-- TODO : Coe lemmas, how should they be arranged?
+-- Not TODO : scalartower do not need a val version. [IsScalarTower R S T] + [ValAlgebra R S] + [ValAlgebra S T] contains enough information
+-- TODO (?) : SubValRing gives ValAlgbra instance, what instance of valued should subalgebra be equipped? This always conflicts with DIscrete valuation in the local field case
 open DiscreteValuation Valuation Valued
-#check OrderRingHom
 
 section ValRingHom_ValRingEquiv
 
 section Hom
 
 -- Valuation on B is an extension of valuation on A.
-/-- `ValRingHom R S` is the type of ring homomorphisms that preserves valuation from valued ring `A` to valued ring `B`. Please note that the definition requires `v x ≤ v y ↔ v (f x) ≤ v (f y)` instead of `v x ≤ v y → v (f x) ≤ v (f y)`. For the latter case, one can use order-preserving ring homomorphisms.
+/-- `ValRingHom R S` is the type of ring homomorphisms that preserves valuation from valued ring `R` to valued ring `S`.
+
+Please note that the definition requires `v x ≤ v y ↔ v (f x) ≤ v (f y)` instead of `v x ≤ v y → v (f x) ≤ v (f y)`. For the latter case, one can use order-preserving ring homomorphisms.
 
 When possible, instead of parametrizing results over `(f : ValRingHom R S)`,
 you should parametrize over `(F : Type*) [ValRingHomClass F R S] (f : F)`.
@@ -96,7 +103,6 @@ class ValRingEquivClass (F R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Rin
   [vR : Valued R ΓR] [vS : Valued S ΓS] [EquivLike F R S] extends OrderIsoClass F R S, RingEquivClass F R S, ContinuousMapClass F R S where
   inv_continuous (f : F) : Continuous (EquivLike.inv f)
   val_isEquiv_comap (f : F) : vR.v.IsEquiv (vS.v.comap f)
-
 
 variable {F R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
@@ -364,6 +370,9 @@ def id : R →+*v R :=
 
 instance : Inhabited (R →+*v R) := ⟨ ValRingHom.id ⟩
 
+@[simp]
+theorem id_apply (r : R) : ValRingHom.id r = r := rfl
+
 def comp (g : S →+*v T) (f : R →+*v S) : R →+*v T where
   toOrderRingHom := (↑g : OrderRingHom S T).comp f
   continuous_toFun := by
@@ -524,18 +533,90 @@ end ValRingHom_ValRingEquiv
 
 section ValAlgebra
 
+/-- A valued algebra over a valued commutative ring `R`, is a valued ring `A` together with a ring map into the center of `A` that preserves the valuation.-/
 class ValAlgebra (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [vR : Valued R ΓR] [vA : Valued A ΓA] extends ValRingHom R A, Algebra R A
 
--- do not use this... definitional equal problems
-def ValRingHom.toValAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] (f : R →+*v A) : ValAlgebra R A where
+/-- The valued ring homomorphism `R →+*v A` given by `Algebra` structure. -/
+def valAlgebraMap (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : R →+*v A := ValAlgebra.toValRingHom
+
+variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [vR : Valued R ΓR] [vA : Valued A ΓA] [ValAlgebra R A]
+
+-- Please do not use this in general, it has definitional equal problems.
+/-- Creating a valued algebra from a valued ring morphism. -/
+def ValRingHom.toValAlgebra' (f : R →+*v A) (h : ∀ (c : R) (x : A), f c * x = x * f c): ValAlgebra R A where
   toValRingHom := f
-  smul := f.toRingHom.toAlgebra.smul
-  smul_def' := f.toRingHom.toAlgebra.smul_def'
-  commutes' := f.toRingHom.toAlgebra.commutes'
+  smul := (f.toAlgebra' h).smul
+  smul_def' := (f.toAlgebra' h).smul_def'
+  commutes' := (f.toAlgebra' h).commutes'
 
--- `copy more lemmas in Algebra`
+def ValRingHom.toValAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] (f : R →+*v A) : ValAlgebra R A :=
+  f.toValAlgebra' (fun _ => mul_comm _)
 
-def valAlgebraMap (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : R →+*v A := ValAlgebra.toValRingHom (R := R) (A := A)
+theorem ValRingHom.valAlgebraMap_toValAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [CommRing A] [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] (f : R →+*v A) :
+    @valAlgebraMap R A _ _ _ _ _ _ _ _ f.toValAlgebra  = f :=
+  rfl
+
+namespace ValAlgebra
+
+/-- To prove two valued algebra structures on a fixed `[CommRing R] [Ring A]` agree,
+it suffices to check the `algebraMap`s agree.
+-/
+@[ext]
+theorem valAlgebra_ext (P Q : ValAlgebra R A)
+    (h : ∀ r : R, (haveI := P; valAlgebraMap R A r) = haveI := Q; valAlgebraMap R A r) :
+    P = Q := by
+  replace h : P.toRingHom = Q.toRingHom := DFunLike.ext _ _ h
+  have h' : (haveI := P; (· • ·) : R → A → A) = (haveI := Q; (· • ·) : R → A → A) := by
+    funext r a
+    rw [P.smul_def', Q.smul_def', h]
+  rcases P with @⟨⟨⟨P⟩⟩, ⟨PSmul⟩⟩
+  rcases Q with @⟨⟨⟨Q⟩⟩, ⟨QSmul⟩⟩
+  congr
+
+theorem val_isEquiv_comap : vR.v.IsEquiv (vA.v.comap (algebraMap R A)) :=
+  (valAlgebraMap R A).val_isEquiv_comap'
+
+open algebraMap
+
+@[simp]
+theorem val_map_le_iff (x y : R) : v (x : A) ≤ v (y : A) ↔ v x ≤ v y :=
+  _root_.val_map_le_iff (valAlgebraMap R A)
+
+@[simp]
+theorem val_map_lt_iff (x y : R) : v (x : A) < v (y : A) ↔ v x < v y :=
+  _root_.val_map_lt_iff (valAlgebraMap R A)
+
+@[simp]
+theorem val_map_le_one_iff (x : R) : v (x : A) ≤ 1 ↔ v x ≤ 1 :=
+  _root_.val_map_le_one_iff (valAlgebraMap R A)
+
+@[simp]
+theorem val_map_lt_one_iff (x : R) : v (x : A) < 1 ↔ v x < 1 :=
+  _root_.val_map_lt_one_iff (valAlgebraMap R A)
+
+variable (R) in
+/-- The identity map inducing an `ValAlgebra` structure. -/
+instance id : ValAlgebra R R where
+  -- copied from `Algebra.id`
+  -- We override `toFun` and `toSMul` because `ValRingHom.id` is not reducible and cannot
+  -- be made so without a significant performance hit.
+  -- see library note [reducible non-instances].
+  toFun x := x
+  toSMul := Mul.toSMul _
+  __ := ValRingHom.toValAlgebra (ValRingHom.id)
+
+namespace id
+
+@[simp]
+theorem map_eq_id : valAlgebraMap R R = ValRingHom.id :=
+  rfl
+
+theorem map_eq_self (x : R) : valAlgebraMap R R x = x :=
+  rfl
+
+end id
+
+end ValAlgebra
 
 end ValAlgebra
 
