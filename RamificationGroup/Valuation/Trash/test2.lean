@@ -33,17 +33,38 @@ theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi
   sorry
   sorry
 
+theorem varphi_mono_int' : ∀a1 a2 : ℤ , a1 ≤ a2 → (varphi R S a1) ≤ (varphi R S a2) := by
+  rintro a1 a2 h
+  by_cases heq : a1 = a2
+  simp [heq]
+  apply le_of_lt
+  push_neg at *
+  have hlt : a1 < a2 := by apply lt_of_le_of_ne h heq
+  apply varphi_mono_int R S a1 a2 hlt
+
 --i'll change this name
 theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a⌋) + ((varphi R S (⌊a⌋ + 1)) - (varphi R S ⌊a⌋)) * (a - ⌊a⌋) := by
   rintro a
   unfold varphi
   by_cases ha : a ≥ 1
-  have hfl : 1 ≤ ↑⌊a⌋ := by sorry
+  have hfl : 1 ≤ ↑⌊a⌋ := by apply le_floor.2 ha
   simp [ha, hfl]
   sorry
+  have hfl : ¬ 1 ≤ ↑⌊a⌋ := by
+    by_contra h'
+    have h'' : 1 ≤ a := by apply le_floor.1 h'
+    contradiction
+  simp [ha, hfl]
   sorry
 
-theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a⌋ + 1)) - ((varphi R S (⌊a⌋ + 1)) - (varphi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by sorry
+theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a⌋ + 1)) - ((varphi R S (⌊a⌋ + 1)) - (varphi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
+  rintro a
+  unfold varphi
+  by_cases ha : a ≥ 1
+  have hcl : 1 ≤ (⌊a⌋ + 1) := by sorry
+  simp [ha, hcl]
+  sorry
+  sorry
 
 theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (varphi R S ⌊a⌋) := by
   rintro a ha
@@ -56,14 +77,8 @@ theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (va
   constructor
   simp
   sorry
+  --apply varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1)
   apply fract_pos.2 ha
-
-theorem varphi_mono_section : ∀ a1 a2 : ℚ , (⌊a1⌋ = ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
-  rintro a1 a2 ⟨h1, h2⟩
-  apply gt_iff_lt.2
-  apply sub_lt_zero.1
-  rw [varphi_rational_floor]
-  sorry
 
 theorem varphi_lt_ceil : ∀ a : ℚ , (varphi R S a) < (varphi R S (⌊a⌋ + 1)) := by
   rintro a
@@ -76,18 +91,91 @@ theorem varphi_lt_ceil : ∀ a : ℚ , (varphi R S a) < (varphi R S (⌊a⌋ + 1
   constructor
   simp
   sorry
-  have : ⌊a⌋ - a > (-1) := by sorry
+  --apply varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1)
+  have : a - 1 < ⌊a⌋ := by apply sub_one_lt_floor
   linarith [this]
+
+theorem varphi_mono_in_section : ∀ a1 a2 : ℚ , (⌊a1⌋ = ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
+  rintro a1 a2 ⟨h1, h2⟩
+  apply gt_iff_lt.2
+  apply sub_lt_zero.1
+  rw [varphi_rational_floor]
+  sorry
+
+--i'll change this name too
+theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
+  rintro a1 a2 ⟨hne, hlt⟩
+  by_cases hfloor : a2 = ⌊a2⌋
+  have hle : ⌊a1⌋ + 1 ≤ ⌊a2⌋ := by
+    have hlt : ⌊a1⌋ < ⌊a2⌋ := by
+      apply lt_of_le_of_ne
+      apply floor_le_floor
+      apply le_of_lt hlt
+      apply hne
+    apply add_one_le_of_lt hlt
+  apply lt_of_lt_of_le
+  have h1 : (varphi R S a1) < (varphi R S (⌊a1⌋ + 1)) := by apply (varphi_lt_ceil R S)
+  apply h1
+  have h2 : (varphi R S (⌊a1⌋ + 1)) ≤ (varphi R S a2) := by
+    by_cases heq : (⌊a1⌋ + 1) = a2
+    simp [heq]
+    push_neg at heq
+    have h1' : (varphi R S (⌊a1⌋ + 1)) ≤ (varphi R S ⌊a2⌋) := by
+      sorry
+      --apply varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋
+    rw [hfloor]
+    exact h1'
+  apply h2
+  have hle : a1 ≤ ⌊a2⌋ := by
+    by_contra hc
+    push_neg at *
+    have h : ⌊a1⌋ = ⌊a2⌋ := by
+      have h1 : ⌊a1⌋ ≤ ⌊a2⌋ := by
+        apply floor_le_floor
+        apply le_of_lt
+        exact hlt
+      have h2 : ⌊a2⌋ ≤ ⌊a1⌋ := by
+        apply le_floor.2
+        apply le_of_lt hc
+      apply (LE.le.ge_iff_eq h1).1 h2
+    contradiction
+  have hlt : ⌊a2⌋ < a2 := by
+    have hge : ⌊a2⌋ ≤ a2 := by apply floor_le
+    push_neg at hfloor
+    apply lt_of_le_of_ne hge hfloor.symm
+  apply lt_of_le_of_lt
+  have h1 : (varphi R S a1) ≤ (varphi R S ⌊a2⌋) := by
+    by_cases heq : a1 = ⌊a2⌋
+    simp [heq]
+    apply le_of_lt
+    apply lt_of_lt_of_le
+    push_neg at *
+    have hlt' : a1 < ⌊a2⌋ := by apply lt_of_le_of_ne hle heq
+    have h1' : (varphi R S a1) < (varphi R S (⌊a1⌋ + 1)) := by apply varphi_lt_ceil R S
+    apply h1'
+    have hle' : ⌊a1⌋ + 1 ≤ ⌊a2⌋ := by
+      sorry
+      --apply varphi_mono_int R S (⌊a1⌋ + 1) ⌊a2⌋
+    have h2' : (varphi R S ↑(⌊a1⌋ + 1)) ≤ (varphi R S (⌊a2⌋)) := by
+      apply varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋ hle'
+    sorry
+    --apply h2'
+  apply h1
+  push_neg at hfloor
+  have h2 : (varphi R S ⌊a2⌋) < (varphi R S a2) := by apply (varphi_gt_floor R S a2 hfloor)
+  apply h2
 
 theorem varphi_mono_iff : (∀a1 a2 : ℚ , a1 < a2 → (varphi R S a1) < (varphi R S a2)) ↔ (∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi R S a2)) := by
   constructor
-  rintro h
-  sorry
+  rintro h a1 a2
+  apply varphi_mono_int R S a1 a2
   rintro h a1 a2 h'
   by_cases hfloor : ⌊a1⌋ = ⌊a2⌋
-  apply varphi_mono_section
+  apply varphi_mono_in_section
   constructor <;> assumption
-  sorry
+  push_neg at *
+  apply varphi_mono_over_section
+  constructor <;> assumption
 
 theorem varphi_mono : ∀a1 a2 : ℚ , a1 < a2 → (varphi R S a1) < (varphi R S a2) := by
   apply (varphi_mono_iff R S).2
