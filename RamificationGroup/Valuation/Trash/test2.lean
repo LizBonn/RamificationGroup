@@ -230,13 +230,13 @@ theorem psi_zero_eq_zero : psi R S 0 = 0 := by
   simp
 
 --lemma 3
-variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
+-- variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
 
-open scoped Classical
+-- open scoped Classical
 
-theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
-  unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
-  by_cases h : u ≥ 1
-  simp [h]
-  sorry
-  sorry
+-- theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
+--   unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
+--   by_cases h : u ≥ 1
+--   simp [h]
+--   sorry
+--   sorry
