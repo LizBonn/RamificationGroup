@@ -8,7 +8,7 @@ variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [LinearOrdered
 {K' : fixedField H}
 
 --lemma 4
-theorem Varphi_With_i (σ : (L ≃ₐv[K] L) ⧸ H) : (varphi K L (Sup (i_[L/K] ((mk' H)⁻¹' {σ})))) = (i_[L/K'] σ) - (1 : WithTop ℤ):= by sorry
+theorem Varphi_With_i (σ : (L ≃ₐ[K] L) ⧸ H) : (varphi K L (Sup (i_[L/K] ((mk' H)⁻¹' {σ})))) = (i_[L/K'] σ) - (1 : WithTop ℤ):= by sorry
 
 --lemma 5
 theorem Herbrand_Thm {u : ℚ} {v : ℚ} (h : v = varphi K L u) {H : Subgroup (L ≃ₐv[K] L)} [Subgroup.Normal H]: G(L/K')_[(Int.ceil v)] = (G(L/K)_[(Int.ceil u)] ⊔ H) ⧸ H:= by sorry

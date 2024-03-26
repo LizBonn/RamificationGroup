@@ -29,7 +29,7 @@ instance : ValAlgebra K L where
   map_add' := _
   monotone' := sorry
   continuous_toFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
   smul := a.smul
   commutes' := a.commutes'
   smul_def' := a.smul_def'

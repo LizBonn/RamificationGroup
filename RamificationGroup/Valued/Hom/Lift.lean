@@ -32,21 +32,25 @@ def liftInteger (f : R →+*v S) : vR.v.integer →+*v vS.v.integer where
   map_add' _ _ := by ext; exact f.map_add _ _
   monotone' := sorry -- a theorem saying O[K] to K is order preserving
   continuous_toFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
 
 variable {K L : Type*} [Field K] [Field L] {ΓK ΓL: outParam Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL] [ValAlgebra K L]
 
 def liftValuationSubring (f : K →+*v L) : 𝒪[K] →+*v 𝒪[L] := f.liftInteger
 
-instance liftValuationSubring.IsLocalRingHom {f : K →+*v L} : IsLocalRingHom (f.liftValuationSubring.toRingHom) := sorry
+#synth LocalRing 𝒪[K]
+#synth LocalRing 𝒪[L]
+
+instance liftValuationSubring.IsLocalRingHom {f : K →+*v L} : IsLocalRingHom (f.liftValuationSubring : 𝒪[K] →+* 𝒪[L]) := sorry
 
 def liftResidueField (f : K →+*v L) : 𝓀[K] →+* 𝓀[L] := LocalRing.ResidueField.map (f.liftValuationSubring) -- TODO? : Should residue field be equipped with trivial valuation and enhance this to a ValRingHom?
 
-variable (f : K →+*v L)
-#synth Coe (𝒪[K] →+*v 𝒪[L]) (𝒪[K] →+* 𝒪[L])
+variable (f : K →+*v L)(s : 𝒪[K] →+*v 𝒪[L])
+#check (s : 𝒪[K] →+* 𝒪[L])
 #check f.liftValuationSubring
 -- #synth IsLocalRingHom (liftValuationSubring f)
-#synth IsLocalRingHom (liftValuationSubring f).toRingHom
+-- #synth IsLocalRingHom (f.liftValuationSubring.toRingHom) -- coe is not def eq to .toRingHom
+#check liftValuationSubring.IsLocalRingHom
 
 end ValRingHom
 
@@ -65,14 +69,14 @@ def liftInteger (f : R ≃+*v S) : vR.v.integer ≃+*v vS.v.integer where
   map_le_map_iff' := sorry
   continuous_toFun := sorry
   continuous_invFun := sorry
-  val_isEquiv_comap := sorry
+  val_isEquiv_comap' := sorry
 
 
 variable {K L : Type*} [Field K] [Field L] {ΓK ΓL: outParam Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL] [ValAlgebra K L]
 
 def liftValuationSubring (f : K ≃+*v L) : 𝒪[K] ≃+*v 𝒪[L] := f.liftInteger
 
-instance liftValuationSubring.IsLocalRingHom {f : K ≃+*v L} : IsLocalRingHom (f.liftValuationSubring.toRingHom) := inferInstanceAs (_root_.IsLocalRingHom f.toValRingHom.liftValuationSubring.toRingHom)
+instance liftValuationSubring.IsLocalRingHom {f : K ≃+*v L} : IsLocalRingHom (f.liftValuationSubring : 𝒪[K] →+* 𝒪[L]) := inferInstanceAs (_root_.IsLocalRingHom (ValRingHom.liftValuationSubring (f : K →+*v L)))
 
 def liftResidueField (f : K ≃+*v L) : 𝓀[K] ≃+* 𝓀[L] := LocalRing.ResidueField.mapEquiv (f.liftValuationSubring) -- TODO? : Should residue field be equipped with trivial valuation and enhance this to a ValRingHom?
 
@@ -116,7 +120,7 @@ variable {K L L' : Type*} [Field K] [Field L] [Field L'] {ΓK ΓL ΓL': Type*} [
 
 def liftValuationSubring (f : L →ₐv[K] L') : 𝒪[L] →ₐv[𝒪[K]] 𝒪[L'] := f.liftInteger
 
-instance liftValuationSubring.IsLocalRingHom {s : L →ₐv[K] L'}: IsLocalRingHom (s.liftValuationSubring : 𝒪[L] →+* 𝒪[L']) := inferInstanceAs (_root_.IsLocalRingHom (s : L →+*v L').liftValuationSubring)
+instance liftValuationSubring.IsLocalRingHom {s : L →ₐv[K] L'}: IsLocalRingHom ((s.liftValuationSubring : 𝒪[L] →+*v 𝒪[L']) : 𝒪[L] →+* 𝒪[L']) := inferInstanceAs (_root_.IsLocalRingHom (s : L →+*v L').liftValuationSubring)
 
 def liftResidueField (f : L →ₐv[K] L') : 𝓀[L] →ₐ[𝓀[K]] 𝓀[L'] where
   toRingHom := ValRingHom.liftResidueField f
@@ -137,9 +141,9 @@ variable {K L L' : Type*} [Field K] [Field L] [Field L'] {ΓK ΓL ΓL': Type*} [
 def liftValuationSubring (f : L ≃ₐv[K] L') : 𝒪[L] ≃ₐv[𝒪[K]] 𝒪[L'] := f.liftInteger
 
 variable (s : L ≃ₐv[K] L')
-#synth IsLocalRingHom ((s : L →+*v L').liftValuationSubring : 𝒪[L] →+* 𝒪[L'])
+#synth IsLocalRingHom (((s : L →ₐv[K] L') : L →+*v L').liftValuationSubring : 𝒪[L] →+* 𝒪[L'])
 -- #synth IsLocalRingHom (s.liftValuationSubring : 𝒪[L] →+* 𝒪[L']) -- this fails, this is the other way of a diamond, rfl to above but lean does not infer instances across rfl.
-instance liftValuationSubring.IsLocalRingHom {s : L ≃ₐv[K] L'}: IsLocalRingHom (s.liftValuationSubring : 𝒪[L] →+* 𝒪[L']) := inferInstanceAs (_root_.IsLocalRingHom (s : L →+*v L').liftValuationSubring)
+instance liftValuationSubring.IsLocalRingHom {s : L ≃ₐv[K] L'}: IsLocalRingHom ((s.liftValuationSubring : 𝒪[L] ≃+*v 𝒪[L']) : 𝒪[L] →+* 𝒪[L']) := inferInstanceAs (_root_.IsLocalRingHom ((s : L ≃+*v L') : L →+*v L').liftValuationSubring)
 
 def liftResidueField (f : L ≃ₐv[K] L') : 𝓀[L] ≃ₐ[𝓀[K]] 𝓀[L'] where
   toEquiv := f.toValRingEquiv.liftResidueField
