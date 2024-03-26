@@ -12,6 +12,8 @@ open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators I
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
+theorem Int.cast_add_one (a : ℤ) : ↑(a + 1) = (↑a + 1) := by sorry
+
 noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
   if u ≥ (-1) then
     relindex' G(S/R)_[0] G(S/R)_[(Int.ceil u)]
@@ -76,8 +78,8 @@ theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (va
   left
   constructor
   simp
-  sorry
-  --apply varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1)
+  convert varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1) (by simp)
+  simp
   apply fract_pos.2 ha
 
 theorem varphi_lt_ceil : ∀ a : ℚ , (varphi R S a) < (varphi R S (⌊a⌋ + 1)) := by
@@ -90,10 +92,10 @@ theorem varphi_lt_ceil : ∀ a : ℚ , (varphi R S a) < (varphi R S (⌊a⌋ + 1
   left
   constructor
   simp
-  sorry
-  --apply varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1)
-  have : a - 1 < ⌊a⌋ := by apply sub_one_lt_floor
-  linarith [this]
+  convert varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1) (by simp)
+  simp
+  have h : a - 1 < ⌊a⌋ := by apply sub_one_lt_floor
+  linarith [h]
 
 theorem varphi_mono_in_section : ∀ a1 a2 : ℚ , (⌊a1⌋ = ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
   rintro a1 a2 ⟨h1, h2⟩
@@ -121,8 +123,8 @@ theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧
     simp [heq]
     push_neg at heq
     have h1' : (varphi R S (⌊a1⌋ + 1)) ≤ (varphi R S ⌊a2⌋) := by
-      sorry
-      --apply varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋
+      convert varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋ hle
+      simp
     rw [hfloor]
     exact h1'
   apply h2
@@ -154,12 +156,19 @@ theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧
     have h1' : (varphi R S a1) < (varphi R S (⌊a1⌋ + 1)) := by apply varphi_lt_ceil R S
     apply h1'
     have hle' : ⌊a1⌋ + 1 ≤ ⌊a2⌋ := by
-      sorry
-      --apply varphi_mono_int R S (⌊a1⌋ + 1) ⌊a2⌋
+      push_neg at *
+      have hlt' : ⌊a1⌋ < ⌊a2⌋ := by
+        have hle'' : ⌊a1⌋ ≤ ⌊a2⌋ := by
+          apply floor_le_floor
+          apply le_of_lt
+          assumption
+        apply lt_of_le_of_ne hle'' hne
+      apply Int.le_of_lt_add_one
+      linarith [hlt']
     have h2' : (varphi R S ↑(⌊a1⌋ + 1)) ≤ (varphi R S (⌊a2⌋)) := by
       apply varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋ hle'
-    sorry
-    --apply h2'
+    convert h2'
+    simp
   apply h1
   push_neg at hfloor
   have h2 : (varphi R S ⌊a2⌋) < (varphi R S a2) := by apply (varphi_gt_floor R S a2 hfloor)
@@ -230,13 +239,13 @@ theorem psi_zero_eq_zero : psi R S 0 = 0 := by
   simp
 
 --lemma 3
--- variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
+variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
 
--- open scoped Classical
+open scoped Classical
 
--- theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
---   unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
---   by_cases h : u ≥ 1
---   simp [h]
---   sorry
---   sorry
+theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
+  unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
+  by_cases h : u ≥ 1
+  simp [h]
+  sorry
+  sorry
