@@ -37,8 +37,20 @@ theorem varphi'_pos : ∀ u : ℚ , 0 < varphi' R S u := by
   constructor <;> sorry
   simp [h]
 
-
-theorem varphi_int_succ : ∀a : ℤ , (varphi R S a) = (varphi R S (a + 1)) - (varphi' R S a) := by sorry
+theorem varphi_int_succ : ∀a : ℤ , (varphi R S a) = (varphi R S (a + 1)) - (varphi' R S (a + 1)) := by
+  rintro a
+  unfold varphi
+  by_cases hgeone : (1 : ℚ) ≤ a
+  · have hgezero : (0 : ℚ) ≤ a := by linarith
+    simp [hgeone, hgezero]
+    sorry
+  by_cases hgezero : (0 : ℚ) ≤ a
+  · have heqzero : (0 : ℚ) = a := by
+      sorry
+    erw [←heqzero]
+    simp [hgeone, hgezero]
+  simp [hgeone, hgezero]
+  sorry
 
 theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi R S a2) := by
   rintro a1 a2 h
@@ -54,7 +66,7 @@ theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi
     apply ih
     simp
     apply sub_lt_zero.1
-    have heq : varphi R S (↑a1 + ↑n + 1) = varphi R S (↑a1 + (↑n + 1) + 1) - (varphi' R S (a1 + n + 1)) := by
+    have heq : varphi R S (↑a1 + ↑n + 1) = varphi R S (↑a1 + (↑n + 1) + 1) - (varphi' R S (a1 + n + 1 + 1)) := by
       convert varphi_int_succ R S (a1 + n + 1)
       <;>simp
       ring
@@ -62,10 +74,6 @@ theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi
     simp
     apply varphi'_pos
   sorry
-
-
-
-
 
 theorem varphi_mono_int' : ∀a1 a2 : ℤ , a1 ≤ a2 → (varphi R S a1) ≤ (varphi R S a2) := by
   rintro a1 a2 h
@@ -84,7 +92,7 @@ theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a�
   · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
       convert le_floor.2 ha
       simp
-      sorry
+      apply cast_le
     have hfl' : (0 : ℚ) ≤ ⌊a⌋ := by
       linarith [hfl]
     simp [ha, hfl, hfl']
@@ -98,21 +106,41 @@ theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a�
   have hfl : ¬ (1 : ℚ) ≤ ↑⌊a⌋ := by
     by_contra h'
     have h'' : (1 : ℚ) ≤ a := by
-      sorry
+      apply le_floor.1
+      convert h'
+      simp
+      apply cast_le.symm
     contradiction
-  simp [ha, hfl]
   by_cases hzero : (0 : ℚ) ≤ ⌊a⌋
-  sorry
+  · simp [ha, hfl, hzero]
+    sorry
+  simp [ha, hfl, hzero]
   sorry
 
 
 theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a⌋ + 1)) - ((varphi R S (⌊a⌋ + 1)) - (varphi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
   rintro a
   unfold varphi
-  by_cases ha : a ≥ 1
-  have hcl : 1 ≤ (⌊a⌋ + 1) := by sorry
-  simp [ha, hcl]
-  sorry
+  by_cases ha : (1 : ℚ) ≤ a
+  · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
+      convert le_floor.2 ha
+      apply cast_le
+    have hcl' : (1 : ℚ) ≤ (⌊a⌋ + 1) := by
+      linarith [hfl]
+    simp [ha, hcl', hfl]
+    sorry
+  have hfl : ¬(1 : ℚ) ≤ ⌊a⌋ := by
+    by_contra hc
+    have hge : (1 : ℚ) ≤ a := by
+      apply le_floor.1
+      convert hc
+      simp
+      apply cast_le.symm
+    contradiction
+  by_cases hcl : (1 : ℚ) ≤ (⌊a⌋ + 1)
+  · simp [ha, hcl, hfl]
+    sorry
+  simp [ha, hcl, hfl]
   sorry
 
 theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (varphi R S ⌊a⌋) := by
