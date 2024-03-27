@@ -1,28 +1,19 @@
---import RamificationGroup.Unused.Definition.LowerNumbering
 import RamificationGroup.LowerNumbering
-import Mathlib.FieldTheory.Galois
-import RamificationGroup.Herbrand
+import Mathlib.RingTheory.Valuation.Basic
+import RamificationGroup.Valuation.Trash.test
 
-open QuotientGroup IntermediateField DiscreteValuation
+open QuotientGroup IntermediateField DiscreteValuation Valued Valuation
 
--- def ValAlgEquiv.upperIndex {K L} [Field K] [Field L] [DiscretelyValued K] [DiscretelyValued L] [ValAlgebra K L]
--- (s : L ≃ₐv[K] L) : WithTop ℕ := sorry
-
-def upperRamificationGroup (K L) [Field K] [Field L] [Valued K ℤₘ₀] [Valued L ℤₘ₀] [ValAlgebra K L]
-(i : ℚ) : Subgroup (L ≃ₐv[K] L) := lowerRamificationGroup K L (Int.ceil (HerbrandPhi i))
-
-notation : max "G(" L:max "/" K:max ")^[" n:max "]" => upperRamificationGroup K L n
-
-variable {K L : Type*} [Field K][Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [ValAlgebra K L] {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H] (vK' : Valuation (fixedField H) ℤₘ₀) [ValuationExtension vK' vL]
---{K'' : IntermediateField K L}
+variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vS : Valued L ℤₘ₀] [ValAlgebra K L] {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H]
+{K' : fixedField H}
 
 --lemma 4
-theorem Varphi_With_i (σ : (L ≃ₐ[K] L) ⧸ H) :(varphi vL vK' (Sup (i[vL/vK'] ((mk' H)⁻¹' {σ})))) = (i[vL/vK'] σ) - (1 : WithTop ℤ):= by sorry
+theorem Varphi_With_i (σ : (L ≃ₐ[K] L) ⧸ H) : (varphi K L (Sup (i_[L/K] ((mk' H)⁻¹' {σ})))) = (i_[L/K'] σ) - (1 : WithTop ℤ):= by sorry
 
 --lemma 5
-theorem Herbrand_Thm {u : ℝ} {v : ℝ} (h : v = varphi vL vK u) {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H]: G(vL/vK')_[v] = (G(vL/vK)_[u] ⊔ H) ⧸ H:= by sorry
+theorem Herbrand_Thm {u : ℚ} {v : ℚ} (h : v = varphi K L u) {H : Subgroup (L ≃ₐv[K] L)} [Subgroup.Normal H]: G(L/K')_[(Int.ceil v)] = (G(L/K)_[(Int.ceil u)] ⊔ H) ⧸ H:= by sorry
 
 --prop 15
-theorem varphi_comp_field_ext : (varphi vK' vK) ∘ (varphi vL vK') = varphi vL vK:= by sorry
+theorem varphi_comp_field_ext : (varphi K K') ∘ (varphi K' L) = varphi K L:= by sorry
 
-theorem psi_comp_field_ext : (psi vL vK') ∘ (psi vK' vK) = psi vL vK:= by sorry
+theorem psi_comp_field_ext : (psi K K') ∘ (psi K' L) = psi K L:= by sorry
