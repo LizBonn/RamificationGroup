@@ -733,8 +733,6 @@ instance (priority := 100) {F : Type*}
 
 end Class
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
-
 section
 
 noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B where
@@ -750,49 +748,6 @@ noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.coma
 
 -- `copy lemmas in MonoidWithZeroHom` or `OrderRingHom`
 -- `id, symm, comp`
-section coercion
--- -- coercions
-
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
-
-instance ValAlgHom.algHom : Coe (A →ₐv[R] B) (A →ₐ[R] B) := ⟨ValAlgHom.toAlgHom⟩
-
-instance ValAlgEquiv.algEquiv: Coe (A ≃ₐv[R] B) (A ≃ₐ[R] B) := ⟨ValAlgEquiv.toAlgEquiv⟩
-
-instance : CoeTC (A →ₐv[R] B) (A →+*v B) := ⟨ValAlgHom.toValRingHom⟩
-
-instance : CoeTC (A ≃ₐv[R] B) (A ≃+*v B) := ⟨ValAlgEquiv.toValRingEquiv⟩
--- `This is temporory, should mimic instCoeTCRingHom use ValRingHomClass to achieve this`
-/-
-#synth CoeTC (AlgHom R A B) (RingHom A B)
-#check instCoeTCRingHom
--/
-
-def ValAlgEquiv.toValAlgHom (f : A ≃ₐv[R] B) : (A →ₐv[R] B) where
-  toFun := f.toFun
-  map_one' := f.map_one
-  map_mul' := f.map_mul
-  map_zero' := f.map_zero
-  map_add' := f.map_add
-  monotone' := by exact OrderHom.monotone (f.toValRingEquiv : A →o B)
-  continuous_toFun := f.toValRingEquiv.continuous_toFun
-  val_isEquiv_comap' := f.toValRingEquiv.val_isEquiv_comap'
-  commutes' := f.commutes'
-
-instance : CoeTC (A ≃ₐv[R] B) (A →ₐv[R] B) := ⟨ValAlgEquiv.toValAlgHom⟩
--- `This is temporory, should Mimic instCoeTCOrderRingHom, use ValAlgHomClass to implement this coe instance`
-/-
-variable {R S} [OrderedRing R] [OrderedRing S] (f : R ≃+*o S)
-#synth CoeTC (R ≃+*o S)  (R →+*o S) -- instCoeTCOrderRingHom
-#check (f : OrderRingHom R S)
--/
-
-end coercion
-
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
-
-#synth Algebra R A
-#synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
 
 protected def ValAlgHom.id : (A →ₐv[R] A) where
   toOrderRingHom := .id A
