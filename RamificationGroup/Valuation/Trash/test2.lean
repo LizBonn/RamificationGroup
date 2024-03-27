@@ -12,8 +12,6 @@ open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators I
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
-theorem Int.cast_add_one (a : ℤ) : ↑(a + 1) = (↑a + 1) := by sorry
-
 noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
   if u ≥ (-1) then
     relindex' G(S/R)_[0] G(S/R)_[(Int.ceil u)]
@@ -29,11 +27,45 @@ noncomputable def varphi (u : ℚ) : ℚ :=
   else
     u * (varphi' R S u)
 
+theorem varphi'_pos : ∀ u : ℚ , 0 < varphi' R S u := by
+  unfold varphi' Index_of_G_i relindex' index
+  rintro u
+  by_cases h : u ≥ -1
+  simp [h]
+  apply div_pos_iff.2
+  left
+  constructor <;> sorry
+  simp [h]
+
+
+theorem varphi_int_succ : ∀a : ℤ , (varphi R S a) = (varphi R S (a + 1)) - (varphi' R S a) := by sorry
+
 theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi R S a2) := by
   rintro a1 a2 h
-  induction' a2 with n ih
+  have hsub : a2 = a1 + (a2 - a1 - 1) + 1 := by ring
+  rw [hsub]
+  induction' a2 - a1 - 1 with n ih
+  · induction' n with n ih
+    · apply sub_lt_zero.1
+      rw [varphi_int_succ R S a1]
+      simp
+      apply varphi'_pos
+    apply lt_trans
+    apply ih
+    simp
+    apply sub_lt_zero.1
+    have heq : varphi R S (↑a1 + ↑n + 1) = varphi R S (↑a1 + (↑n + 1) + 1) - (varphi' R S (a1 + n + 1)) := by
+      convert varphi_int_succ R S (a1 + n + 1)
+      <;>simp
+      ring
+    rw [heq]
+    simp
+    apply varphi'_pos
   sorry
-  sorry
+
+
+
+
 
 theorem varphi_mono_int' : ∀a1 a2 : ℤ , a1 ≤ a2 → (varphi R S a1) ≤ (varphi R S a2) := by
   rintro a1 a2 h
@@ -49,15 +81,30 @@ theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a�
   rintro a
   unfold varphi
   by_cases ha : a ≥ 1
-  have hfl : 1 ≤ ↑⌊a⌋ := by apply le_floor.2 ha
-  simp [ha, hfl]
-  sorry
-  have hfl : ¬ 1 ≤ ↑⌊a⌋ := by
+  · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
+      convert le_floor.2 ha
+      simp
+      sorry
+    have hfl' : (0 : ℚ) ≤ ⌊a⌋ := by
+      linarith [hfl]
+    simp [ha, hfl, hfl']
+    nth_rw 2 [mul_comm]
+    apply mul_eq_mul_left_iff.2
+    by_cases hzero : fract a = 0
+    · right
+      exact hzero
+    left
+    sorry
+  have hfl : ¬ (1 : ℚ) ≤ ↑⌊a⌋ := by
     by_contra h'
-    have h'' : 1 ≤ a := by apply le_floor.1 h'
+    have h'' : (1 : ℚ) ≤ a := by
+      sorry
     contradiction
   simp [ha, hfl]
+  by_cases hzero : (0 : ℚ) ≤ ⌊a⌋
   sorry
+  sorry
+
 
 theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a⌋ + 1)) - ((varphi R S (⌊a⌋ + 1)) - (varphi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
   rintro a
@@ -101,8 +148,29 @@ theorem varphi_mono_in_section : ∀ a1 a2 : ℚ , (⌊a1⌋ = ⌊a2⌋) ∧ (a1
   rintro a1 a2 ⟨h1, h2⟩
   apply gt_iff_lt.2
   apply sub_lt_zero.1
-  rw [varphi_rational_floor]
-  sorry
+  nth_rw 2 [varphi_rational_floor]
+  nth_rw 1 [varphi_rational_floor]
+  rw [h1]
+  simp
+  apply sub_lt_zero.1
+  have : ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - ↑⌊a2⌋) - ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * fract a2 = ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - a2) := by
+    unfold fract
+    calc
+      ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - ↑⌊a2⌋) - ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a2 - ⌊a2⌋) = ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * ((a1 - ⌊a2⌋) - (a2 - ⌊a2⌋)) := by
+        ring
+      _ = ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - a2) := by
+        simp
+        left
+        unfold fract
+        ring
+  rw [this]
+  apply mul_neg_iff.2
+  left
+  constructor
+  simp
+  convert varphi_mono_int R S ⌊a2⌋ (⌊a2⌋ + 1) (by simp)
+  simp
+  simp [h2]
 
 --i'll change this name too
 theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
