@@ -334,10 +334,19 @@ theorem psi_zero_eq_zero : psi R S 0 = 0 := by
   rw [← invFun_comp Inj]
   simp
 
+theorem varphi_inv_psi : ∀ a : ℚ , varphi R S (psi R S a) = a := by
+  rintro a
+  apply invFun_eq
+  apply (varphi_bij R S).surjective
+
 --lemma 3
 variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
 
 open scoped Classical
+
+theorem Varphi_eq_Sum_Inf_Int (u : ℤ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by sorry
+
+
 
 theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
   unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
