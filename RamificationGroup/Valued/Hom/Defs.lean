@@ -628,7 +628,7 @@ end ValAlgebra
 
 section ValAlgHom_ValAlgEquiv
 
-section
+section Hom
 
 variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
 
@@ -656,6 +656,12 @@ notation:25 A " →ₐv[" R "] " B => ValAlgHom R A B
 @[inherit_doc]
 notation:25 A " ≃ₐv[" R "] " B => ValAlgEquiv R A B
 
+end Hom
+
+variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
+
+section Class
+
 /-- `ValAlgHomClass F R A B` asserts `F` is a type of bundled valued algebra homomorphisms
 from `A` to `B`.  -/
 class ValAlgHomClass (F : Type*) (R A B : outParam Type*) [CommRing R] [Ring A] [Ring B]
@@ -663,9 +669,6 @@ class ValAlgHomClass (F : Type*) (R A B : outParam Type*) [CommRing R] [Ring A] 
   [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB]
   [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
   [FunLike F A B] extends ValRingHomClass F A B, AlgHomClass F R A B : Prop
-
-#synth AlgHomClass (A →ₐv[R] B) R A B
-#synth AlgEquivClass (A ≃ₐv[R] B) R A B
 
 instance : FunLike (A →ₐv[R] B) A B where
   coe f := f.toFun
@@ -717,9 +720,18 @@ instance (priority := 100) : AlgEquivClass (A ≃ₐv[R] B) R A B :=
   commutes := fun f => f.commutes'
 }
 
-variable (f : A ≃ₐv[R] B)
-#check (f : A →ₐv[R] B)
-end
+@[coe]
+def ValAlgHom.ofAlgHomClassValRingHomClass {F : Type*}
+  [FunLike F A B] [ValRingHomClass F A B] [AlgHomClass F R A B] (f : F) :
+    A →ₐv[R] B :=
+  { ValRingHomClass.toValRingHom f, AlgHomClass.toAlgHom f with}
+
+instance (priority := 100) {F : Type*}
+  [FunLike F A B] [ValRingHomClass F A B] [AlgHomClass F R A B] :
+  CoeTC F (A →ₐv[R] B) where
+    coe := ValAlgHom.ofAlgHomClassValRingHomClass
+
+end Class
 
 variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
 
