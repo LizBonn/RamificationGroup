@@ -658,13 +658,67 @@ notation:25 A " ≃ₐv[" R "] " B => ValAlgEquiv R A B
 
 /-- `ValAlgHomClass F R A B` asserts `F` is a type of bundled valued algebra homomorphisms
 from `A` to `B`.  -/
-class ValAlgHomClass (F : Type*) (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*}
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB]
+class ValAlgHomClass (F : Type*) (R A B : outParam Type*) [CommRing R] [Ring A] [Ring B]
+  {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR]
+  [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB]
   [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
   [FunLike F A B] extends ValRingHomClass F A B, AlgHomClass F R A B : Prop
--- ValAlgHomClass
--- ValAlgIsoClass
 
+#synth AlgHomClass (A →ₐv[R] B) R A B
+#synth AlgEquivClass (A ≃ₐv[R] B) R A B
+
+instance : FunLike (A →ₐv[R] B) A B where
+  coe f := f.toFun
+  coe_injective' f g h := by
+    rcases f with ⟨⟨_, _⟩, _⟩
+    rcases g with ⟨⟨_, _⟩, _⟩
+    dsimp at h
+    congr
+    apply DFunLike.coe_injective'
+    exact h
+
+instance : EquivLike (A ≃ₐv[R] B) A B where
+  coe f := f.toFun
+  inv f := f.invFun
+  left_inv f := f.left_inv
+  right_inv f := f.right_inv
+  coe_injective' f g h _ := by
+    rcases f with ⟨⟨_, _⟩, _⟩
+    rcases g with ⟨⟨_, _⟩, _⟩
+    dsimp at h
+    congr
+    apply DFunLike.coe_injective'
+    exact h
+
+instance (priority := 100) : ValRingHomClass (A →ₐv[R] B) A B where
+  map_rel f := map_rel f.toValRingHom
+  map_mul f := f.map_mul
+  map_one f := f.map_one
+  map_add f := f.map_add
+  map_zero f := f.map_zero
+  map_continuous f := f.toValRingHom.continuous_toFun
+  val_isEquiv_comap f := f.val_isEquiv_comap'
+
+instance (priority := 100) : ValRingEquivClass (A ≃ₐv[R] B) A B where
+  map_le_map_iff f := map_le_map_iff f.toValRingEquiv
+  map_mul f := f.map_mul
+  map_add f := f.map_add
+  map_continuous f := f.toValRingEquiv.continuous_toFun
+  inv_continuous f := f.toValRingEquiv.continuous_invFun
+  val_isEquiv_comap f := f.val_isEquiv_comap'
+
+instance (priority := 100) : AlgHomClass (A →ₐv[R] B) R A B :=
+{
+  commutes := fun f => f.commutes'
+}
+
+instance (priority := 100) : AlgEquivClass (A ≃ₐv[R] B) R A B :=
+{
+  commutes := fun f => f.commutes'
+}
+
+variable (f : A ≃ₐv[R] B)
+#check (f : A →ₐv[R] B)
 end
 
 variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
@@ -727,29 +781,6 @@ variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam 
 
 #synth Algebra R A
 #synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
-
-instance : FunLike (A →ₐv[R] B) A B where
-  coe f := f.toFun
-  coe_injective' f g h := by
-    rcases f with ⟨⟨_, _⟩, _⟩
-    rcases g with ⟨⟨_, _⟩, _⟩
-    dsimp at h
-    congr
-    apply DFunLike.coe_injective'
-    exact h
-
-instance : EquivLike (A ≃ₐv[R] B) A B where
-  coe f := f.toFun
-  inv f := f.invFun
-  left_inv f := f.left_inv
-  right_inv f := f.right_inv
-  coe_injective' f g h _ := by
-    rcases f with ⟨⟨_, _⟩, _⟩
-    rcases g with ⟨⟨_, _⟩, _⟩
-    dsimp at h
-    congr
-    apply DFunLike.coe_injective'
-    exact h
 
 protected def ValAlgHom.id : (A →ₐv[R] A) where
   toOrderRingHom := .id A
