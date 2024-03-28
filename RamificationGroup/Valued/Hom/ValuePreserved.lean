@@ -1,14 +1,10 @@
 import RamificationGroup.Valued.Hom.Defs
 
-variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-  [vR : Valued R ΓR] [vS : Valued S ΓS]
-variable {F : Type*} [FunLike F R S] [ValRingHomClass F R S]
+variable {K L : Type*} {ΓK: outParam Type*} [Ring K] [Ring L]
+  [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
+variable {f : K →+* L}
 
 /-
 1. how to add completeness
-2. should parametrized over `ValRingHomClass`, right?
+2. should be parametrized over `ValRingHomClass`, right?
 -/
-
-theorem ringhom_preserve_valuation (f : F) : vR.v.IsEquiv (vS.v.comap f) := by
-  sorry
