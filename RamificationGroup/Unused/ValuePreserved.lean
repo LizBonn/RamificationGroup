@@ -1,13 +1,13 @@
 /-
-Might need to use another namespace
+# of WARNINGs : 1
 -/
 
 import RamificationGroup.Valued.Hom.Defs
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
+import RamificationGroup.ForMathlib.Henselian
 
 variable {K : Type*} {ΓK : outParam Type*} [Field K]
   [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
-  [CompleteSpace K]
 variable {L : Type*} [Field L]
 
 namespace Valuation
@@ -16,12 +16,19 @@ variable [Algebra K L] [FiniteDimensional K L]
 
 section int_closure
 
-#check DiscreteValuation.Extension.integralClosure_eq_integer
-
 variable {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ]
   {v : Valuation L Γ}
 
-theorem integral_closure_eq_integer
+theorem integral_closure_eq_integer_of_helselian [HenselianLocalRing vK.valuationSubring]
+  (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
+    (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
+  sorry
+
+/-- WARNING : not mathematically true? more conditions? -/
+instance ___false___HenselianOfComplete [CompleteSpace K] : HenselianLocalRing vK.valuationSubring := by
+  sorry
+
+theorem integral_closure_eq_integer_of_complete_of_ext [CompleteSpace K]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
     (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
   sorry
@@ -30,7 +37,7 @@ end int_closure
 
 section value_ext
 
-variable [Algebra K L] [FiniteDimensional K L]
+variable [CompleteSpace K]
 variable {Γ₁ Γ₂ : outParam Type*} [LinearOrderedCommGroupWithZero Γ₁] [LinearOrderedCommGroupWithZero Γ₂]
   {v₁ : Valuation L Γ₁} {v₂ : Valuation L Γ₂}
 
@@ -40,7 +47,7 @@ theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algeb
   ext
   rw [Valuation.mem_valuationSubring_iff, Valuation.mem_valuationSubring_iff,
     ← Valuation.mem_integer_iff, ← Valuation.mem_integer_iff,
-    ← integral_closure_eq_integer h₁, ← integral_closure_eq_integer h₂]
+    ← integral_closure_eq_integer_of_complete_of_ext h₁, ← integral_closure_eq_integer_of_complete_of_ext h₂]
 
 theorem unique_val_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
@@ -56,7 +63,7 @@ namespace ValAlgEquiv
 
 section alg_end
 variable {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ΓL]
-variable [ValAlgebra K L] [FiniteDimensional K L]
+variable [ValAlgebra K L] [FiniteDimensional K L] [CompleteSpace K]
 
 theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := by
   apply Valuation.unique_val_of_ext (K := K)
