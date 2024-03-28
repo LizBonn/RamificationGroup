@@ -3,6 +3,8 @@ import Mathlib.FieldTheory.Galois
 
 open DiscreteValuation Valued Valuation
 
+section
+
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
 def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
@@ -23,6 +25,9 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
 --   }
 --   monotone' := sorry
 
+end
+
+section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
 open Classical
 
@@ -52,6 +57,12 @@ instance {α} [Add α] [ConditionallyCompleteLinearOrder α] : ConditionallyComp
 #synth Add ENat
 #check WithTop.untop
 -- instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
+
+end WithBot
+
+section lowerIndex
+
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
 open Classical
 noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
@@ -99,19 +110,59 @@ variable [FiniteDimensional K L]
 #synth Finite (L ≃ₐ[K] L)
 #synth Finite (K' ≃ₐ[K] K')
 
-open BigOperators
-
--- need instances of computation rules related to WithTop ℤ
-instance : Coe (WithTop ℤ) (WithTop ℚ) := sorry
-#synth Mul (WithTop ℚ)
---theorem index_quotient_group (s₀ : L ≃ₐ[K] L) : i[vK'/vK] (s₀.restrictNormal K')  = ((1 / e(vL/vK) :ℚ) : (WithTop ℚ)) * ∑ s in {s : L ≃ₐ[K] L | s.restrictNormal K' = s₀.restrictNormal K'}.toFinite.toFinset, i[vL/vK] s := sorry
--- do we need to def this index finset separately?
-
 -/
 
 noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ): ℚ :=
   if h : i_[S/R] s = ⊤ then u
-  else if (i_[S/R] s).untop h > u then u
+  else if u ≤ (i_[S/R] s).untop h then u
   else (i_[S/R] s).untop h
 
 #check ValAlgEquiv.truncatedLowerIndex
+
+end lowerIndex
+
+#check AlgEquiv.restrictScalars
+
+variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [Field K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
+[LinearOrderedCommGroupWithZero ΓK']
+[vK : Valued K ΓK] [vK' : Valued K' ΓK'] [vL : Valued L ℤₘ₀] [ValAlgebra K L] --{H : Subgroup (L ≃ₐ[K] L)} [H.Normal]
+[Algebra K K'] [ValAlgebra K' L] [IsScalarTower K K' L]
+
+section
+
+variable (R : Type*) {S A B : Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing S] [Ring A] [Ring B]
+[LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
+[LinearOrderedCommGroupWithZero ΓA]
+[LinearOrderedCommGroupWithZero ΓB]
+[vR : Valued R ΓR] [vS : Valued S ΓS] [vA : Valued A ΓA] [vB : Valued B ΓB]
+[Algebra R S] [ValAlgebra R A] [ValAlgebra S A] [ValAlgebra R B] [ValAlgebra S B] [IsScalarTower R S A] [IsScalarTower R S B]
+
+#synth CommSemiring R
+
+def ValAlgEquiv.restrictScalars (f : A ≃ₐv[S] B) : A ≃ₐv[R] B :=
+  {
+    f.toValRingEquiv, f.toAlgEquiv.restrictScalars R with
+  }
+
+def ValAlgEquiv.restrictScalarsₘ : (A ≃ₐv[S] A) →* (A ≃ₐv[R] A) where -- add this bundled version for AlgEquiv.restrictScalars
+  toFun := ValAlgEquiv.restrictScalars R
+  map_one' := rfl
+  map_mul' _ _ := by
+    ext
+    rfl
+
+#check AlgEquiv.restrictScalars
+
+end
+
+-- theorem truncatedLowerIndexlowerIndex_
+
+
+@[simp]
+theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (ValAlgEquiv.restrictScalars K s) =  i_[L/K'] s := rfl
+
+@[simp]
+theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : L ≃ₐv[K'] L) : (ValAlgEquiv.restrictScalars K s).truncatedLowerIndex K L u = s.truncatedLowerIndex K' L u := rfl
+
+@[simp]
+theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(L/K)_[u].comap (ValAlgEquiv.restrictScalarsₘ K) = G(L/K')_[u] := rfl
