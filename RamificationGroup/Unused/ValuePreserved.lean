@@ -1,53 +1,45 @@
 /-
+# of WARNINGs : 1
 -/
 
 import RamificationGroup.Valued.Hom.Defs
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import RamificationGroup.ForMathlib.Henselian
 
+variable {K : Type*} {ΓK : outParam Type*} [Field K]
+  [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
+variable {L : Type*} [Field L]
 
-open Valuation Valued DiscreteValuation
+namespace Valuation
 
-section hensel
+variable [Algebra K L] [FiniteDimensional K L]
 
-variable {K L : Type*} {ΓK ΓL: outParam Type*} [Field K] [Field L]
-  [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
-  [vK : Valued K ΓK] {v : Valuation L ΓL}
-  [Algebra K L] [FiniteDimensional K L]
+section int_closure
+
+variable {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ]
+  {v : Valuation L Γ}
 
 theorem integral_closure_eq_integer_of_helselian [HenselianLocalRing vK.valuationSubring]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
     (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
   sorry
 
-
-end hensel
-
-variable {K : Type*} [Field K] [vK : Valued K ℤₘ₀]
-variable {L : Type*} [Field L]
-
-namespace DiscreteValuation
-
-variable [Algebra K L] [FiniteDimensional K L]
-
-section int_closure_discrete
-
-variable {v : Valuation L ℤₘ₀}
-
-instance HenselianOfComplete [CompleteSpace K] [IsDiscrete vK.v] : HenselianLocalRing vK.valuationSubring := by
+/-- WARNING : not mathematically true? more conditions? -/
+instance ___false___HenselianOfComplete [CompleteSpace K] : HenselianLocalRing vK.valuationSubring := by
   sorry
 
-theorem integral_closure_eq_integer_of_complete_of_ext [CompleteSpace K] [IsDiscrete vK.v]
+theorem integral_closure_eq_integer_of_complete_of_ext [CompleteSpace K]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
     (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
   sorry
 
-end int_closure_discrete
+end int_closure
 
 section value_ext
 
-variable [CompleteSpace K] [IsDiscrete vK.v]
-variable {v₁ : Valuation L ℤₘ₀} {v₂ : Valuation L ℤₘ₀}
+variable [CompleteSpace K]
+variable {Γ₁ Γ₂ : outParam Type*} [LinearOrderedCommGroupWithZero Γ₁] [LinearOrderedCommGroupWithZero Γ₂]
+  {v₁ : Valuation L Γ₁} {v₂ : Valuation L Γ₂}
 
 theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
@@ -62,20 +54,19 @@ theorem unique_val_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
     v₁.IsEquiv v₂ :=
   (Valuation.isEquiv_iff_valuationSubring _ _).mpr <| unique_valuationSubring_of_ext h₁ h₂
 
+
 end value_ext
 
-end DiscreteValuation
+end Valuation
 
 namespace ValAlgEquiv
 
-open DiscreteValuation
-
 section alg_end
-variable [CompleteSpace K] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀]
+variable {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ΓL]
 variable [ValAlgebra K L] [FiniteDimensional K L] [CompleteSpace K]
 
 theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := by
-  apply unique_val_of_ext (K := K)
+  apply Valuation.unique_val_of_ext (K := K)
   · apply ValAlgebra.val_isEquiv_comap
   · rw [Valuation.isEquiv_iff_val_le_one]
     simp; intro x
