@@ -58,9 +58,9 @@ noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
   if h : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
 
-scoped [DiscreteValuation] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
+scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
 
-scoped [DiscreteValuation] notation:max " i_[" S:max "/" R:max "]" => ValAlgEquiv.lowerIndex R S
+scoped [Valued] notation:max " i_[" S:max "/" R:max "]" => ValAlgEquiv.lowerIndex R S
 
 variable (n : ℤ) (s : S ≃ₐv[R] S)
 #check G(S/R)_[n]

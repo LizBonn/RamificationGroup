@@ -40,11 +40,11 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 def phi (K L : Type*) [CommRing K] [Ring L] [Algebra K L] : ℚ → ℚ := sorry
 
-scoped notation:max  "φ_[" L:max "/" K:max "](" x:max ")" => phi K L x
+scoped notation:max  " φ_[" L:max "/" K:max "](" x:max ") " => phi K L x
 
 def psi (K L : Type*) [CommRing K] [Ring L] [Algebra K L] : ℚ → ℚ := sorry
 
-scoped notation:max  "ψ_[" L:max "/" K:max "](" x:max ")" => psi K L x
+scoped notation:max  " ψ_[" L:max "/" K:max "](" x:max ") " => psi K L x
 
 variable (K L : Type*) [CommRing K] [Ring L] [Algebra K L] (x : ℕ)
 #check φ_[L/K](x)

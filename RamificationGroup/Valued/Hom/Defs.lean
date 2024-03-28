@@ -777,7 +777,7 @@ def mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B w
   commutes' := f.commutes'
   continuous_toFun := sorry
 
-theorem coe_mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := by sorry
+theorem coe_mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := rfl
 
 -- def mk'' : given ValRingHom and commute.
 -- theorem coe_mk''
@@ -840,6 +840,17 @@ theorem comp_assoc (φ₁ : C →ₐv[R] D) (φ₂ : B →ₐv[R] C) (φ₃ : A 
 end ValAlgHom
 
 namespace ValAlgEquiv
+
+def mk' (f : A ≃ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A ≃ₐv[R] B :=
+  { f with
+  toFun := f
+  val_isEquiv_comap' := h
+  map_le_map_iff' := sorry
+  commutes' := f.commutes'
+  continuous_toFun := sorry
+  continuous_invFun := sorry
+  }
+theorem coe_mk' (f : A ≃ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := rfl
 
 @[refl]
 def refl : (A ≃ₐv[R] A) where
