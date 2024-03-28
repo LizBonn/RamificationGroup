@@ -5,7 +5,6 @@ import RamificationGroup.Valued.Hom.Defs
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import RamificationGroup.ForMathlib.Henselian
 
-
 open Valuation Valued DiscreteValuation
 
 section hensel
@@ -15,7 +14,7 @@ variable {K L : Type*} {ΓK ΓL: outParam Type*} [Field K] [Field L]
   [vK : Valued K ΓK] {v : Valuation L ΓL}
   [Algebra K L] [FiniteDimensional K L]
 
-theorem integral_closure_eq_integer_of_helselian [HenselianLocalRing vK.valuationSubring]
+theorem integral_closure_eq_integer_of_henselian [HenselianLocalRing vK.valuationSubring]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
     (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
   sorry
@@ -34,7 +33,7 @@ section int_closure_discrete
 
 variable {v : Valuation L ℤₘ₀}
 
-instance HenselianOfComplete [CompleteSpace K] [IsDiscrete vK.v] : HenselianLocalRing vK.valuationSubring := by
+instance HenselianOfCompleteOfDiscrete [CompleteSpace K] [IsDiscrete vK.v] : HenselianLocalRing vK.valuationSubring := by
   sorry
 
 theorem integral_closure_eq_integer_of_complete_discrete [CompleteSpace K] [IsDiscrete vK.v]
@@ -47,7 +46,7 @@ end int_closure_discrete
 section value_ext
 
 variable [CompleteSpace K] [IsDiscrete vK.v]
-variable {v₁ : Valuation L ℤₘ₀} {v₂ : Valuation L ℤₘ₀}
+variable {v₁ v₂ : Valuation L ℤₘ₀}
 
 theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
@@ -70,7 +69,6 @@ namespace ValAlgEquiv
 
 open DiscreteValuation
 
-section alg_end
 variable [CompleteSpace K] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀]
 variable [ValAlgebra K L] [FiniteDimensional K L] [CompleteSpace K]
 
@@ -83,7 +81,6 @@ theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f :
     revert x
     rw [← Valuation.isEquiv_iff_val_le_one]
     apply ValAlgebra.val_isEquiv_comap
-
 
 theorem algEquiv_preserve_val (f : L ≃ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := algEnd_preserve_val f.toAlgHom
 
@@ -100,7 +97,5 @@ def equivAlgEquiv : (L ≃ₐ[K] L) ≃* (L ≃ₐv[K] L) where
   left_inv := sorry
   right_inv := sorry
   map_mul' := sorry
-
-end alg_end
 
 end ValAlgEquiv
