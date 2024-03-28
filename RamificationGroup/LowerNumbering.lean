@@ -5,7 +5,7 @@ open DiscreteValuation Valued Valuation
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
-def lowerRamificationGroup (i : ℤ) : (Subgroup (S ≃ₐv[R] S)) where
+def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
     carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
     mul_mem' := sorry
     one_mem' := sorry

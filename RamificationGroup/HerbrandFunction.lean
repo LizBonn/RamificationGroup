@@ -1,6 +1,8 @@
 import RamificationGroup.Valued.Hom.Defs
 import Mathlib.FieldTheory.Galois
 
+open DiscreteValuation
+
 -- variable (K L ΓK ΓL) [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [Valued K ΓK] [vL : Valued L ΓL] [ValAlgebra K L]
 -- variable (K' : IntermediateField K L)
 
@@ -32,6 +34,19 @@ import Mathlib.FieldTheory.Galois
 --   commutes' := sorry
 --   smul_def' := sorry
 
-def HerbrandPhi : ℚ → ℚ := sorry
+namespace HerbrandFunction
 
-def HerbrandPsi : ℚ → ℚ := sorry
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
+
+def phi (K L : Type*) [CommRing K] [Ring L] [Algebra K L] : ℚ → ℚ := sorry
+
+scoped notation:max  "φ_[" L:max "/" K:max "](" x:max ")" => phi K L x
+
+def psi (K L : Type*) [CommRing K] [Ring L] [Algebra K L] : ℚ → ℚ := sorry
+
+scoped notation:max  "ψ_[" L:max "/" K:max "](" x:max ")" => psi K L x
+
+variable (K L : Type*) [CommRing K] [Ring L] [Algebra K L] (x : ℕ)
+#check φ_[L/K](x)
+#check ψ_[L/K](x)
+end HerbrandFunction
