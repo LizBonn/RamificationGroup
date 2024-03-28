@@ -37,7 +37,7 @@ variable {v : Valuation L ℤₘ₀}
 instance HenselianOfComplete [CompleteSpace K] [IsDiscrete vK.v] : HenselianLocalRing vK.valuationSubring := by
   sorry
 
-theorem integral_closure_eq_integer_of_complete_of_ext [CompleteSpace K] [IsDiscrete vK.v]
+theorem integral_closure_eq_integer_of_complete_discrete [CompleteSpace K] [IsDiscrete vK.v]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
     (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
   sorry
@@ -55,7 +55,7 @@ theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algeb
   ext
   rw [Valuation.mem_valuationSubring_iff, Valuation.mem_valuationSubring_iff,
     ← Valuation.mem_integer_iff, ← Valuation.mem_integer_iff,
-    ← integral_closure_eq_integer_of_complete_of_ext h₁, ← integral_closure_eq_integer_of_complete_of_ext h₂]
+    ← integral_closure_eq_integer_of_complete_discrete h₁, ← integral_closure_eq_integer_of_complete_discrete h₂]
 
 theorem unique_val_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
