@@ -157,8 +157,7 @@ end
 
 @[simp]
 theorem lowerIndex_refl : (i_[L/K] .refl) = ⊤ := by
-  simp [ValAlgEquiv.lowerIndex] -- add simp lemmas : lift of refl is refl
-  sorry
+  simp [ValAlgEquiv.lowerIndex]
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ): ValAlgEquiv.truncatedLowerIndex K L .refl u = u := by
