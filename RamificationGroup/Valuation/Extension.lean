@@ -270,10 +270,9 @@ theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : 
       (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive h_inj (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
         (irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
-variable [NoZeroSMulDivisors A B] -- cannot be inferred if `A → B` is not injective
-
 /-- A power basis of finite extension of DVR `A ↪ B` with seperable residue field extension.-/
 noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
+  letI := NoZeroSMulDivisors.of_algebraMap_injective h;
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
     (AlgEquiv.ofTop (exists_primitive _ _ h).choose_spec)
 
