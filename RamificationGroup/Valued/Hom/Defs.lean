@@ -9,11 +9,16 @@ In this file we define the type of ring homomorphisms that respect the valuation
 
 * `ValRingHom` : Valued ring homomorphisms.
 * `ValRingEquiv` : Valued ring isomorphisms.
+* `ValAlgebra`
+* `ValAlgHom`
+* `ValAlgEquiv`
 
-## Notation
+## Notations
 
 * `→+*v`: Valued ring homomorphisms.
 * `≃+*v`: Valued ring isomorphisms.
+* `A →ₐv[R] B`
+* `A ≃ₐv[R] B`
 
 ## Implementation notes
 
@@ -29,6 +34,7 @@ valued ring homomorphism, valued homomorphism
 -- if as first choice, order preserving <=> valuation preserving <=> continuous (v(x) < 1 -> v f x < 1, by x^n -> 0 -> f x ^n -> 0)
 -- preorder on the set of valuations? not a type, IsSpecialization
 
+-- TODO : Split these into 3 files(?) .ValAlgebra.Hom, .ValAlgebra.Basic
 -- TODO : SubValRing SubValAlgebra, SubValAlgebraClass, intermediate field shoul be SubValAlgebraClass instance.
 -- Question : whether the order should be included as part of the data of Valued instance? not an instance derived from Valued.
 -- TODO : Coe lemmas, how should they be arranged?
@@ -93,14 +99,14 @@ section Class
 /-- `ValHomClass F R S` asserts that `F` is a type of valuation-preserving morphisms. -/
 class ValRingHomClass (F R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-  [vR : Valued R ΓR] [vS : Valued S ΓS] [FunLike F R S] extends RelHomClass F ((· ≤ ·) : R → R → Prop) ((· ≤ ·) : S → S → Prop), RingHomClass F R S, ContinuousMapClass F R S where
+  [vR : Valued R ΓR] [vS : Valued S ΓS] [FunLike F R S] extends RelHomClass F ((· ≤ ·) : R → R → Prop) ((· ≤ ·) : S → S → Prop), RingHomClass F R S, ContinuousMapClass F R S : Prop where
   val_isEquiv_comap (f : F) : vR.v.IsEquiv (vS.v.comap f)
 
 export ValRingHomClass (val_isEquiv_comap)
 
 class ValRingEquivClass (F R S : Type*) {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-  [vR : Valued R ΓR] [vS : Valued S ΓS] [EquivLike F R S] extends OrderIsoClass F R S, RingEquivClass F R S, ContinuousMapClass F R S where
+  [vR : Valued R ΓR] [vS : Valued S ΓS] [EquivLike F R S] extends OrderIsoClass F R S, RingEquivClass F R S, ContinuousMapClass F R S : Prop where
   inv_continuous (f : F) : Continuous (EquivLike.inv f)
   val_isEquiv_comap (f : F) : vR.v.IsEquiv (vS.v.comap f)
 
@@ -264,7 +270,7 @@ namespace ValRingHom
 -- theorem toFun_eq_coe (f : R →+*v S) : f.toFun = f := rfl
 
 @[ext]
-theorem ext (f g : R →+*v S) (h : (f : R → S) = g) : f = g := DFunLike.coe_injective h
+theorem ext {f g : R →+*v S} (h : (f : R → S) = g) : f = g := DFunLike.coe_injective h
 
 -- @[simp]
 -- theorem coe_eq (f : R →+*v S) : ValRingHomClass.toValRingHom f = f := rfl
@@ -364,14 +370,15 @@ section Composition
 
 namespace ValRingHom
 
+variable (R) in
 /-- The identity function as bundled valuation ring homomorphism. -/
 def id : R →+*v R :=
   ⟨.id R, continuous_id , IsEquiv.refl⟩
 
-instance : Inhabited (R →+*v R) := ⟨ ValRingHom.id ⟩
+instance : Inhabited (R →+*v R) := ⟨ ValRingHom.id R ⟩
 
 @[simp]
-theorem id_apply (r : R) : ValRingHom.id r = r := rfl
+theorem id_apply (r : R) : ValRingHom.id R r = r := rfl
 
 def comp (g : S →+*v T) (f : R →+*v S) : R →+*v T where
   toOrderRingHom := (↑g : OrderRingHom S T).comp f
@@ -385,12 +392,12 @@ def comp (g : S →+*v T) (f : R →+*v S) : R →+*v T where
     exact (g.val_isEquiv_comap' (f x) (f y)).symm
 
 @[simp]
-theorem id_comp (f : R →+*v S) : id.comp f = f := by
+theorem id_comp (f : R →+*v S) : (ValRingHom.id S).comp f = f := by
   ext
   rfl
 
 @[simp]
-theorem comp_id (f : R →+*v S) : f.comp id = f := by
+theorem comp_id (f : R →+*v S) : f.comp (.id R) = f := by
   ext
   rfl
 
@@ -408,7 +415,7 @@ def refl : (R ≃+*v R) where
   val_isEquiv_comap' := IsEquiv.refl
 
 @[simp]
-theorem coe_refl : (refl R : R →+*v R) = .id :=
+theorem coe_refl : (refl R : R →+*v R) = .id R :=
   rfl
 
 @[simp]
@@ -603,12 +610,12 @@ instance id : ValAlgebra R R where
   -- see library note [reducible non-instances].
   toFun x := x
   toSMul := Mul.toSMul _
-  __ := ValRingHom.toValAlgebra (ValRingHom.id)
+  __ := ValRingHom.toValAlgebra (ValRingHom.id R)
 
 namespace id
 
 @[simp]
-theorem map_eq_id : valAlgebraMap R R = ValRingHom.id :=
+theorem map_eq_id : valAlgebraMap R R = ValRingHom.id R :=
   rfl
 
 theorem map_eq_self (x : R) : valAlgebraMap R R x = x :=
@@ -620,83 +627,55 @@ end ValAlgebra
 
 end ValAlgebra
 
-section
+section ValAlgHom_ValAlgEquiv
+
+section Hom
 
 variable (R A B : Type*) [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
 
+/-- Defining the homomorphism in the category of valued-`R`-algebra. -/
 structure ValAlgHom extends ValRingHom A B, AlgHom R A B
 
+/-- Defining the isomorphism in the category of valued-`R`-algebra. -/
 structure ValAlgEquiv extends ValRingEquiv A B, AlgEquiv R A B
 
+/-- Reinterpret an `ValAlgHom` as a `ValRingHom` -/
+add_decl_doc ValAlgHom.toValRingHom
+
+/-- Reinterpret an `ValAlgHom` as a `AlgHom` -/
+add_decl_doc ValAlgHom.toAlgHom
+
+/-- Reinterpret an `ValAlgEquiv` as a `ValRingEquiv` -/
+add_decl_doc ValAlgEquiv.toValRingEquiv
+
+/-- Reinterpret an `ValAlgEquiv` as a `AlgEquiv` -/
+add_decl_doc ValAlgEquiv.toAlgEquiv
+
+@[inherit_doc]
 notation:25 A " →ₐv[" R "] " B => ValAlgHom R A B
 
+@[inherit_doc]
 notation:25 A " ≃ₐv[" R "] " B => ValAlgEquiv R A B
 
--- ValAlgHomClass
--- ValAlgIsoClass
+end Hom
 
-end
+variable {R A B C D: Type*} [CommRing R] [Ring A] [Ring B] [Ring C] [Ring D]
+{ΓR ΓA ΓB ΓC ΓD: outParam Type*} [LinearOrderedCommGroupWithZero ΓR]
+[LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB]
+[LinearOrderedCommGroupWithZero ΓC]
+[LinearOrderedCommGroupWithZero ΓD]
+[Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [vC : Valued C ΓC] [vD : Valued D ΓD]
+[fA : ValAlgebra R A] [fB : ValAlgebra R B] [fC : ValAlgebra R C] [fD : ValAlgebra R D]
 
-section
+section Class
 
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [fA : ValAlgebra R A] [fB : ValAlgebra R B]
-
-noncomputable def ValAlgHom.mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B where
-  toFun := f
-  map_one' := f.map_one
-  map_mul' := f.map_mul
-  map_zero' := f.map_zero
-  map_add' := f.map_add'
-  monotone' := sorry
-  val_isEquiv_comap' := h
-  commutes' := sorry
-  continuous_toFun := sorry
-
--- `copy lemmas in MonoidWithZeroHom` or `OrderRingHom`
--- `id, symm, comp`
-section coercion
--- -- coercions
-
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
-
-instance ValAlgHom.algHom : Coe (A →ₐv[R] B) (A →ₐ[R] B) := ⟨ValAlgHom.toAlgHom⟩
-
-instance ValAlgEquiv.algEquiv: Coe (A ≃ₐv[R] B) (A ≃ₐ[R] B) := ⟨ValAlgEquiv.toAlgEquiv⟩
-
-instance : CoeTC (A →ₐv[R] B) (A →+*v B) := ⟨ValAlgHom.toValRingHom⟩
-
-instance : CoeTC (A ≃ₐv[R] B) (A ≃+*v B) := ⟨ValAlgEquiv.toValRingEquiv⟩
--- `This is temporory, should mimic instCoeTCRingHom use ValRingHomClass to achieve this`
-/-
-#synth CoeTC (AlgHom R A B) (RingHom A B)
-#check instCoeTCRingHom
--/
-
-def ValAlgEquiv.toValAlgHom (f : A ≃ₐv[R] B) : (A →ₐv[R] B) where
-  toFun := f.toFun
-  map_one' := f.map_one
-  map_mul' := f.map_mul
-  map_zero' := f.map_zero
-  map_add' := f.map_add
-  monotone' := by exact OrderHom.monotone (f.toValRingEquiv : A →o B)
-  continuous_toFun := f.toValRingEquiv.continuous_toFun
-  val_isEquiv_comap' := f.toValRingEquiv.val_isEquiv_comap'
-  commutes' := f.commutes'
-
-instance : CoeTC (A ≃ₐv[R] B) (A →ₐv[R] B) := ⟨ValAlgEquiv.toValAlgHom⟩
--- `This is temporory, should Mimic instCoeTCOrderRingHom, use ValAlgHomClass to implement this coe instance`
-/-
-variable {R S} [OrderedRing R] [OrderedRing S] (f : R ≃+*o S)
-#synth CoeTC (R ≃+*o S)  (R →+*o S) -- instCoeTCOrderRingHom
-#check (f : OrderRingHom R S)
--/
-
-end coercion
-
-variable {R A B : Type*} [CommRing R] [Ring A] [Ring B] {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB] [Valued R ΓR] [Valued A ΓA] [Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
-
-#synth Algebra R A
-#synth CoeFun (AlgEquiv R A B) (fun _ => (A → B))
+/-- `ValAlgHomClass F R A B` asserts `F` is a type of bundled valued algebra homomorphisms
+from `A` to `B`.  -/
+class ValAlgHomClass (F : Type*) (R A B : outParam Type*) [CommRing R] [Ring A] [Ring B]
+  {ΓR ΓA ΓB : outParam Type*} [LinearOrderedCommGroupWithZero ΓR]
+  [LinearOrderedCommGroupWithZero ΓA] [LinearOrderedCommGroupWithZero ΓB]
+  [Valued R ΓR] [vA : Valued A ΓA] [vB : Valued B ΓB] [ValAlgebra R A] [ValAlgebra R B]
+  [FunLike F A B] extends ValRingHomClass F A B, AlgHomClass F R A B : Prop
 
 instance : FunLike (A →ₐv[R] B) A B where
   coe f := f.toFun
@@ -721,26 +700,296 @@ instance : EquivLike (A ≃ₐv[R] B) A B where
     apply DFunLike.coe_injective'
     exact h
 
-protected def ValAlgHom.id : (A →ₐv[R] A) where
+instance (priority := 100) : ValRingHomClass (A →ₐv[R] B) A B where
+  map_rel f := map_rel f.toValRingHom
+  map_mul f := f.map_mul
+  map_one f := f.map_one
+  map_add f := f.map_add
+  map_zero f := f.map_zero
+  map_continuous f := f.toValRingHom.continuous_toFun
+  val_isEquiv_comap f := f.val_isEquiv_comap'
+
+instance (priority := 100) : ValRingEquivClass (A ≃ₐv[R] B) A B where
+  map_le_map_iff f := map_le_map_iff f.toValRingEquiv
+  map_mul f := f.map_mul
+  map_add f := f.map_add
+  map_continuous f := f.toValRingEquiv.continuous_toFun
+  inv_continuous f := f.toValRingEquiv.continuous_invFun
+  val_isEquiv_comap f := f.val_isEquiv_comap'
+
+instance (priority := 100) : AlgHomClass (A →ₐv[R] B) R A B :=
+{
+  commutes := fun f => f.commutes'
+}
+
+instance (priority := 100) : AlgEquivClass (A ≃ₐv[R] B) R A B :=
+{
+  commutes := fun f => f.commutes'
+}
+
+@[coe]
+def ValAlgHom.ofAlgHomClassValRingHomClass {F : Type*}
+  [FunLike F A B] [ValRingHomClass F A B] [AlgHomClass F R A B] (f : F) :
+    A →ₐv[R] B :=
+  { ValRingHomClass.toValRingHom f, AlgHomClass.toAlgHom f with}
+
+instance (priority := 100) {F : Type*}
+  [FunLike F A B] [ValRingHomClass F A B] [AlgHomClass F R A B] :
+  CoeTC F (A →ₐv[R] B) where
+    coe := ValAlgHom.ofAlgHomClassValRingHomClass
+
+end Class
+
+section coe
+
+namespace ValAlgHom
+-- copy AlgHom.coe_coe, ...
+-- ..., coe_fn_injective
+
+@[ext]
+theorem ext {f g : A →ₐv[R] B} (h : (f : A → B) = g) : f = g := DFunLike.coe_injective h
+
+end ValAlgHom
+
+theorem comp_valAlgebraMap {F} [FunLike F A B] [FunLike F A B] [ValRingHomClass F A B] [AlgHomClass F R A B] (φ : F) : (φ : A →+*v B).comp (valAlgebraMap R A) = valAlgebraMap R B :=
+  DFunLike.ext _ _ <| AlgHomClass.commutes φ
+
+namespace ValAlgEquiv
+
+@[ext]
+theorem ext {f g : A ≃ₐv[R] B} (h : ∀ a, f a = g a) : f = g :=
+  DFunLike.ext f g h
+
+end ValAlgEquiv
+
+end coe
+
+namespace ValAlgHom
+
+def mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B where
+  toFun := f
+  map_one' := f.map_one
+  map_mul' := f.map_mul
+  map_zero' := f.map_zero
+  map_add' := f.map_add'
+  monotone' := sorry
+  val_isEquiv_comap' := h
+  commutes' := f.commutes'
+  continuous_toFun := sorry
+
+theorem coe_mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := rfl
+
+-- def mk'' : given ValRingHom and commute.
+-- theorem coe_mk''
+
+variable (R A) in
+/-- Identity map as an `ValAlgHom`. -/
+protected def id : (A →ₐv[R] A) where
   toOrderRingHom := .id A
   continuous_toFun := continuous_id
   val_isEquiv_comap' := IsEquiv.refl
   commutes' _ := rfl
 
+@[simp]
+theorem coe_id : ⇑(ValAlgHom.id R A) = id :=
+  rfl
+
+@[simp]
+theorem id_toValRingHom : (ValAlgHom.id R A : A →+* A) = ValRingHom.id A :=
+  rfl
+
+@[simp]
+theorem id_apply (p : A) : ValAlgHom.id R A p = p :=
+  rfl
+
+protected def comp (φ₁ : B →ₐv[R] C) (φ₂ : A →ₐv[R] B) : A →ₐv[R] C :=
+  { φ₁.toValRingHom.comp ↑φ₂ with
+    commutes' := fun r : R => by rw [← (φ₁ : B →ₐ[R] C).commutes', ← (φ₂ : A →ₐ[R] B).commutes]; rfl }
+
+@[simp]
+theorem coe_comp (φ₁ : B →ₐv[R] C) (φ₂ : A →ₐv[R] B) : ⇑(φ₁.comp φ₂) = φ₁ ∘ φ₂ :=
+  rfl
+
+theorem comp_apply (φ₁ : B →ₐv[R] C) (φ₂ : A →ₐv[R] B) (p : A) : φ₁.comp φ₂ p = φ₁ (φ₂ p) :=
+  rfl
+
+theorem comp_toRingHom (φ₁ : B →ₐv[R] C) (φ₂ : A →ₐv[R] B) :
+    (φ₁.comp φ₂ : A →+*v C) = (φ₁ : B →+*v C).comp ↑φ₂ :=
+  rfl
+
+@[simp]
+theorem comp_id (φ : A →ₐv[R] B) : φ.comp (ValAlgHom.id R A) = φ := by
+  ext
+  rfl
+
+@[simp]
+theorem id_comp (φ : A →ₐv[R] B) : (ValAlgHom.id R B).comp φ = φ := by
+  ext
+  rfl
+
+theorem comp_assoc (φ₁ : C →ₐv[R] D) (φ₂ : B →ₐv[R] C) (φ₃ : A →ₐv[R] B) :
+    (φ₁.comp φ₂).comp φ₃ = φ₁.comp (φ₂.comp φ₃) := by
+  ext
+  rfl
+
+-- instance : Monoid (A →ₐv[R] A)
+
+-- /-- `AlgebraMap` as an `AlgHom`. -/
+-- def ofId : R →ₐv[R] A :=
+
+end ValAlgHom
+
+namespace ValAlgEquiv
+
+def mk' (f : A ≃ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A ≃ₐv[R] B :=
+  { f with
+  toFun := f
+  val_isEquiv_comap' := h
+  map_le_map_iff' := sorry
+  commutes' := f.commutes'
+  continuous_toFun := sorry
+  continuous_invFun := sorry
+  }
+theorem coe_mk' (f : A ≃ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := rfl
+
 @[refl]
-protected def ValAlgEquiv.refl : (A ≃ₐv[R] A) where
-  toOrderRingIso := .refl A
-  continuous_toFun := continuous_id
-  continuous_invFun := continuous_id
-  val_isEquiv_comap' := IsEquiv.refl
+def refl : (A ≃ₐv[R] A) where
+  toValRingEquiv := .refl A
   commutes' _ := rfl
 
+instance : Inhabited (A ≃ₐv[R] A) :=
+  ⟨.refl⟩
+
+@[simp]
+theorem refl_toAlgHom : ↑(.refl : A ≃ₐv[R] A) = AlgHom.id R A :=
+  rfl
+
+@[simp]
+theorem coe_refl : ⇑(.refl : A ≃ₐv[R] A) = id :=
+  rfl
+
+/-- Inverse of a valued ring algebra equivalence. -/
+@[symm]
+def symm (e : A ≃ₐv[R] B) : B ≃ₐv[R] A :=
+  { e.toValRingEquiv.symm with
+    commutes' := fun r => by
+      rw [← e.toRingEquiv.symm_apply_apply (algebraMap R A r)]
+      congr
+      change _ = e _
+      exact ((e : A →ₐ[R] B).commutes r).symm }
+
+
+@[simp]
+theorem symm_toEquiv_eq_symm {e : A ≃ₐv[R] B} : (e : A ≃ B).symm = e.symm :=
+  rfl
+
+theorem invFun_eq_symm {e : A ≃ₐv[R] B} : e.invFun = e.symm :=
+  rfl
+
+@[simp]
+theorem symm_symm (e : A ≃ₐv[R] B) : e.symm.symm = e := by
+  ext
+  rfl
+
+theorem symm_bijective : Function.Bijective (symm : (A ≃ₐv[R] B) → B ≃ₐv[R] A) :=
+  Function.bijective_iff_has_inverse.mpr ⟨_ , symm_symm, symm_symm⟩
+
+
+@[simp]
+theorem refl_symm : (.refl : A ≃ₐv[R] A).symm = .refl :=
+  rfl
+
+@[simp]
+theorem toRingEquiv_symm (f : A ≃ₐv[R] A) : (f : A ≃+*v A).symm = f.symm :=
+  rfl
+
+@[simp]
+theorem symm_toRingEquiv (e : A ≃ₐv[R] B): (e.symm : B ≃+*v A) = (e : A ≃+*v B).symm :=
+  rfl
+
+/-- Algebra equivalences are transitive. -/
+@[trans]
+def trans (e₁ : A ≃ₐv[R] B) (e₂ : B ≃ₐv[R] C) : A ≃ₐv[R] C :=
+  { e₁.toValRingEquiv.trans e₂.toValRingEquiv with
+    commutes' := fun r => show e₂.toFun (e₁.toFun _) = _ by rw [e₁.commutes', e₂.commutes'] }
+
+@[simp]
+theorem apply_symm_apply (e : A ≃ₐv[R] B) : ∀ x, e (e.symm x) = x :=
+  e.toEquiv.apply_symm_apply
+
+@[simp]
+theorem symm_apply_apply (e : A ≃ₐv[R] B) : ∀ x, e.symm (e x) = x :=
+  e.toEquiv.symm_apply_apply
+
+@[simp]
+theorem symm_trans_self (e : A ≃ₐv[R] B) : e.symm.trans e = .refl := by
+  ext x
+  exact e.apply_symm_apply x
+
+@[simp]
+theorem trans_symm_self (e : A ≃ₐv[R] B) : e.trans e.symm = .refl := by
+  ext x
+  exact e.symm_apply_apply x
+
+@[simp]
+theorem symm_trans_apply (e₁ : A ≃ₐv[R] B) (e₂ : B ≃ₐv[R] C) (x : C) :
+    (e₁.trans e₂).symm x = e₁.symm (e₂.symm x) :=
+  rfl
+
+@[simp]
+theorem coe_trans (e₁ : A ≃ₐv[R] B) (e₂ : B ≃ₐv[R] C) : ⇑(e₁.trans e₂) = e₂ ∘ e₁ :=
+  rfl
+
+@[simp]
+theorem trans_apply (e₁ : A ≃ₐv[R] B) (e₂ : B ≃ₐv[R] C) (x : A) : (e₁.trans e₂) x = e₂ (e₁ x) :=
+  rfl
+
+@[simp]
+theorem comp_symm (e : A ≃ₐv[R] B) : ValAlgHom.comp (e : A →ₐv[R] B) e.symm = ValAlgHom.id R B := by
+  ext
+  simp only [ValAlgHom.coe_comp, Function.comp_apply, ValAlgHom.id_apply]
+  exact apply_symm_apply e _
+
+@[simp]
+theorem symm_comp (e : A ≃ₐv[R] B) : ValAlgHom.comp ↑e.symm (e : A →ₐv[R] B) = ValAlgHom.id R A := by
+  ext
+  simp only [ValAlgHom.coe_comp, Function.comp_apply, ValAlgHom.id_apply]
+  exact symm_apply_apply e _
+
+theorem leftInverse_symm (e : A ≃ₐv[R] B) : Function.LeftInverse e.symm e :=
+  e.left_inv
+
+theorem rightInverse_symm (e : A ≃ₐv[R] B) : Function.RightInverse e.symm e :=
+  e.right_inv
+
+-- /-- Promotes a bijective valued algebra homomorphism to an algebra equivalence. -/
+-- noncomputable def ofBijective (f : A →ₐv[R] B) (hf : Function.Bijective f) : A ≃ₐv[R] B :=
+--   { ValRingEquiv.ofBijective (f : A →+*v B) hf, f with }
+
+-- /-- If `A` is equivalent to `A'` and `B` is equivalent to `B'`, then the type of maps
+-- `A →ₐv[R] B` is equivalent to the type of maps `A' →ₐv[R] B'`. -/
+-- @[simps apply]
+-- def arrowCongr (e₁ : A ≃ₐv[R] A') (e₂ : B ≃ₐv[R] B') : (A →ₐv[R] B) ≃ (A' →ₐv[R] B')
+
+-- def equivCongr
 
 instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
-  mul := sorry
-  mul_assoc := sorry
-  one := sorry
-  one_mul := sorry
-  mul_one := sorry
-  inv := sorry
-  mul_left_inv := sorry
+  mul := trans
+  mul_assoc _ _ _:= rfl
+  one := .refl
+  one_mul _ := rfl
+  mul_one _ := rfl
+  inv := symm
+  mul_left_inv := symm_trans_self
+
+-- bundled version of forgetful, this will be enhanced to a equiv in certain cases
+def toAlgEquivₘ : (A ≃ₐv[R] A) →* (A ≃ₐ[R] A) where
+  toFun := ValAlgEquiv.toAlgEquiv (R := R) (A := A) (B := A)
+  map_one' := rfl
+  map_mul' := sorry -- more coe lemmas
+
+theorem toAlgEquiv_injective : Function.Injective (ValAlgHom.toAlgHom (R := R) (A := A) (B := A))  := sorry
+
+end ValAlgEquiv
+
+end ValAlgHom_ValAlgEquiv

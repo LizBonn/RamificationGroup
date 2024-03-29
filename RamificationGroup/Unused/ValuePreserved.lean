@@ -1,52 +1,45 @@
 /-
+# of WARNINGs : 1
 -/
 
 import RamificationGroup.Valued.Hom.Defs
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import RamificationGroup.ForMathlib.Henselian
 
-open Valuation Valued DiscreteValuation
-
-section hensel
-
-variable {K L : Type*} {ΓK ΓL: outParam Type*} [Field K] [Field L]
-  [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
-  [vK : Valued K ΓK] {v : Valuation L ΓL}
-  [Algebra K L] [FiniteDimensional K L]
-
-theorem integral_closure_eq_integer_of_henselian [HenselianLocalRing vK.valuationSubring]
-  (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
-    (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
-  sorry
-
-
-end hensel
-
-variable {K : Type*} [Field K] [vK : Valued K ℤₘ₀]
+variable {K : Type*} {ΓK : outParam Type*} [Field K]
+  [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
 variable {L : Type*} [Field L]
 
-namespace DiscreteValuation
+namespace Valuation
 
 variable [Algebra K L] [FiniteDimensional K L]
 
-section int_closure_discrete
+section int_closure
 
-variable {v : Valuation L ℤₘ₀}
+variable {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ]
+  {v : Valuation L Γ}
 
-instance HenselianOfCompleteOfDiscrete [CompleteSpace K] [IsDiscrete vK.v] : HenselianLocalRing vK.valuationSubring := by
-  sorry
-
-theorem integral_closure_eq_integer_of_complete_discrete [CompleteSpace K] [IsDiscrete vK.v]
+theorem integral_closure_eq_integer_of_helselian [HenselianLocalRing vK.valuationSubring]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
     (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
   sorry
 
-end int_closure_discrete
+/-- WARNING : not mathematically true? more conditions? -/
+instance ___false___HenselianOfComplete [CompleteSpace K] : HenselianLocalRing vK.valuationSubring := by
+  sorry
+
+theorem integral_closure_eq_integer_of_complete_of_ext [CompleteSpace K]
+  (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
+    (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
+  sorry
+
+end int_closure
 
 section value_ext
 
-variable [CompleteSpace K] [IsDiscrete vK.v]
-variable {v₁ v₂ : Valuation L ℤₘ₀}
+variable [CompleteSpace K]
+variable {Γ₁ Γ₂ : outParam Type*} [LinearOrderedCommGroupWithZero Γ₁] [LinearOrderedCommGroupWithZero Γ₂]
+  {v₁ : Valuation L Γ₁} {v₂ : Valuation L Γ₂}
 
 theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
@@ -54,26 +47,26 @@ theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algeb
   ext
   rw [Valuation.mem_valuationSubring_iff, Valuation.mem_valuationSubring_iff,
     ← Valuation.mem_integer_iff, ← Valuation.mem_integer_iff,
-    ← integral_closure_eq_integer_of_complete_discrete h₁, ← integral_closure_eq_integer_of_complete_discrete h₂]
+    ← integral_closure_eq_integer_of_complete_of_ext h₁, ← integral_closure_eq_integer_of_complete_of_ext h₂]
 
 theorem unique_val_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
     v₁.IsEquiv v₂ :=
   (Valuation.isEquiv_iff_valuationSubring _ _).mpr <| unique_valuationSubring_of_ext h₁ h₂
 
+
 end value_ext
 
-end DiscreteValuation
+end Valuation
 
 namespace ValAlgEquiv
 
-open DiscreteValuation
-
-variable [CompleteSpace K] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀]
+section alg_end
+variable {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ΓL]
 variable [ValAlgebra K L] [FiniteDimensional K L] [CompleteSpace K]
 
 theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := by
-  apply unique_val_of_ext (K := K)
+  apply Valuation.unique_val_of_ext (K := K)
   · apply ValAlgebra.val_isEquiv_comap
   · rw [Valuation.isEquiv_iff_val_le_one]
     simp; intro x
@@ -81,6 +74,7 @@ theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f :
     revert x
     rw [← Valuation.isEquiv_iff_val_le_one]
     apply ValAlgebra.val_isEquiv_comap
+
 
 theorem algEquiv_preserve_val (f : L ≃ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := algEnd_preserve_val f.toAlgHom
 
@@ -97,5 +91,7 @@ def equivAlgEquiv : (L ≃ₐ[K] L) ≃* (L ≃ₐv[K] L) where
   left_inv := sorry
   right_inv := sorry
   map_mul' := sorry
+
+end alg_end
 
 end ValAlgEquiv

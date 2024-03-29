@@ -44,6 +44,7 @@ theorem is_unit_of_unit_add_nonunit {x y : A} (hx : IsUnit x) (hy : y ∈ nonuni
   exact (isUnit_or_isUnit_of_isUnit_add hx).resolve_right fun h ↦ hy ((IsUnit.neg_iff y).mp h)
 
 theorem maximalIdeal_eq_jacobson_of_bot : maximalIdeal A ≤ Ideal.jacobson ⊥ := le_of_eq (jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm
+
 end LocalRing
 end local_ring
 
@@ -269,10 +270,9 @@ theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : 
       (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive h_inj (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
         (irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
-variable [NoZeroSMulDivisors A B] -- cannot be inferred if `A → B` is not injective
-
 /-- A power basis of finite extension of DVR `A ↪ B` with seperable residue field extension.-/
 noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
+  letI := NoZeroSMulDivisors.of_algebraMap_injective h;
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
     (AlgEquiv.ofTop (exists_primitive _ _ h).choose_spec)
 
