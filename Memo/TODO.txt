@@ -2,3 +2,4 @@
 
 1. add lift lemmas such as lift refl = refl lift symm = symm, make them @[simp]
 2. low priority, add coe lemmas in ValHom,...
+3. we need a bundled version ValAlgEquiv.restrictScalarsₘ, AlgEquiv.restrictScalarsₘ is not in mathlib?
