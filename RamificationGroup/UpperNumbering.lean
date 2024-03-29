@@ -48,7 +48,7 @@ variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [vK : Valued K
 
 #synth Valued K' ℤₘ₀
 
-#check valuedIntermediateField
+#check valuedIntermediateField -- this should be renamed
 
 variable (v : ℚ)
 #check (G(L/K)^[v]).subgroupOf (H.comap ValAlgEquiv.toAlgEquivₘ)
