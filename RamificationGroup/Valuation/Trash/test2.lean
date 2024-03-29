@@ -13,7 +13,7 @@ open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators I
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
 noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
-  if u ≥ (-1) then
+  if u > (-1) then
     relindex' G(S/R)_[0] G(S/R)_[(Int.ceil u)]
   else
     1
@@ -27,15 +27,78 @@ noncomputable def varphi (u : ℚ) : ℚ :=
   else
     u * (varphi' R S u)
 
+--for mathlib
+theorem sub_of_sum (a : ℤ) (f : ℚ → ℚ) (h : 1 ≤ a): ∑ x in Icc 1 (a + 1), f x - ∑ x in Icc 1 a, f x = f (a + 1) := by
+  have hncons : (a + 1) ∉ Finset.Icc 1 a := by simp
+  have hcons : (Finset.Icc 1 (a + 1)) = cons (a + 1) (Finset.Icc 1 a) hncons := by
+    ext n
+    simpa using (by omega)
+  rw [hcons]
+  rw [sum_cons]
+  simp
+
+--for mathlib
+theorem ceil_eq_floor_add_one_iff (u : ℚ) (h : u ≠ ⌊u⌋) : ⌈u⌉ = ⌊u⌋ + 1 := by
+  have hu : fract u ≠ 0 := by
+    unfold fract
+    by_contra h'
+    have : u = ⌊u⌋ := by linarith [h']
+    contradiction
+  have h' : ⌈u⌉ = u + 1 - Int.fract u := by
+    apply ceil_eq_add_one_sub_fract hu
+  unfold fract at h'
+  have h'': (⌈u⌉ : ℚ) = ((⌊u⌋ + 1) : ℚ):= by
+    rw [h']
+    ring
+  exact_mod_cast h''
+
+--for mathlib
+theorem Int.eq_of_ge_of_lt_add_one (a m : ℤ) (h1 : m ≤ a) (h2 : a < (m + 1)) : a = m := by
+  have hle : a ≤ m + 1 - 1 := by apply le_sub_one_iff.2 h2
+  simp at hle
+  apply ((LE.le.ge_iff_eq h1).1 hle).symm
+
+theorem varphi'_eq_ceil : ∀ u : ℚ , varphi' R S u = varphi' R S ⌈u⌉ := by
+  rintro u
+  unfold varphi' Index_of_G_i
+  by_cases h : -1 < u
+  · have hcl : ⌈u⌉ > (-1 : ℚ) := by
+      apply lt_of_lt_of_le
+      apply h
+      apply le_ceil
+    simp [h, hcl]
+  have hcl : ¬⌈u⌉ > (-1 : ℚ) := by
+    by_contra hc
+    have hcl' : -1 < ⌈u⌉ := by apply cast_lt.1 hc
+    have : -1 < u := by
+      apply lt_ceil.1 hcl'
+    contradiction
+  simp [h, hcl]
+
 theorem varphi'_pos : ∀ u : ℚ , 0 < varphi' R S u := by
   unfold varphi' Index_of_G_i relindex' index
   rintro u
-  by_cases h : u ≥ -1
+  by_cases h : u > -1
   simp [h]
   apply div_pos_iff.2
   left
   constructor <;> sorry
   simp [h]
+
+theorem varphi'_neg_int_eq_one : ∀ u : ℤ , (u ≤ 0) → varphi' R S u = 1 := by
+  rintro u hu
+  unfold varphi' Index_of_G_i
+  by_cases hgt : (-1 : ℚ) < u
+  · simp [hgt]
+    have hzero : 0 = u := by
+      have hgt' : -1 < u := by apply cast_lt.1 hgt
+      have hge : -1 ≤ u - 1 := by
+        apply le_sub_one_iff.2 hgt'
+      simp at hge
+      apply (LE.le.ge_iff_eq hge).1 hu
+    have hzero' : u = (0 : ℚ) := by simp [hzero]
+    sorry
+  simp [hgt]
 
 theorem varphi_int_succ : ∀a : ℤ , (varphi R S a) = (varphi R S (a + 1)) - (varphi' R S (a + 1)) := by
   rintro a
@@ -43,14 +106,40 @@ theorem varphi_int_succ : ∀a : ℤ , (varphi R S a) = (varphi R S (a + 1)) - (
   by_cases hgeone : (1 : ℚ) ≤ a
   · have hgezero : (0 : ℚ) ≤ a := by linarith
     simp [hgeone, hgezero]
-    sorry
+    have h : ∑ x in Icc 1 (a + 1), varphi' R S ↑x = varphi' R S (a + 1) + ∑ x in Icc 1 a, varphi' R S ↑x := by
+      have hgeone' : 1 ≤ a := by apply cast_le.1 hgeone
+      have h' : ∑ x in Finset.Icc 1 (a + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 a, varphi' R S ↑x = varphi' R S (↑a + 1) := by
+        apply sub_of_sum a (varphi' R S) hgeone'
+      linarith [h']
+    simp [h]
   by_cases hgezero : (0 : ℚ) ≤ a
   · have heqzero : (0 : ℚ) = a := by
-      sorry
+      --this
+      push_neg at hgeone
+      have hgeone' : a < 1 := by
+        apply cast_lt.1 hgeone
+      have hlezero  : a ≤ (0 : ℚ) := by
+        convert le_sub_one_iff.2 hgeone'
+        simp
+      apply (LE.le.ge_iff_eq hgezero).1 hlezero
     erw [←heqzero]
     simp [hgeone, hgezero]
   simp [hgeone, hgezero]
-  sorry
+  push_neg at *
+  ring
+  apply mul_eq_mul_left_iff.2
+  left
+  rw [varphi'_neg_int_eq_one]
+  have : (1 + a) ≤ 0 := by
+    have hgezero' : a < 0 := by apply cast_lt.1 hgezero
+    have hle: a ≤ 0 - 1 := by
+      convert le_sub_one_iff.2 hgezero'
+    linarith [hle]
+  symm
+  convert varphi'_neg_int_eq_one R S (1 + a) this
+  simp
+  apply le_of_lt
+  apply cast_lt.1 hgezero
 
 theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi R S a2) := by
   rintro a1 a2 h
@@ -102,7 +191,21 @@ theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a�
     · right
       exact hzero
     left
-    sorry
+    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x = varphi' R S (⌊a⌋ + 1) := by
+      have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
+      apply sub_of_sum ⌊a⌋ (varphi' R S) hfl'
+    rw [h, varphi'_eq_ceil]
+    have hflcl : ⌈a⌉ = ⌊a⌋ + 1 := by
+      unfold fract at hzero
+      push_neg at hzero
+      have : a ≠ ⌊a⌋ := by
+        by_contra hc
+        have hc' : a - ⌊a⌋ = 0 := by linarith
+        contradiction
+      apply ceil_eq_floor_add_one_iff a this
+    rw [hflcl]
+    congr
+    simp
   have hfl : ¬ (1 : ℚ) ≤ ↑⌊a⌋ := by
     by_contra h'
     have h'' : (1 : ℚ) ≤ a := by
@@ -113,8 +216,41 @@ theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a�
     contradiction
   by_cases hzero : (0 : ℚ) ≤ ⌊a⌋
   · simp [ha, hfl, hzero]
-    sorry
+    push_neg at *
+    --and this is the same
+    have hflzero : 0 = ⌊a⌋ := by
+      have hfl' : ⌊a⌋ < 1 := by apply cast_lt.1 hfl
+      have hlezero : ⌊a⌋ ≤ 1 - 1 := by
+        apply le_sub_one_iff.2 hfl'
+      simp at hlezero
+      have hgezero : 0 ≤ ⌊a⌋ := by apply cast_le.1 hzero
+      apply (LE.le.ge_iff_eq hgezero).1 hlezero
+    unfold fract
+    simp [hflzero.symm]
+    rw [mul_comm]
+    apply mul_eq_mul_right_iff.2
+    by_cases hzero' : a = 0
+    · right
+      exact hzero'
+    left
+    have hcl : ⌈a⌉ = 1 := by
+      have hgtzero : (0 : ℚ) < a := by
+        apply lt_of_le_of_ne
+        have : ⌊a⌋ ≤ a := by apply floor_le
+        apply le_trans
+        apply hzero
+        apply this
+        push_neg at hzero'
+        apply hzero'.symm
+      apply ceil_eq_on_Ioc
+      simp
+      constructor
+      apply hgtzero
+      apply le_of_lt ha
+    rw [varphi'_eq_ceil, hcl]
+    congr
   simp [ha, hfl, hzero]
+  push_neg at *
   sorry
 
 
@@ -125,10 +261,41 @@ theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a�
   · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
       convert le_floor.2 ha
       apply cast_le
-    have hcl' : (1 : ℚ) ≤ (⌊a⌋ + 1) := by
+    have hcl : (1 : ℚ) ≤ (⌊a⌋ + 1) := by
       linarith [hfl]
-    simp [ha, hcl', hfl]
-    sorry
+    simp [ha, hcl, hfl]
+    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x = varphi' R S (⌊a⌋ + 1) := by
+      have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
+      apply sub_of_sum ⌊a⌋ (varphi' R S) hfl'
+    have h' :  (∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x) - fract a * varphi' R S a -
+    (∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x) * (↑⌊a⌋ - a + 1) = 0 := by
+      rw [h]
+      by_cases hfl' : a - ⌊a⌋ = 0
+      · unfold fract
+        have : ⌊a⌋ - a = 0 := by linarith [hcl]
+        simp [hcl, this]
+        left
+        unfold fract
+        linarith [this]
+      push_neg at *
+      have hcl' : (⌈a⌉ : ℚ) = (⌊a⌋ : ℚ) + 1:= by
+        have hfl'' : a ≠ ⌊a⌋ := by
+          by_contra hc
+          have : a - ⌊a⌋ = 0 := by linarith [hc]
+          contradiction
+        have hcl'' : ⌈a⌉ = ⌊a⌋ + 1:= by
+          apply ceil_eq_floor_add_one_iff a hfl''
+        sorry
+      ring
+      nth_rw 3 [varphi'_eq_ceil]
+      unfold fract
+      have heq : varphi' R S (1 + ⌊a⌋) = varphi' R S ⌈a⌉ := by
+        rw [hcl']
+        have : 1 + (⌊a⌋ : ℚ) = (⌊a⌋ : ℚ) + 1 := by ring
+        rw [this]
+      rw [heq]
+      ring
+    linarith [h']
   have hfl : ¬(1 : ℚ) ≤ ⌊a⌋ := by
     by_contra hc
     have hge : (1 : ℚ) ≤ a := by
@@ -139,8 +306,32 @@ theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a�
     contradiction
   by_cases hcl : (1 : ℚ) ≤ (⌊a⌋ + 1)
   · simp [ha, hcl, hfl]
-    sorry
+    push_neg at *
+    have hfl' : ⌊a⌋ = 0 := by
+      simp at hcl
+      have hfl' : ⌊a⌋ < 1 := by apply cast_lt.1 hfl
+      apply Int.eq_of_ge_of_lt_add_one ⌊a⌋ 0 hcl hfl'
+    simp [hfl']
+    by_cases hzero : a = 0
+    · simp [hzero]
+    have h : varphi' R S a = varphi' R S 1 := by
+      have h' : varphi' R S a = varphi' R S ⌈a⌉ := by
+        apply varphi'_eq_ceil
+      rw [h']
+      have hcl' : ⌈a⌉ = (1 : ℚ) := by
+        have hnefl : a ≠ ⌊a⌋ := by
+          rw [hfl']
+          push_neg at hzero
+          apply hzero
+        have : ⌈a⌉ = ⌊a⌋ + 1 := by
+          apply ceil_eq_floor_add_one_iff a hnefl
+        rw [this]
+        simp [hfl']
+      rw [hcl']
+    ring
+    simp [h]
   simp [ha, hcl, hfl]
+  push_neg at *
   sorry
 
 theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (varphi R S ⌊a⌋) := by
@@ -354,3 +545,8 @@ theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) 
   simp [h]
   sorry
   sorry
+
+
+variable {a : ℤ} (f : ℚ → ℚ)
+
+example (ha : a ≥ 0) : (∑ x in Icc 0 (a + 1), f x) - (∑ x in Icc 0 a, f x) = f (a + 1) := by sorry

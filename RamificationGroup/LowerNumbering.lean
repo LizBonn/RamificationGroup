@@ -109,7 +109,7 @@ instance : Coe (WithTop ℤ) (WithTop ℚ) := sorry
 
 -/
 
-noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ): ℚ :=
+noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ) : ℚ :=
   if h : i_[S/R] s = ⊤ then u
   else if (i_[S/R] s).untop h > u then u
   else (i_[S/R] s).untop h
