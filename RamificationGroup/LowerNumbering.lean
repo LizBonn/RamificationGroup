@@ -112,7 +112,7 @@ variable [FiniteDimensional K L]
 
 -/
 
-noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ) : ℚ :=
+noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ): ℚ :=
   if h : i_[S/R] s = ⊤ then u
   else if u ≤ (i_[S/R] s).untop h then u
   else (i_[S/R] s).untop h
