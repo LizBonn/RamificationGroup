@@ -28,7 +28,13 @@ scoped instance : ValAlgebra K' L :=
     val_isEquiv_comap' := sorry
     continuous_toFun := sorry
   }
-
-scoped instance : ValAlgebra K K' := sorry
+#synth Algebra K K'
+scoped instance : ValAlgebra K K' :=
+  {
+    IntermediateField.algebra K' with
+    monotone' := sorry
+    val_isEquiv_comap' := sorry
+    continuous_toFun := sorry
+  }
 
 end DiscreteValuation

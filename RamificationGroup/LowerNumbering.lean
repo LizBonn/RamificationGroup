@@ -112,10 +112,12 @@ variable [FiniteDimensional K L]
 
 -/
 
-noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ): ℚ :=
+noncomputable def ValAlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐv[R] S)) : ℚ :=
   if h : i_[S/R] s = ⊤ then u
   else if u ≤ (i_[S/R] s).untop h then u
   else (i_[S/R] s).untop h
+
+notation:max " i_[" L:max "/" K:max "]ₜ" => ValAlgEquiv.truncatedLowerIndex K L
 
 #check ValAlgEquiv.truncatedLowerIndex
 
@@ -160,8 +162,14 @@ theorem lowerIndex_refl : (i_[L/K] .refl) = ⊤ := by
   simp [ValAlgEquiv.lowerIndex]
 
 @[simp]
-theorem truncatedLowerIndex_refl (u : ℚ): ValAlgEquiv.truncatedLowerIndex K L .refl u = u := by
+theorem truncatedLowerIndex_refl (u : ℚ) : ValAlgEquiv.truncatedLowerIndex K L u .refl = u := by
   simp [ValAlgEquiv.truncatedLowerIndex]
+
+theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : (n : ℕ∞) ≤ i_[L/K] s - 1 ↔ s ∈ G(L/K)_[n] := sorry
+
+theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ s.truncatedLowerIndex K L r - 1) : s ∈ G(L/K)_[⌈u⌉] := sorry
+
+theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ s.truncatedLowerIndex K L r - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := sorry
 
 @[simp]
 theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl
