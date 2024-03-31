@@ -157,18 +157,17 @@ end
 
 @[simp]
 theorem lowerIndex_refl : (i_[L/K] .refl) = ⊤ := by
-  simp [ValAlgEquiv.lowerIndex] -- add simp lemmas : lift of refl is refl
-  sorry
+  simp [ValAlgEquiv.lowerIndex]
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ): ValAlgEquiv.truncatedLowerIndex K L .refl u = u := by
   simp [ValAlgEquiv.truncatedLowerIndex]
 
 @[simp]
-theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (ValAlgEquiv.restrictScalars K s) =  i_[L/K'] s := rfl
+theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl
 
 @[simp]
-theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : L ≃ₐv[K'] L) : (ValAlgEquiv.restrictScalars K s).truncatedLowerIndex K L u = s.truncatedLowerIndex K' L u := rfl
+theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : L ≃ₐv[K'] L) : (s.restrictScalars K).truncatedLowerIndex K L u = s.truncatedLowerIndex K' L u := rfl
 
 @[simp]
 theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(L/K)_[u].comap (ValAlgEquiv.restrictScalarsₘ K) = G(L/K')_[u] := rfl
