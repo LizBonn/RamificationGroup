@@ -33,13 +33,17 @@ section int_closure_discrete
 
 variable {v : Valuation L ℤₘ₀}
 
-instance HenselianOfCompleteOfDiscrete [CompleteSpace K] [IsDiscrete vK.v] : HenselianLocalRing vK.valuationSubring := by
+variable (K) in
+instance instIsAdicCompleteToCompleteToDiscrete [CompleteSpace K] [IsDiscrete vK.v] : IsAdicComplete (LocalRing.maximalIdeal 𝒪[K]) 𝒪[K] := by
   sorry
+
+variable (K) in
+instance instHenselianToCompleteToDiscrete [CompleteSpace K] [IsDiscrete vK.v] :
+  HenselianLocalRing vK.valuationSubring := inferInstance
 
 theorem integral_closure_eq_integer_of_complete_discrete [CompleteSpace K] [IsDiscrete vK.v]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
-    (integralClosure vK.v.valuationSubring L).toSubring = v.integer := by
-  sorry
+    (integralClosure vK.v.valuationSubring L).toSubring = v.integer := integral_closure_eq_integer_of_henselian h
 
 end int_closure_discrete
 
@@ -76,7 +80,8 @@ theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f :
   apply unique_val_of_ext (K := K)
   · apply ValAlgebra.val_isEquiv_comap
   · rw [Valuation.isEquiv_iff_val_le_one]
-    simp; intro x
+    simp only [comap_apply, RingHom.coe_coe, AlgHom.commutes]
+    intro x
     rw [← Valuation.comap_apply (algebraMap K L)]
     revert x
     rw [← Valuation.isEquiv_iff_val_le_one]
