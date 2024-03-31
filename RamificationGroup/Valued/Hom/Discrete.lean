@@ -3,7 +3,8 @@
 
 import RamificationGroup.Valued.Hom.Defs
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
-import RamificationGroup.ForMathlib.Henselian
+import RamificationGroup.Valuation.Discrete
+
 
 open Valuation Valued DiscreteValuation
 
@@ -32,14 +33,6 @@ variable [Algebra K L] [FiniteDimensional K L]
 section int_closure_discrete
 
 variable {v : Valuation L ℤₘ₀}
-
-variable (K) in
-instance instIsAdicCompleteToCompleteToDiscrete [CompleteSpace K] [IsDiscrete vK.v] : IsAdicComplete (LocalRing.maximalIdeal 𝒪[K]) 𝒪[K] := by
-  sorry
-
-variable (K) in
-instance instHenselianToCompleteToDiscrete [CompleteSpace K] [IsDiscrete vK.v] :
-  HenselianLocalRing vK.valuationSubring := inferInstance
 
 theorem integral_closure_eq_integer_of_complete_discrete [CompleteSpace K] [IsDiscrete vK.v]
   (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
