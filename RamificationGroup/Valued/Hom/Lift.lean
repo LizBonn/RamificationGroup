@@ -178,8 +178,22 @@ namespace ValAlgEquiv
 variable {K L L' : Type*} [Field K] [Field L] [Field L'] {ΓK ΓL ΓL': Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [LinearOrderedCommGroupWithZero ΓL'] [vK : Valued K ΓK] [vL : Valued L ΓL] [vL' : Valued L' ΓL'] [ValAlgebra K L] [ValAlgebra K L']
 
 @[simp]
-theorem lift_refl : (.refl : L ≃ₐv[K] L).liftInteger = .refl := by
+theorem coe_liftInteger {s : L ≃ₐv[K] L} {x : vL.v.integer} : ((s.liftInteger x) : L) = s x := rfl
+
+@[simp]
+theorem liftInteger_refl : (.refl : L ≃ₐv[K] L).liftInteger = .refl := by
   ext
   rfl
+
+@[simp]
+theorem eq_refl_of_liftInteger_eq_refl {s : L ≃ₐv[K] L} : s.liftInteger = .refl ↔ s = .refl := by
+  constructor <;>
+  intro h
+  · ext l
+    obtain ⟨x, ⟨y, ⟨_, rfl⟩⟩⟩ := IsFractionRing.div_surjective l (A := 𝒪[L])
+    calc
+    _ = ((s.liftInteger x) : L) / s.liftInteger y := by simp
+    _ = _ := by simp [h]
+  · simp [h]
 
 end ValAlgEquiv
