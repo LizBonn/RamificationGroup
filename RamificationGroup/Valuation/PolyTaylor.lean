@@ -11,6 +11,7 @@ namespace Polynomial
 #check Polynomial.eval₂_map -- ev₂(x, ψ) ∘ map(φ) = ev₂(x, ψ ∘ φ)
 #check Polynomial.hom_eval₂ -- ψ ∘ ev(x, φ) = ev₂(ψ(x), ψ ∘ φ)
 
+
 variable {A : Type*} [CommSemiring A]
 variable (f : A[X])
 variable {B : Type*} [CommSemiring B]

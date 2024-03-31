@@ -2,3 +2,9 @@
 
 1. add lift lemmas such as lift refl = refl lift symm = symm, make them @[simp]
 2. low priority, add coe lemmas in ValHom,...
+3. we need a bundled version ValAlgEquiv.restrictScalarsₘ, AlgEquiv.restrictScalarsₘ is not in mathlib?
+
+3.31 
+1. add instances of intermediate field being ValAlg correctly
+2. change lemmas from requiring intermediate field to IsScalarTower
+3. (high!) make restrictNormal works good, put in the correct file  also  restrictScalarsₘ restrictScalars

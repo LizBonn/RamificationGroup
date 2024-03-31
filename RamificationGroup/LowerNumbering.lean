@@ -112,10 +112,12 @@ variable [FiniteDimensional K L]
 
 -/
 
-noncomputable def ValAlgEquiv.truncatedLowerIndex (s : (S ≃ₐv[R] S)) (u : ℚ) : ℚ :=
+noncomputable def ValAlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐv[R] S)) : ℚ :=
   if h : i_[S/R] s = ⊤ then u
   else if u ≤ (i_[S/R] s).untop h then u
   else (i_[S/R] s).untop h
+
+scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => ValAlgEquiv.truncatedLowerIndex K L
 
 #check ValAlgEquiv.truncatedLowerIndex
 
@@ -160,14 +162,41 @@ theorem lowerIndex_refl : (i_[L/K] .refl) = ⊤ := by
   simp [ValAlgEquiv.lowerIndex]
 
 @[simp]
-theorem truncatedLowerIndex_refl (u : ℚ): ValAlgEquiv.truncatedLowerIndex K L .refl u = u := by
+theorem truncatedLowerIndex_refl (u : ℚ) : ValAlgEquiv.truncatedLowerIndex K L u .refl = u := by
   simp [ValAlgEquiv.truncatedLowerIndex]
+/-
+noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
+  if h : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) = 0 then ⊤
+  else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
+-/
+@[simp]
+theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔ s = .refl := by
+  constructor <;>
+  intro h
+  · ext l
+    by_cases hs : iSup (fun x : vL.v.integer => (v (s.liftInteger x - x))) = 0
+    · simp at hs
+      sorry
+    · simp only [ValAlgEquiv.lowerIndex, integer_val_coe, AddSubgroupClass.coe_sub,
+      ValAlgEquiv.coe_liftInteger, dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
+      have h : ∀ x : 𝒪[L], v (s ↑x - ↑x) = 0 := sorry
+      sorry
+  · simp [h]
+
+theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
+  simp [ValAlgEquiv.truncatedLowerIndex]
+  sorry
+
+
+theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := sorry
+
+theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := sorry
 
 @[simp]
-theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (ValAlgEquiv.restrictScalars K s) =  i_[L/K'] s := rfl
+theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl
 
 @[simp]
-theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : L ≃ₐv[K'] L) : (ValAlgEquiv.restrictScalars K s).truncatedLowerIndex K L u = s.truncatedLowerIndex K' L u := rfl
+theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : L ≃ₐv[K'] L) : i_[L/K]ₜ u (s.restrictScalars K) = i_[L/K']ₜ u s := rfl
 
 @[simp]
 theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(L/K)_[u].comap (ValAlgEquiv.restrictScalarsₘ K) = G(L/K')_[u] := rfl
