@@ -169,23 +169,41 @@ noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
   if h : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
 -/
+
 @[simp]
 theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔ s = .refl := by
   constructor <;>
   intro h
   · ext l
+    simp only [ValAlgEquiv.coe_refl, id_eq]
+    obtain ⟨x, ⟨y, ⟨_, rfl⟩⟩⟩ := IsFractionRing.div_surjective l (A := 𝒪[L])
+    simp
     by_cases hs : iSup (fun x : vL.v.integer => (v (s.liftInteger x - x))) = 0
-    · simp at hs
+    · simp only [AddSubgroupClass.coe_sub] at hs
+      have : ∀ x, v ((ValAlgEquiv.liftInteger s) x - x) = 0 := by
+        intro x
+        apply le_of_eq at hs
+        rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
+        exact (ciSup_le_iff' sorry).mp hs x
       sorry
+
     · simp only [ValAlgEquiv.lowerIndex, integer_val_coe, AddSubgroupClass.coe_sub,
-      ValAlgEquiv.coe_liftInteger, dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
+      dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
       have h : ∀ x : 𝒪[L], v (s ↑x - ↑x) = 0 := sorry
+      --exact h l
       sorry
-  · simp [h]
+  · simp [ValAlgEquiv.lowerIndex, h]
 
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [ValAlgEquiv.truncatedLowerIndex]
+  by_cases h : i_[L/K] s = ⊤
+  · simp only [lowerIndex_eq_top_iff_eq_refl] at h
+    rw [h]
+    simp only [lowerIndex_refl, le_top, iff_true]
+    exact Subgroup.one_mem _
+  let i := WithTop.untop _ h
   sorry
+
 
 
 theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := sorry
