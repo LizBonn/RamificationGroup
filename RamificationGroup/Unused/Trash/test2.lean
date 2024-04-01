@@ -8,12 +8,13 @@ import Mathlib.Algebra.BigOperators.Basic
 
 --definition of varphi and psi
 
-open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators Int
+open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators Int Valued
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
+
 noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
-  if u ≥ (-1) then
+  if u > (-1) then
     relindex' G(S/R)_[0] G(S/R)_[(Int.ceil u)]
   else
     1
@@ -27,10 +28,141 @@ noncomputable def varphi (u : ℚ) : ℚ :=
   else
     u * (varphi' R S u)
 
+--for mathlib
+theorem sub_of_sum (a : ℤ) (f : ℚ → ℚ) (h : 1 ≤ a): ∑ x in Icc 1 (a + 1), f x - ∑ x in Icc 1 a, f x = f (a + 1) := by
+  have hncons : (a + 1) ∉ Finset.Icc 1 a := by simp
+  have hcons : (Finset.Icc 1 (a + 1)) = cons (a + 1) (Finset.Icc 1 a) hncons := by
+    ext n
+    simpa using (by omega)
+  rw [hcons]
+  rw [sum_cons]
+  simp
+
+--for mathlib
+theorem ceil_eq_floor_add_one_iff (u : ℚ) (h : u ≠ ⌊u⌋) : ⌈u⌉ = ⌊u⌋ + 1 := by
+  have hu : fract u ≠ 0 := by
+    unfold fract
+    by_contra h'
+    have : u = ⌊u⌋ := by linarith [h']
+    contradiction
+  have h' : ⌈u⌉ = u + 1 - Int.fract u := by
+    apply ceil_eq_add_one_sub_fract hu
+  unfold fract at h'
+  have h'': (⌈u⌉ : ℚ) = ((⌊u⌋ + 1) : ℚ):= by
+    rw [h']
+    ring
+  exact_mod_cast h''
+
+--for mathlib
+theorem Int.eq_of_ge_of_lt_add_one (a m : ℤ) (h1 : m ≤ a) (h2 : a < (m + 1)) : a = m := by
+  have hle : a ≤ m + 1 - 1 := by apply le_sub_one_iff.2 h2
+  simp at hle
+  apply ((LE.le.ge_iff_eq h1).1 hle).symm
+
+theorem varphi'_eq_ceil : ∀ u : ℚ , varphi' R S u = varphi' R S ⌈u⌉ := by
+  rintro u
+  unfold varphi' Index_of_G_i
+  by_cases h : -1 < u
+  · have hcl : ⌈u⌉ > (-1 : ℚ) := by
+      apply lt_of_lt_of_le
+      apply h
+      apply le_ceil
+    simp [h, hcl]
+  have hcl : ¬⌈u⌉ > (-1 : ℚ) := by
+    by_contra hc
+    have hcl' : -1 < ⌈u⌉ := by apply cast_lt.1 hc
+    have : -1 < u := by
+      apply lt_ceil.1 hcl'
+    contradiction
+  simp [h, hcl]
+
+theorem varphi'_pos : ∀ u : ℚ , 0 < varphi' R S u := by
+  unfold varphi' Index_of_G_i relindex' index
+  rintro u
+  by_cases h : u > -1
+  simp [h]
+  apply div_pos_iff.2
+  left
+  constructor <;> sorry
+  simp [h]
+
+theorem varphi'_neg_int_eq_one : ∀ u : ℤ , (u ≤ 0) → varphi' R S u = 1 := by
+  rintro u hu
+  unfold varphi' Index_of_G_i
+  by_cases hgt : (-1 : ℚ) < u
+  · simp [hgt]
+    have hzero : 0 = u := by
+      have hgt' : -1 < u := by apply cast_lt.1 hgt
+      have hge : -1 ≤ u - 1 := by
+        apply le_sub_one_iff.2 hgt'
+      simp at hge
+      apply (LE.le.ge_iff_eq hge).1 hu
+    have hzero' : u = (0 : ℚ) := by simp [hzero]
+    sorry
+  simp [hgt]
+
+theorem varphi_int_succ : ∀a : ℤ , (varphi R S a) = (varphi R S (a + 1)) - (varphi' R S (a + 1)) := by
+  rintro a
+  unfold varphi
+  by_cases hgeone : (1 : ℚ) ≤ a
+  · have hgezero : (0 : ℚ) ≤ a := by linarith
+    simp [hgeone, hgezero]
+    have h : ∑ x in Icc 1 (a + 1), varphi' R S ↑x = varphi' R S (a + 1) + ∑ x in Icc 1 a, varphi' R S ↑x := by
+      have hgeone' : 1 ≤ a := by apply cast_le.1 hgeone
+      have h' : ∑ x in Finset.Icc 1 (a + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 a, varphi' R S ↑x = varphi' R S (↑a + 1) := by
+        apply sub_of_sum a (varphi' R S) hgeone'
+      linarith [h']
+    simp [h]
+  by_cases hgezero : (0 : ℚ) ≤ a
+  · have heqzero : (0 : ℚ) = a := by
+      --this
+      push_neg at hgeone
+      have hgeone' : a < 1 := by
+        apply cast_lt.1 hgeone
+      have hlezero  : a ≤ (0 : ℚ) := by
+        convert le_sub_one_iff.2 hgeone'
+        simp
+      apply (LE.le.ge_iff_eq hgezero).1 hlezero
+    erw [←heqzero]
+    simp [hgeone, hgezero]
+  simp [hgeone, hgezero]
+  push_neg at *
+  ring
+  apply mul_eq_mul_left_iff.2
+  left
+  rw [varphi'_neg_int_eq_one]
+  have : (1 + a) ≤ 0 := by
+    have hgezero' : a < 0 := by apply cast_lt.1 hgezero
+    have hle: a ≤ 0 - 1 := by
+      convert le_sub_one_iff.2 hgezero'
+    linarith [hle]
+  symm
+  convert varphi'_neg_int_eq_one R S (1 + a) this
+  simp
+  apply le_of_lt
+  apply cast_lt.1 hgezero
+
 theorem varphi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (varphi R S a1) < (varphi R S a2) := by
   rintro a1 a2 h
-  induction' a2 with n ih
-  sorry
+  have hsub : a2 = a1 + (a2 - a1 - 1) + 1 := by ring
+  rw [hsub]
+  induction' a2 - a1 - 1 with n ih
+  · induction' n with n ih
+    · apply sub_lt_zero.1
+      rw [varphi_int_succ R S a1]
+      simp
+      apply varphi'_pos
+    apply lt_trans
+    apply ih
+    simp
+    apply sub_lt_zero.1
+    have heq : varphi R S (↑a1 + ↑n + 1) = varphi R S (↑a1 + (↑n + 1) + 1) - (varphi' R S (a1 + n + 1 + 1)) := by
+      convert varphi_int_succ R S (a1 + n + 1)
+      <;>simp
+      ring
+    rw [heq]
+    simp
+    apply varphi'_pos
   sorry
 
 theorem varphi_mono_int' : ∀a1 a2 : ℤ , a1 ≤ a2 → (varphi R S a1) ≤ (varphi R S a2) := by
@@ -47,23 +179,160 @@ theorem varphi_rational_floor : ∀ a : ℚ , (varphi R S a) = (varphi R S ⌊a�
   rintro a
   unfold varphi
   by_cases ha : a ≥ 1
-  have hfl : 1 ≤ ↑⌊a⌋ := by apply le_floor.2 ha
-  simp [ha, hfl]
-  sorry
-  have hfl : ¬ 1 ≤ ↑⌊a⌋ := by
+  · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
+      convert le_floor.2 ha
+      simp
+      apply cast_le
+    have hfl' : (0 : ℚ) ≤ ⌊a⌋ := by
+      linarith [hfl]
+    simp [ha, hfl, hfl']
+    nth_rw 2 [mul_comm]
+    apply mul_eq_mul_left_iff.2
+    by_cases hzero : fract a = 0
+    · right
+      exact hzero
+    left
+    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x = varphi' R S (⌊a⌋ + 1) := by
+      have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
+      apply sub_of_sum ⌊a⌋ (varphi' R S) hfl'
+    rw [h, varphi'_eq_ceil]
+    have hflcl : ⌈a⌉ = ⌊a⌋ + 1 := by
+      unfold fract at hzero
+      push_neg at hzero
+      have : a ≠ ⌊a⌋ := by
+        by_contra hc
+        have hc' : a - ⌊a⌋ = 0 := by linarith
+        contradiction
+      apply ceil_eq_floor_add_one_iff a this
+    rw [hflcl]
+    congr
+    simp
+  have hfl : ¬ (1 : ℚ) ≤ ↑⌊a⌋ := by
     by_contra h'
-    have h'' : 1 ≤ a := by apply le_floor.1 h'
+    have h'' : (1 : ℚ) ≤ a := by
+      apply le_floor.1
+      convert h'
+      simp
+      apply cast_le.symm
     contradiction
-  simp [ha, hfl]
+  by_cases hzero : (0 : ℚ) ≤ ⌊a⌋
+  · simp [ha, hfl, hzero]
+    push_neg at *
+    --and this is the same
+    have hflzero : 0 = ⌊a⌋ := by
+      have hfl' : ⌊a⌋ < 1 := by apply cast_lt.1 hfl
+      have hlezero : ⌊a⌋ ≤ 1 - 1 := by
+        apply le_sub_one_iff.2 hfl'
+      simp at hlezero
+      have hgezero : 0 ≤ ⌊a⌋ := by apply cast_le.1 hzero
+      apply (LE.le.ge_iff_eq hgezero).1 hlezero
+    unfold fract
+    simp [hflzero.symm]
+    rw [mul_comm]
+    apply mul_eq_mul_right_iff.2
+    by_cases hzero' : a = 0
+    · right
+      exact hzero'
+    left
+    have hcl : ⌈a⌉ = 1 := by
+      have hgtzero : (0 : ℚ) < a := by
+        apply lt_of_le_of_ne
+        have : ⌊a⌋ ≤ a := by apply floor_le
+        apply le_trans
+        apply hzero
+        apply this
+        push_neg at hzero'
+        apply hzero'.symm
+      apply ceil_eq_on_Ioc
+      simp
+      constructor
+      apply hgtzero
+      apply le_of_lt ha
+    rw [varphi'_eq_ceil, hcl]
+    congr
+  simp [ha, hfl, hzero]
+  push_neg at *
   sorry
+
 
 theorem varphi_rational_ceil : ∀ a : ℚ , (varphi R S a) = (varphi R S (⌊a⌋ + 1)) - ((varphi R S (⌊a⌋ + 1)) - (varphi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
   rintro a
   unfold varphi
-  by_cases ha : a ≥ 1
-  have hcl : 1 ≤ (⌊a⌋ + 1) := by sorry
-  simp [ha, hcl]
-  sorry
+  by_cases ha : (1 : ℚ) ≤ a
+  · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
+      convert le_floor.2 ha
+      apply cast_le
+    have hcl : (1 : ℚ) ≤ (⌊a⌋ + 1) := by
+      linarith [hfl]
+    simp [ha, hcl, hfl]
+    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x = varphi' R S (⌊a⌋ + 1) := by
+      have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
+      apply sub_of_sum ⌊a⌋ (varphi' R S) hfl'
+    have h' :  (∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x) - fract a * varphi' R S a -
+    (∑ x in Finset.Icc 1 (⌊a⌋ + 1), varphi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, varphi' R S ↑x) * (↑⌊a⌋ - a + 1) = 0 := by
+      rw [h]
+      by_cases hfl' : a - ⌊a⌋ = 0
+      · unfold fract
+        have : ⌊a⌋ - a = 0 := by linarith [hcl]
+        simp [hcl, this]
+        left
+        unfold fract
+        linarith [this]
+      push_neg at *
+      have hcl' : (⌈a⌉ : ℚ) = (⌊a⌋ : ℚ) + 1:= by
+        have hfl'' : a ≠ ⌊a⌋ := by
+          by_contra hc
+          have : a - ⌊a⌋ = 0 := by linarith [hc]
+          contradiction
+        have hcl'' : ⌈a⌉ = ⌊a⌋ + 1:= by
+          apply ceil_eq_floor_add_one_iff a hfl''
+        sorry
+      ring
+      nth_rw 3 [varphi'_eq_ceil]
+      unfold fract
+      have heq : varphi' R S (1 + ⌊a⌋) = varphi' R S ⌈a⌉ := by
+        rw [hcl']
+        have : 1 + (⌊a⌋ : ℚ) = (⌊a⌋ : ℚ) + 1 := by ring
+        rw [this]
+      rw [heq]
+      ring
+    linarith [h']
+  have hfl : ¬(1 : ℚ) ≤ ⌊a⌋ := by
+    by_contra hc
+    have hge : (1 : ℚ) ≤ a := by
+      apply le_floor.1
+      convert hc
+      simp
+      apply cast_le.symm
+    contradiction
+  by_cases hcl : (1 : ℚ) ≤ (⌊a⌋ + 1)
+  · simp [ha, hcl, hfl]
+    push_neg at *
+    have hfl' : ⌊a⌋ = 0 := by
+      simp at hcl
+      have hfl' : ⌊a⌋ < 1 := by apply cast_lt.1 hfl
+      apply Int.eq_of_ge_of_lt_add_one ⌊a⌋ 0 hcl hfl'
+    simp [hfl']
+    by_cases hzero : a = 0
+    · simp [hzero]
+    have h : varphi' R S a = varphi' R S 1 := by
+      have h' : varphi' R S a = varphi' R S ⌈a⌉ := by
+        apply varphi'_eq_ceil
+      rw [h']
+      have hcl' : ⌈a⌉ = (1 : ℚ) := by
+        have hnefl : a ≠ ⌊a⌋ := by
+          rw [hfl']
+          push_neg at hzero
+          apply hzero
+        have : ⌈a⌉ = ⌊a⌋ + 1 := by
+          apply ceil_eq_floor_add_one_iff a hnefl
+        rw [this]
+        simp [hfl']
+      rw [hcl']
+    ring
+    simp [h]
+  simp [ha, hcl, hfl]
+  push_neg at *
   sorry
 
 theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (varphi R S ⌊a⌋) := by
@@ -76,8 +345,8 @@ theorem varphi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (varphi R S a) > (va
   left
   constructor
   simp
-  sorry
-  --apply varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1)
+  convert varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1) (by simp)
+  simp
   apply fract_pos.2 ha
 
 theorem varphi_lt_ceil : ∀ a : ℚ , (varphi R S a) < (varphi R S (⌊a⌋ + 1)) := by
@@ -90,17 +359,38 @@ theorem varphi_lt_ceil : ∀ a : ℚ , (varphi R S a) < (varphi R S (⌊a⌋ + 1
   left
   constructor
   simp
-  sorry
-  --apply varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1)
-  have : a - 1 < ⌊a⌋ := by apply sub_one_lt_floor
-  linarith [this]
+  convert varphi_mono_int R S ⌊a⌋ (⌊a⌋ + 1) (by simp)
+  simp
+  have h : a - 1 < ⌊a⌋ := by apply sub_one_lt_floor
+  linarith [h]
 
 theorem varphi_mono_in_section : ∀ a1 a2 : ℚ , (⌊a1⌋ = ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
   rintro a1 a2 ⟨h1, h2⟩
   apply gt_iff_lt.2
   apply sub_lt_zero.1
-  rw [varphi_rational_floor]
-  sorry
+  nth_rw 2 [varphi_rational_floor]
+  nth_rw 1 [varphi_rational_floor]
+  rw [h1]
+  simp
+  apply sub_lt_zero.1
+  have : ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - ↑⌊a2⌋) - ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * fract a2 = ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - a2) := by
+    unfold fract
+    calc
+      ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - ↑⌊a2⌋) - ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a2 - ⌊a2⌋) = ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * ((a1 - ⌊a2⌋) - (a2 - ⌊a2⌋)) := by
+        ring
+      _ = ((varphi R S (↑⌊a2⌋ + 1)) - (varphi R S ↑⌊a2⌋)) * (a1 - a2) := by
+        simp
+        left
+        unfold fract
+        ring
+  rw [this]
+  apply mul_neg_iff.2
+  left
+  constructor
+  simp
+  convert varphi_mono_int R S ⌊a2⌋ (⌊a2⌋ + 1) (by simp)
+  simp
+  simp [h2]
 
 --i'll change this name too
 theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧ (a1 < a2) → (varphi R S a1) < (varphi R S a2) := by
@@ -121,8 +411,8 @@ theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧
     simp [heq]
     push_neg at heq
     have h1' : (varphi R S (⌊a1⌋ + 1)) ≤ (varphi R S ⌊a2⌋) := by
-      sorry
-      --apply varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋
+      convert varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋ hle
+      simp
     rw [hfloor]
     exact h1'
   apply h2
@@ -154,12 +444,19 @@ theorem varphi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧
     have h1' : (varphi R S a1) < (varphi R S (⌊a1⌋ + 1)) := by apply varphi_lt_ceil R S
     apply h1'
     have hle' : ⌊a1⌋ + 1 ≤ ⌊a2⌋ := by
-      sorry
-      --apply varphi_mono_int R S (⌊a1⌋ + 1) ⌊a2⌋
+      push_neg at *
+      have hlt' : ⌊a1⌋ < ⌊a2⌋ := by
+        have hle'' : ⌊a1⌋ ≤ ⌊a2⌋ := by
+          apply floor_le_floor
+          apply le_of_lt
+          assumption
+        apply lt_of_le_of_ne hle'' hne
+      apply Int.le_of_lt_add_one
+      linarith [hlt']
     have h2' : (varphi R S ↑(⌊a1⌋ + 1)) ≤ (varphi R S (⌊a2⌋)) := by
       apply varphi_mono_int' R S (⌊a1⌋ + 1) ⌊a2⌋ hle'
-    sorry
-    --apply h2'
+    convert h2'
+    simp
   apply h1
   push_neg at hfloor
   have h2 : (varphi R S ⌊a2⌋) < (varphi R S a2) := by apply (varphi_gt_floor R S a2 hfloor)
@@ -229,14 +526,109 @@ theorem psi_zero_eq_zero : psi R S 0 = 0 := by
   rw [← invFun_comp Inj]
   simp
 
---lemma 3
-variable [Field R] [Field S] [Module R S] [FiniteDimensional R S]
+theorem varphi_inv_psi : ∀ a : ℚ , varphi R S (psi R S a) = a := by
+  rintro a
+  apply invFun_eq
+  apply (varphi_bij R S).surjective
 
+--lemma 3
 open scoped Classical
 
-theorem Varphi_eq_Sum_Inf (u : ℚ) [Fintype (S ≃ₐv[R] S)] : (varphi R S u) = (1 / Nat.card G(S/R)_[0]) * (∑ x : (S ≃ₐv[R] S) , ((ValAlgEquiv.truncatedLowerIndex R S x (u + 1))))- 1 := by
-  unfold varphi varphi' ValAlgEquiv.truncatedLowerIndex
-  by_cases h : u ≥ 1
-  simp [h]
+
+variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vS : Valued L ℤₘ₀] [ValAlgebra K L]
+
+instance : Fintype (L ≃ₐv[K] L) where
+  elems := by sorry
+  complete := by sorry
+
+#check Finset.sum_disjiUnion
+#check Set.PairwiseDisjoint
+#check disjiUnion
+#check Finset (Subgroup (L ≃ₐv[K] L))
+#check Finset (L ≃ₐv[K] L)
+#check Finset G(L/K)_[10]
+#check ((G(L/K)_[10] : Set (L ≃ₐv[K] L)) \ (G(L/K)_[11] : Set (L ≃ₐv[K] L))).toFinset
+#check SDiff
+#check (G(L/K)_[(-1)] : Set (L ≃ₐv[K] L)).toFinset
+
+noncomputable def G_diff (i : ℤ) : Finset (L ≃ₐv[K] L) := ((G(L/K)_[i] : Set (L ≃ₐv[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐv[K] L))).toFinset
+
+theorem G_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(Finset.Icc (-1) (n - 1))) (G_diff K L)) := by
+  induction' n with n ih
+  induction' n with n ih
+  simp
   sorry
+  sorry
+
+theorem G_n_or_G_lt_n {n : ℤ} (x : (L ≃ₐv[K] L)) (h : x ∉ G(L/K)_[n]) : ∃ a, (-1 ≤ a ∧ a ≤ n - 1) ∧ x ∈ G_diff K L a := by
+  sorry
+
+theorem G_split (n : ℤ) : (⊤ : Finset (L ≃ₐv[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (G_diff K L) (G_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset := by
+  ext x
+  constructor
+  simp
+  by_cases h : x ∈ G(L/K)_[n]
+  · right
+    assumption
+  left
+  apply G_n_or_G_lt_n K L x h
+  simp
+
+theorem Sum_Trunc_lower_Index_of_G_n (n : ℤ) (u : ℚ) (h : u ≤ n) : (Finset.sum (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) = (u + 1) * (Nat.card (G(L/K)_[n])) := by
+  calc
+  (Finset.sum (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) = Finset.sum (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset (fun (x : _) => u + 1) := by
+    apply sum_equiv (.refl (L ≃ₐv[K] L))
+    simp
+    rintro s hs
+    sorry
+  _ = (u + 1) * (Nat.card (G(L/K)_[n])) := by
+    norm_num
+    ring
+
+theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Finset.sum (G_diff K L n) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) = (n + 1) * (Nat.card (G_diff K L n)) := by
+  calc
+  (Finset.sum (G_diff K L n) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) = (Finset.sum (G_diff K L n) (fun (x : _) => ((n : ℚ) + 1))) := by
+    apply sum_equiv (.refl (L ≃ₐv[K] L))
+    simp
+    rintro s hs
+    sorry
+  _ = (n + 1) * (Nat.card (G_diff K L n)) := by
+    norm_num
+    ring
+
+theorem Varphi_eq_Sum_Inf (u : ℚ) : (varphi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐv[K] L)) (ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) - 1 := by
+  by_cases h : u ≥ 1
+  · simp [h]
+    have hsplit : (Finset.sum (⊤ : Finset (L ≃ₐv[K] L)) (ValAlgEquiv.truncatedLowerIndex K L · (u + 1))) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset)) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) := by
+      calc
+      (Finset.sum (⊤ : Finset (L ≃ₐv[K] L)) (ValAlgEquiv.truncatedLowerIndex K L · (u + 1))) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) ∪ (G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset)) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) := by
+        congr
+        apply G_split
+      _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset)) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) := by
+        have : Disjoint (disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) (toFinset ↑ G(L/K)_[⌈u⌉]) := by sorry
+        apply sum_union
+        apply this
+    have hsplit' : (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) = Finset.sum _ fun (i : ℤ) => Finset.sum _ fun (x : _) => (ValAlgEquiv.truncatedLowerIndex K L x (u + 1)) := by
+      apply sum_disjiUnion
+    simp at hsplit hsplit'
+    rw [hsplit, hsplit']
+    have hu : (Finset.sum ((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset) ((ValAlgEquiv.truncatedLowerIndex K L · (u + 1)))) = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
+      convert Sum_Trunc_lower_Index_of_G_n K L ⌈u⌉ u (by apply le_ceil)
+    rw [hu]
+    have hd : Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) (fun (i : ℤ) => Finset.sum (G_diff K L i) (fun (x : _) => (ValAlgEquiv.truncatedLowerIndex K L x (u + 1)))) = Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) fun (i : ℤ) => (i + 1) * (Nat.card ((G(L/K)_[i] : Set (L ≃ₐv[K] L)) \ G(L/K)_[(i + 1)] : Set (L ≃ₐv[K] L))):= by
+      norm_num
+      apply sum_equiv (.refl ℤ)
+      simp
+      simp
+      rintro i hge hle
+      have hle' : i ≤ u := by
+        sorry
+      convert Sum_Trunc_lower_Index_of_diff_G K L i u hle'
+      unfold G_diff
+      simp
+      sorry
+    rw [hd]
+    sorry
+  unfold varphi
+  simp [h]
   sorry
