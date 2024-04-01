@@ -31,7 +31,10 @@ theorem eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one {f : L[X]} (hf : 
     apply mul_lt_mul_of_lt_of_le₀ (hf n) (one_ne_zero) ((pow_lt_one_iff hn).mpr hx)
 
 
-theorem aeval_valuationSubring_lt_one_of_lt_one (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) (f : 𝒪[K][X]) (h0 : f.coeff 0 = 0) {x : L} (hx : v x < 1) : v (aeval x f) < 1 := by
+theorem aeval_valuationSubring_lt_one_of_lt_one
+    (h : vK.v.IsEquiv <| v.comap (algebraMap K L))
+    (f : 𝒪[K][X]) (h0 : f.coeff 0 = 0) {x : L} (hx : v x < 1) :
+  v (aeval x f) < 1 := by
   rw [aeval_def, ← eval_map]
   apply eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one _ _ hx
   · intro n
@@ -40,13 +43,19 @@ theorem aeval_valuationSubring_lt_one_of_lt_one (h : vK.v.IsEquiv <| v.comap (al
     apply (f.coeff n).2
   · simp only [coeff_map, h0, _root_.map_zero]
 
-theorem val_coeff_minpoly_of_integer (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L} (hx : x ∈ v.integer) (n : ℕ) :  (minpoly K x).coeff n ∈ 𝒪[K] := by
+theorem val_coeff_minpoly_of_integer
+    (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
+    (hx : x ∈ v.integer) (n : ℕ) :
+  (minpoly K x).coeff n ∈ 𝒪[K] := by
   sorry
 
-theorem isIntegral_valuationSubring_of_integer (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L} (hx : x ∈ v.integer) : IsIntegral 𝒪[K] x := by
+theorem isIntegral_valuationSubring_of_integer
+    (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
+    (hx : x ∈ v.integer) :
+  IsIntegral 𝒪[K] x := by
   use intPolynomial vK.v <| val_coeff_minpoly_of_integer h hx
   constructor
-  · simp [IntPolynomial.monic_iff]
+  · simp only [IntPolynomial.monic_iff]
     apply minpoly.monic <| IsIntegral.of_finite K x
   · rw [IntPolynomial.eval₂_eq, minpoly.aeval]
 
