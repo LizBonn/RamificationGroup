@@ -27,7 +27,7 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
     one_mem' := by
       simp
       rintro a b
-      sorry
+      erw [one_apply]
     inv_mem' := by
       simp
       rintro x hx
@@ -217,7 +217,6 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔
         rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
         exact (ciSup_le_iff' sorry).mp hs x
       sorry
-
     · simp only [ValAlgEquiv.lowerIndex, integer_val_coe, AddSubgroupClass.coe_sub,
       dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
       have h : ∀ x : 𝒪[L], v (s ↑x - ↑x) = 0 := sorry
@@ -225,6 +224,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔
       sorry
   · simp [ValAlgEquiv.lowerIndex, h]
 
+--the type of n should be changed
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [ValAlgEquiv.truncatedLowerIndex]
   constructor <;>
@@ -236,7 +236,7 @@ theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(
     simp [hs]
   · simp at hs
     simp [hs]
-    sorry
+
   simp
   rintro h
   sorry
@@ -262,7 +262,17 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
 theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
   constructor
   apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
-  sorry
+  rintro hs
+  unfold ValAlgEquiv.truncatedLowerIndex
+  by_cases hc : i_[L/K] s = ⊤
+  · simp [hc]
+    linarith [h]
+  · have : ⌈u⌉.toNat + 1 ≤ i_[L/K] s := by
+      sorry
+      --apply (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).1 hs
+    simp [hc]
+    sorry
+
 
 @[simp]
 theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl
