@@ -126,7 +126,11 @@ theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐv[K] K') : phi K' L ((tr
 
 theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := sorry
 
-theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := sorry
+theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
+  simp only [Subgroup.mem_map]
+  constructor
+  sorry
+  sorry
 
 -- Lemma 5
 @[simp]

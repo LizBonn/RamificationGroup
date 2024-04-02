@@ -339,7 +339,20 @@ theorem monotone_of_val_isEquiv_comap {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.c
   rw [le_iff_val_le] at h ⊢
   exact (hf x y).1 h
 
-theorem continuous_of_val_isEquiv_comap {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : Continuous f := sorry -- difficult
+-- to Mathlib Mathlib.Topology.Algebra.Valuation
+theorem Valued.mem_nhds' {R : Type*}  [Ring R]  {Γ₀ : Type*} [LinearOrderedCommGroupWithZero Γ₀]  [_i : Valued R Γ₀] {s : Set R} {x : R} :
+s ∈ nhds x ↔ ∃ (a : R), Valued.v a > 0 ∧ {y : R | Valued.v (y - x) < Valued.v a} ⊆ s := sorry
+
+theorem continuous_of_val_isEquiv_comap {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : Continuous f := by
+  rw [continuous_iff_continuousAt]
+  intro x
+  simp [ContinuousAt, Filter.Tendsto, Filter.map]
+  intro s
+  simp
+  rw [Valued.mem_nhds', Valued.mem_nhds']
+  rintro ⟨a, ⟨ha, h⟩⟩
+  -- use a
+  sorry -- difficult
 
 -- lower TODO : stronger version, f is topological embedding
 
@@ -515,7 +528,7 @@ theorem symm_trans (e₁ : R ≃+*v S) (e₂ : S ≃+*v T) : (e₁.trans e₂).s
   rfl
 
 @[simp]
-theorem self_trans_symm (e : R ≃+*v S) : e.trans e.symm = .refl R := by
+theorem symm_trans_self (e : R ≃+*v S) : e.trans e.symm = .refl R := by
   ext; apply Equiv.left_inv
 
 @[simp]
@@ -524,13 +537,19 @@ theorem self_symm_trans (e : R ≃+*v S) : e.symm.trans e = .refl S := by
 
 -- -- structures on ValRingIso
 instance group : Group (R ≃+*v R) where
-  mul := .trans
+  mul e e' := e'.trans e
   mul_assoc := by intros; rfl
   one := .refl R
   one_mul := by intros; rfl
   mul_one := by intros; rfl
   inv := .symm
-  mul_left_inv := self_symm_trans
+  mul_left_inv := symm_trans_self
+
+@[simp]
+theorem one_apply (x : R) : (1 : R ≃+*v R) x = x := rfl
+
+@[simp]
+theorem mul_apply (e e' : (R ≃+*v R)) (x : R) : (e * e') x = e (e' x) := rfl
 
 end ValRingEquiv
 
@@ -772,10 +791,10 @@ def mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A →ₐv[R] B w
   map_mul' := f.map_mul
   map_zero' := f.map_zero
   map_add' := f.map_add'
-  monotone' := sorry
+  monotone' := monotone_of_val_isEquiv_comap h
   val_isEquiv_comap' := h
   commutes' := f.commutes'
-  continuous_toFun := sorry
+  continuous_toFun := continuous_of_val_isEquiv_comap h
 
 theorem coe_mk' (f : A →ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := rfl
 
@@ -842,13 +861,8 @@ end ValAlgHom
 namespace ValAlgEquiv
 
 def mk' (f : A ≃ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : A ≃ₐv[R] B :=
-  { f with
-  toFun := f
-  val_isEquiv_comap' := h
-  map_le_map_iff' := sorry
+  { f, ValRingEquiv.mk' h with
   commutes' := f.commutes'
-  continuous_toFun := sorry
-  continuous_invFun := sorry
   }
 theorem coe_mk' (f : A ≃ₐ[R] B) (h : vA.v.IsEquiv (vB.v.comap f)) : (mk' f h) = f := rfl
 
@@ -922,12 +936,12 @@ theorem symm_apply_apply (e : A ≃ₐv[R] B) : ∀ x, e.symm (e x) = x :=
   e.toEquiv.symm_apply_apply
 
 @[simp]
-theorem symm_trans_self (e : A ≃ₐv[R] B) : e.symm.trans e = .refl := by
+theorem self_symm_trans (e : A ≃ₐv[R] B) : e.symm.trans e = .refl := by
   ext x
   exact e.apply_symm_apply x
 
 @[simp]
-theorem trans_symm_self (e : A ≃ₐv[R] B) : e.trans e.symm = .refl := by
+theorem symm_trans_self (e : A ≃ₐv[R] B) : e.trans e.symm = .refl := by
   ext x
   exact e.symm_apply_apply x
 
@@ -974,7 +988,7 @@ theorem rightInverse_symm (e : A ≃ₐv[R] B) : Function.RightInverse e.symm e 
 -- def equivCongr
 
 instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA] [Valued R ΓR] [Valued A ΓA] [ValAlgebra R A] : Group (A ≃ₐv[R] A) where
-  mul := trans
+  mul e e' := e'.trans e
   mul_assoc _ _ _:= rfl
   one := .refl
   one_mul _ := rfl
@@ -982,13 +996,29 @@ instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearO
   inv := symm
   mul_left_inv := symm_trans_self
 
+@[simp]
+theorem one_apply (x : A) : (1 : A ≃ₐv[R] A) x = x := rfl
+
+@[simp]
+theorem mul_apply (e e' : (A ≃ₐv[R] A)) (x : A) : (e * e') x = e (e' x) := rfl
+
 -- bundled version of forgetful, this will be enhanced to a equiv in certain cases
 def toAlgEquivₘ : (A ≃ₐv[R] A) →* (A ≃ₐ[R] A) where
   toFun := ValAlgEquiv.toAlgEquiv (R := R) (A := A) (B := A)
   map_one' := rfl
-  map_mul' := sorry -- more coe lemmas
+  map_mul' _ _ := by
+    ext
+    rfl
 
-theorem toAlgEquiv_injective : Function.Injective (ValAlgHom.toAlgHom (R := R) (A := A) (B := A))  := sorry
+@[simp]
+theorem toAlgEquivₘ_coe (f : A ≃ₐv[R] A) : toAlgEquivₘ f = (f : A → A) := by
+  ext
+  rfl
+
+theorem toAlgEquiv_injective : Function.Injective (toAlgEquivₘ : (A ≃ₐv[R] A) →* (A ≃ₐ[R] A)) := by
+  intro _ _ h
+  apply DFunLike.coe_injective
+  exact congrArg ((↑) : (A ≃ₐ[R] A) → A → A) h
 
 end ValAlgEquiv
 

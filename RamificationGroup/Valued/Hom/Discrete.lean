@@ -16,7 +16,7 @@ namespace Valuation
 
 variable {K L : Type*} {ΓK ΓL: outParam Type*} [Field K] [Field L]
   [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
-  [vK : Valued K ΓK] {v : Valuation L ΓL}
+  [vK : Valued K ℤₘ₀] {v : Valuation L ΓL}
   [Algebra K L] [FiniteDimensional K L]
 -- variable [HenselianLocalRing vK.valuationSubring]
 
@@ -31,7 +31,10 @@ theorem eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one {f : L[X]} (hf : 
     apply mul_lt_mul_of_lt_of_le₀ (hf n) (one_ne_zero) ((pow_lt_one_iff hn).mpr hx)
 
 
-theorem aeval_valuationSubring_lt_one_of_lt_one (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) (f : 𝒪[K][X]) (h0 : f.coeff 0 = 0) {x : L} (hx : v x < 1) : v (aeval x f) < 1 := by
+theorem aeval_valuationSubring_lt_one_of_lt_one
+    (h : vK.v.IsEquiv <| v.comap (algebraMap K L))
+    (f : 𝒪[K][X]) (h0 : f.coeff 0 = 0) {x : L} (hx : v x < 1) :
+  v (aeval x f) < 1 := by
   rw [aeval_def, ← eval_map]
   apply eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one _ _ hx
   · intro n
@@ -40,16 +43,33 @@ theorem aeval_valuationSubring_lt_one_of_lt_one (h : vK.v.IsEquiv <| v.comap (al
     apply (f.coeff n).2
   · simp only [coeff_map, h0, _root_.map_zero]
 
-#synth Algebra 𝒪[K] L
+theorem val_coeff_minpoly_of_integer
+    (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
+    (hx : x ∈ v.integer) (n : ℕ) :
+  (minpoly K x).coeff n ∈ 𝒪[K] := by
+  sorry
+
+theorem isIntegral_valuationSubring_of_integer
+    (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
+    (hx : x ∈ v.integer) :
+  IsIntegral 𝒪[K] x := by
+  use intPolynomial vK.v <| val_coeff_minpoly_of_integer h hx
+  constructor
+  · simp only [IntPolynomial.monic_iff]
+    apply minpoly.monic <| IsIntegral.of_finite K x
+  · rw [IntPolynomial.eval₂_eq, minpoly.aeval]
+
+#check intPolynomial
 #check integralClosure.isIntegral
 #check Valuation.one_lt_val_iff
+
 
 theorem integral_closure_eq_integer_of_henselian [HenselianLocalRing vK.valuationSubring]
     (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
   (integralClosure vK.valuationSubring L).toSubring = v.integer := by
-  ext x; constructor
+  ext x; rw [Subalgebra.mem_toSubring]
+  constructor
   · intro hx
-    rw [Subalgebra.mem_toSubring] at hx
     rcases hx with ⟨p, h_monic, h_eval⟩
     rw [mem_integer_iff]
     by_contra! vxgt1
@@ -69,7 +89,7 @@ theorem integral_closure_eq_integer_of_henselian [HenselianLocalRing vK.valuatio
       simp only [_root_.map_add, _root_.map_neg, _root_.map_one, add_neg_cancel_left]
       rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, h_eval]
     rw [this, map_neg, map_one]
-  · sorry
+  · apply isIntegral_valuationSubring_of_integer h
 
 end Valuation
 
