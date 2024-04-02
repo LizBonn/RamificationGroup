@@ -9,21 +9,17 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
     carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
-    mul_mem' := by
-      rintro a b ha hb x
-      have hm : (a * b).liftInteger x = a.liftInteger (b.liftInteger x) := by sorry
-      rw [hm]
-      have heq : Valued.v (a.liftInteger (b.liftInteger x) - x) = Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x) + (b.liftInteger x) - x) := by
-        simp
-      have htri : Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x) + (b.liftInteger x) - x) ≤ max (Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x))) (Valued.v ((b.liftInteger x) - x)) := by sorry
-      have hmax : max (Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x))) (Valued.v ((b.liftInteger x) - x)) ≤ .coe (.ofAdd (- i - 1)) := by
-        apply max_le
-        apply ha (b.liftInteger x)
-        apply hb x
-      rw [heq]
-      apply le_trans
-      apply htri
-      apply hmax
+    mul_mem' {a} {b} ha hb := by
+      intro x
+      calc
+      _ = v (a (b x) - x) := rfl
+      _ = v ((a (b x) - b x) + (b x - x)) := by congr; simp
+      _ ≤ max (v (a (b x) - b x)) (v (b x - x)) := Valuation.map_add _ _ _
+      _ ≤ max (.coe (.ofAdd (- i - 1))) (.coe (.ofAdd (- i - 1))) := by
+        apply max_le_max
+        exact ha (b.liftInteger x)
+        exact hb x
+      _ = _ := max_self _
     one_mem' := by
       simp
       rintro a b
