@@ -9,11 +9,43 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
     carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
-    mul_mem' := sorry
-    one_mem' := sorry
-    inv_mem' := sorry
+    mul_mem' := by
+      rintro a b ha hb x
+      have hm : (a * b).liftInteger x = a.liftInteger (b.liftInteger x) := by sorry
+      rw [hm]
+      have heq : Valued.v (a.liftInteger (b.liftInteger x) - x) = Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x) + (b.liftInteger x) - x) := by
+        simp
+      have htri : Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x) + (b.liftInteger x) - x) ≤ max (Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x))) (Valued.v ((b.liftInteger x) - x)) := by sorry
+      have hmax : max (Valued.v (a.liftInteger (b.liftInteger x) - (b.liftInteger x))) (Valued.v ((b.liftInteger x) - x)) ≤ .coe (.ofAdd (- i - 1)) := by
+        apply max_le
+        apply ha (b.liftInteger x)
+        apply hb x
+      rw [heq]
+      apply le_trans
+      apply htri
+      apply hmax
+    one_mem' := by
+      simp
+      rintro a b
+      sorry
+    inv_mem' := by
+      simp
+      rintro x hx
+      sorry
 
-theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := sorry
+theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
+  unfold Antitone lowerRamificationGroup
+  rintro a b hab
+  simp
+  rintro s hs
+  have hle : ((Multiplicative.ofAdd b)⁻¹ / Multiplicative.ofAdd 1) ≤ ((Multiplicative.ofAdd a)⁻¹ / Multiplicative.ofAdd 1) := by
+    simpa using hab
+  rintro a_1 b_1
+  apply le_trans
+  apply hs a_1 b_1
+  convert hle
+  simp
+
 
 -- -- Is such a bundled version better? OrderDual can be add at either source or target.
 -- def lowerRamificationGroup' : OrderHom ℤᵒᵈ (Subgroup (S ≃ₐv[R] S)) where
@@ -114,8 +146,7 @@ variable [FiniteDimensional K L]
 
 noncomputable def ValAlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐv[R] S)) : ℚ :=
   if h : i_[S/R] s = ⊤ then u
-  else if u ≤ (i_[S/R] s).untop h then u
-  else (i_[S/R] s).untop h
+  else min u ((i_[S/R] s).untop h)
 
 scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => ValAlgEquiv.truncatedLowerIndex K L
 
@@ -185,12 +216,42 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔
 
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [ValAlgEquiv.truncatedLowerIndex]
+  constructor <;>
+  unfold lowerRamificationGroup ValAlgEquiv.lowerIndex
+  simp
+  rintro h
+  by_cases hs : iSup (fun x : v.integer => (Valued.v (s.liftInteger x - x))) = 0
+  · simp at hs
+    simp [hs]
+  · simp at hs
+    simp [hs]
+    sorry
+  simp
+  rintro h
   sorry
 
+theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
+  unfold ValAlgEquiv.truncatedLowerIndex at h
+  by_cases hs : i_[L/K] s = ⊤
+  · simp [hs] at h
+    --maybe there is a better way
+    have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
+    convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
+    sorry
+  · simp [hs] at h
+    have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
+      have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
+      have hnt: i_[L/K] s = (WithTop.untop (i_[L/K] s) hs) := by sorry
+      rw [hnt]
+      convert (le_min_iff.1 h').right
+      sorry
+    convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
+    sorry
 
-theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := sorry
-
-theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := sorry
+theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
+  constructor
+  apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
+  sorry
 
 @[simp]
 theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl
