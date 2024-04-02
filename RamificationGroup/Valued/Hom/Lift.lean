@@ -175,7 +175,9 @@ def AlgEquiv.liftResidueField (s : L ≃ₐ[K] L) : 𝓀[vL] ≃ₐ[𝓀[vK]] �
 
 namespace ValAlgEquiv
 
-variable {K L L' : Type*} [Field K] [Field L] [Field L'] {ΓK ΓL ΓL': Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [LinearOrderedCommGroupWithZero ΓL'] [vK : Valued K ΓK] [vL : Valued L ΓL] [vL' : Valued L' ΓL'] [ValAlgebra K L] [ValAlgebra K L']
+section
+
+variable {K L L' : Type*} [CommRing K] [Ring L] [Ring L'] {ΓK ΓL ΓL': Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [LinearOrderedCommGroupWithZero ΓL'] [vK : Valued K ΓK] [vL : Valued L ΓL] [vL' : Valued L' ΓL'] [ValAlgebra K L] [ValAlgebra K L']
 
 @[simp]
 theorem coe_liftInteger {s : L ≃ₐv[K] L} {x : vL.v.integer} : ((s.liftInteger x) : L) = s x := rfl
@@ -184,6 +186,12 @@ theorem coe_liftInteger {s : L ≃ₐv[K] L} {x : vL.v.integer} : ((s.liftIntege
 theorem liftInteger_refl : (.refl : L ≃ₐv[K] L).liftInteger = .refl := by
   ext
   rfl
+
+end
+
+section
+
+variable {K L L' : Type*} [CommRing K] [Field L] [Ring L'] {ΓK ΓL ΓL': Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [LinearOrderedCommGroupWithZero ΓL'] [vK : Valued K ΓK] [vL : Valued L ΓL] [vL' : Valued L' ΓL'] [ValAlgebra K L] [ValAlgebra K L']
 
 @[simp]
 theorem eq_refl_of_liftInteger_eq_refl {s : L ≃ₐv[K] L} : s.liftInteger = .refl ↔ s = .refl := by
@@ -195,5 +203,7 @@ theorem eq_refl_of_liftInteger_eq_refl {s : L ≃ₐv[K] L} : s.liftInteger = .r
     _ = ((s.liftInteger x) : L) / s.liftInteger y := by simp
     _ = _ := by simp [h]
   · simp [h]
+
+end
 
 end ValAlgEquiv

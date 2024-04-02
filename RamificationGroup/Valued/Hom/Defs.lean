@@ -660,15 +660,19 @@ structure ValAlgEquiv extends ValRingEquiv A B, AlgEquiv R A B
 
 /-- Reinterpret an `ValAlgHom` as a `ValRingHom` -/
 add_decl_doc ValAlgHom.toValRingHom
+attribute [coe] ValAlgHom.toValRingHom
 
 /-- Reinterpret an `ValAlgHom` as a `AlgHom` -/
 add_decl_doc ValAlgHom.toAlgHom
+attribute [coe] ValAlgHom.toAlgHom
 
 /-- Reinterpret an `ValAlgEquiv` as a `ValRingEquiv` -/
 add_decl_doc ValAlgEquiv.toValRingEquiv
+attribute [coe] ValAlgEquiv.toValRingEquiv
 
 /-- Reinterpret an `ValAlgEquiv` as a `AlgEquiv` -/
 add_decl_doc ValAlgEquiv.toAlgEquiv
+attribute [coe] ValAlgEquiv.toAlgEquiv
 
 @[inherit_doc]
 notation:25 A " →ₐv[" R "] " B => ValAlgHom R A B
@@ -998,6 +1002,9 @@ instance {R A : Type*} [CommRing R] [Ring A] {ΓR ΓA : outParam Type*} [LinearO
 
 @[simp]
 theorem one_apply (x : A) : (1 : A ≃ₐv[R] A) x = x := rfl
+
+@[simp]
+theorem one_def : (1 : A ≃ₐv[R] A) = .refl := rfl
 
 @[simp]
 theorem mul_apply (e e' : (A ≃ₐv[R] A)) (x : A) : (e * e') x = e (e' x) := rfl

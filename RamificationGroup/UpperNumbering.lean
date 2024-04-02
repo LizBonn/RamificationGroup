@@ -14,30 +14,46 @@ variable {K L} (K') {ΓK ΓK' ΓL : outParam Type*} [Field K] [Field K'] [Field 
 [LinearOrderedCommGroupWithZero ΓK]
 [LinearOrderedCommGroupWithZero ΓK']
 [LinearOrderedCommGroupWithZero ΓL]
-[Valued K ΓK] [Valued K' ΓK'] [Valued L ΓL]
+[vK : Valued K ΓK] [vK' : Valued K' ΓK'] [vL : Valued L ΓL]
 [ValAlgebra K K'] [ValAlgebra K L] [ValAlgebra K' L] [IsScalarTower K K' L] [Normal K K']
 -- change this using IsScalatower
 open algebraMap
+
+theorem restrictNormalHom.val_isEquiv_comap_aux (f : (L ≃ₐv[K] L)): vK'.v.IsEquiv (vK'.v.comap (AlgEquiv.restrictNormalHom K' (f : L ≃ₐ[K] L)))  := by
+  intro x y
+  convert f.val_isEquiv_comap' (x : L) (y : L)
+  simp only [ValAlgebra.val_map_le_iff]
+  dsimp
+  rw [← ValAlgebra.val_map_le_iff (A := L), iff_eq_eq]
+  congr <;>
+  calc
+    _ = f _ := AlgEquiv.restrictNormal_commutes (f : L ≃ₐ[K] L) K' _
+    _ = _ := rfl
 
 noncomputable def restrictNormalHom : (L ≃ₐv[K] L) →* K' ≃ₐv[K] K' where
   toFun f :=
     {
       AlgEquiv.restrictNormalHom K' (f : L ≃ₐ[K] L) with
-      map_le_map_iff' := sorry
-      val_isEquiv_comap' := by
-        intro x y
-        convert f.val_isEquiv_comap' (x : L) (y : L)
-        simp only [ValAlgebra.val_map_le_iff]
-        dsimp
-        -- rw [← ValAlgebra.val_map_le_iff (A := L)]
-        sorry
+      val_isEquiv_comap' := restrictNormalHom.val_isEquiv_comap_aux K' f
+      map_le_map_iff' := map_le_map_iff_of_val_isEquiv_comap (restrictNormalHom.val_isEquiv_comap_aux K' f)
       continuous_toFun := sorry
       continuous_invFun := sorry
     }
   map_one' := by
-    ext
-    sorry
-  map_mul' := sorry
+    ext a
+    calc
+      _ = ((AlgEquiv.restrictNormalHom K') (.refl : L ≃ₐ[K] L)) a := rfl
+      _ = _ := by
+        erw [_root_.map_one]
+        rfl
+  map_mul' s s' := by
+    ext a
+    calc
+      _ = (AlgEquiv.restrictNormalHom K' (s * s' : L ≃ₐ[K] L)) a := rfl
+      _ = ((AlgEquiv.restrictNormalHom K' (s : L ≃ₐ[K] L)) * (AlgEquiv.restrictNormalHom K' (s' : L ≃ₐ[K] L))) a := by
+        erw [_root_.map_mul]
+      _ = _ := rfl
+
 
 theorem restrictNormalHom_surjective : Function.Surjective (restrictNormalHom K' (K := K) (L := L)) := sorry
 
