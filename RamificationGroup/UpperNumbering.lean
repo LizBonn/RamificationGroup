@@ -132,7 +132,9 @@ theorem preimage_singleton_nonempty {σ : K' ≃ₐv[K] K'} : ((ValAlgEquiv.rest
   apply Finset.coe_nonempty.mp
   simp [ValAlgEquiv.restrictNormalHom_surjective]
 
-noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ℚ := (Finset.sup'  ((ValAlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset preimage_singleton_nonempty (fun x => x.truncatedLowerIndex K L u - 1))
+noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ℚ := Finset.max' (((ValAlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐv[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
+
+theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ∃ s : L ≃ₐv[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := sorry
 
 variable {σ : K' ≃ₐv[K] K'}
 
