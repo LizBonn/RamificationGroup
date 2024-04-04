@@ -144,8 +144,17 @@ theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐv[K] K') : phi K' L ((tr
 
 theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := sorry
 
-theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
+theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
   simp only [Subgroup.mem_map]
+  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ u σ
+  simp at s_in
+  let f : (L ≃ₐv[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
+    fun x => ⟨s * (x.restrictScalars K), by
+      simp [s_in]
+      ext a
+      sorry⟩
+  have : Function.Bijective f := sorry
+  have : ∀ x : (L ≃ₐv[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
   constructor
   sorry
   sorry
@@ -155,7 +164,7 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (u : ℚ) (r : ℚ)
 theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
   ext σ
   calc
-  _ ↔ truncatedJ (u + 1) σ - 1 ≥ u := (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup u (u + 1) (by linarith)).symm
+  _ ↔ truncatedJ (u + 1) σ - 1 ≥ u := (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
   _ ↔ phi K' L (truncatedJ (u + 1) σ - 1) ≥ phi K' L u := (phi_strictMono K L).le_iff_le.symm
   _ ↔ σ.truncatedLowerIndex K K' ((phi K L u) + 1) - 1 ≥ phi K' L u := by
     simp [phi_truncatedJ_sub_one]
