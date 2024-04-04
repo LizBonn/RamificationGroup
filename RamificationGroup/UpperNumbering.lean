@@ -14,30 +14,46 @@ variable {K L} (K') {ΓK ΓK' ΓL : outParam Type*} [Field K] [Field K'] [Field 
 [LinearOrderedCommGroupWithZero ΓK]
 [LinearOrderedCommGroupWithZero ΓK']
 [LinearOrderedCommGroupWithZero ΓL]
-[Valued K ΓK] [Valued K' ΓK'] [Valued L ΓL]
+[vK : Valued K ΓK] [vK' : Valued K' ΓK'] [vL : Valued L ΓL]
 [ValAlgebra K K'] [ValAlgebra K L] [ValAlgebra K' L] [IsScalarTower K K' L] [Normal K K']
 -- change this using IsScalatower
 open algebraMap
+
+theorem restrictNormalHom.val_isEquiv_comap_aux (f : (L ≃ₐv[K] L)): vK'.v.IsEquiv (vK'.v.comap (AlgEquiv.restrictNormalHom K' (f : L ≃ₐ[K] L)))  := by
+  intro x y
+  convert f.val_isEquiv_comap' (x : L) (y : L)
+  simp only [ValAlgebra.val_map_le_iff]
+  dsimp
+  rw [← ValAlgebra.val_map_le_iff (A := L), iff_eq_eq]
+  congr <;>
+  calc
+    _ = f _ := AlgEquiv.restrictNormal_commutes (f : L ≃ₐ[K] L) K' _
+    _ = _ := rfl
 
 noncomputable def restrictNormalHom : (L ≃ₐv[K] L) →* K' ≃ₐv[K] K' where
   toFun f :=
     {
       AlgEquiv.restrictNormalHom K' (f : L ≃ₐ[K] L) with
-      map_le_map_iff' := sorry
-      val_isEquiv_comap' := by
-        intro x y
-        convert f.val_isEquiv_comap' (x : L) (y : L)
-        simp only [ValAlgebra.val_map_le_iff]
-        dsimp
-        -- rw [← ValAlgebra.val_map_le_iff (A := L)]
-        sorry
+      val_isEquiv_comap' := restrictNormalHom.val_isEquiv_comap_aux K' f
+      map_le_map_iff' := map_le_map_iff_of_val_isEquiv_comap (restrictNormalHom.val_isEquiv_comap_aux K' f)
       continuous_toFun := sorry
       continuous_invFun := sorry
     }
   map_one' := by
-    ext
-    sorry
-  map_mul' := sorry
+    ext a
+    calc
+      _ = ((AlgEquiv.restrictNormalHom K') (.refl : L ≃ₐ[K] L)) a := rfl
+      _ = _ := by
+        erw [_root_.map_one]
+        rfl
+  map_mul' s s' := by
+    ext a
+    calc
+      _ = (AlgEquiv.restrictNormalHom K' (s * s' : L ≃ₐ[K] L)) a := rfl
+      _ = ((AlgEquiv.restrictNormalHom K' (s : L ≃ₐ[K] L)) * (AlgEquiv.restrictNormalHom K' (s' : L ≃ₐ[K] L))) a := by
+        erw [_root_.map_mul]
+      _ = _ := rfl
+
 
 theorem restrictNormalHom_surjective : Function.Surjective (restrictNormalHom K' (K := K) (L := L)) := sorry
 
@@ -116,7 +132,9 @@ theorem preimage_singleton_nonempty {σ : K' ≃ₐv[K] K'} : ((ValAlgEquiv.rest
   apply Finset.coe_nonempty.mp
   simp [ValAlgEquiv.restrictNormalHom_surjective]
 
-noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ℚ := (Finset.sup'  ((ValAlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset preimage_singleton_nonempty (fun x => x.truncatedLowerIndex K L u - 1))
+noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ℚ := Finset.max' (((ValAlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐv[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
+
+theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ∃ s : L ≃ₐv[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := sorry
 
 variable {σ : K' ≃ₐv[K] K'}
 
@@ -126,14 +144,27 @@ theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐv[K] K') : phi K' L ((tr
 
 theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := sorry
 
-theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := sorry
+theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
+  simp only [Subgroup.mem_map]
+  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ u σ
+  simp at s_in
+  let f : (L ≃ₐv[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
+    fun x => ⟨s * (x.restrictScalars K), by
+      simp [s_in]
+      ext a
+      sorry⟩
+  have : Function.Bijective f := sorry
+  have : ∀ x : (L ≃ₐv[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
+  constructor
+  sorry
+  sorry
 
 -- Lemma 5
 @[simp]
 theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
   ext σ
   calc
-  _ ↔ truncatedJ (u + 1) σ - 1 ≥ u := (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup u (u + 1) (by linarith)).symm
+  _ ↔ truncatedJ (u + 1) σ - 1 ≥ u := (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
   _ ↔ phi K' L (truncatedJ (u + 1) σ - 1) ≥ phi K' L u := (phi_strictMono K L).le_iff_le.symm
   _ ↔ σ.truncatedLowerIndex K K' ((phi K L u) + 1) - 1 ≥ phi K' L u := by
     simp [phi_truncatedJ_sub_one]

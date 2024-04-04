@@ -9,11 +9,50 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
     carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
-    mul_mem' := sorry
-    one_mem' := sorry
-    inv_mem' := sorry
+    mul_mem' {a} {b} ha hb := by
+      intro x
+      calc
+      _ = v (a (b x) - x) := rfl
+      _ = v ((a (b x) - b x) + (b x - x)) := by congr; simp
+      _ ≤ max (v (a (b x) - b x)) (v (b x - x)) := Valuation.map_add _ _ _
+      _ ≤ max (.coe (.ofAdd (- i - 1))) (.coe (.ofAdd (- i - 1))) := by
+        apply max_le_max
+        exact ha (b.liftInteger x)
+        exact hb x
+      _ = _ := max_self _
+    one_mem' := by
+      simp only [ValAlgEquiv.one_def, integer_val_coe, AddSubgroupClass.coe_sub, ofAdd_sub,
+        ofAdd_neg, Subtype.forall, Set.mem_setOf_eq]
+      rintro a b
+      simp
+    inv_mem' := by
+      rintro s hs a
+      calc
+      _ = v (s⁻¹ a - a) := rfl
+      _ = v ( s⁻¹ a - s (s⁻¹ a) ) := by
+        congr 1
+        simp only [sub_right_inj]
+        exact (EquivLike.apply_inv_apply s ↑a).symm
+      _ = v ( s (s⁻¹ a) - s ⁻¹ a) := by
+        rw [← Valuation.map_neg]
+        congr
+        simp
+      _ ≤ _ := hs (s.liftInteger⁻¹ a)
 
-theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := sorry
+theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
+  rintro a b hab
+  simp only [lowerRamificationGroup, integer_val_coe, AddSubgroupClass.coe_sub,
+    ValAlgEquiv.coe_liftInteger, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mk_le_mk,
+    Set.setOf_subset_setOf]
+  rintro s hs
+  have hle : ((Multiplicative.ofAdd b)⁻¹ / Multiplicative.ofAdd 1) ≤ ((Multiplicative.ofAdd a)⁻¹ / Multiplicative.ofAdd 1) := by
+    simpa using hab
+  intro x hx
+  apply le_trans
+  apply hs x hx
+  convert hle
+  simp
+
 
 -- -- Is such a bundled version better? OrderDual can be add at either source or target.
 -- def lowerRamificationGroup' : OrderHom ℤᵒᵈ (Subgroup (S ≃ₐv[R] S)) where
@@ -114,8 +153,7 @@ variable [FiniteDimensional K L]
 
 noncomputable def ValAlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐv[R] S)) : ℚ :=
   if h : i_[S/R] s = ⊤ then u
-  else if u ≤ (i_[S/R] s).untop h then u
-  else (i_[S/R] s).untop h
+  else min u ((i_[S/R] s).untop h)
 
 scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => ValAlgEquiv.truncatedLowerIndex K L
 
@@ -169,28 +207,79 @@ noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
   if h : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
 -/
+
 @[simp]
 theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔ s = .refl := by
   constructor <;>
   intro h
   · ext l
+    simp only [ValAlgEquiv.coe_refl, id_eq]
+    obtain ⟨x, ⟨y, ⟨_, rfl⟩⟩⟩ := IsFractionRing.div_surjective l (A := 𝒪[L])
+    simp
     by_cases hs : iSup (fun x : vL.v.integer => (v (s.liftInteger x - x))) = 0
-    · simp at hs
+    · simp only [AddSubgroupClass.coe_sub] at hs
+      have : ∀ x, v ((ValAlgEquiv.liftInteger s) x - x) = 0 := by
+        intro x
+        apply le_of_eq at hs
+        rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
+        exact (ciSup_le_iff' sorry).mp hs x -- this sorry is should be filled with bounded by one
       sorry
     · simp only [ValAlgEquiv.lowerIndex, integer_val_coe, AddSubgroupClass.coe_sub,
-      ValAlgEquiv.coe_liftInteger, dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
+      dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
       have h : ∀ x : 𝒪[L], v (s ↑x - ↑x) = 0 := sorry
+      --exact h l
       sorry
-  · simp [h]
+  · simp [ValAlgEquiv.lowerIndex, h]
 
+--the type of n should be changed
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [ValAlgEquiv.truncatedLowerIndex]
+  constructor <;>
+  unfold lowerRamificationGroup ValAlgEquiv.lowerIndex
+  simp
+  rintro h
+  by_cases hs : iSup (fun x : v.integer => (Valued.v (s.liftInteger x - x))) = 0
+  · simp at hs
+    simp [hs]
+  · simp at hs
+    simp [hs]
+    sorry
+  simp
+  rintro h
   sorry
 
+theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
+  unfold ValAlgEquiv.truncatedLowerIndex at h
+  by_cases hs : i_[L/K] s = ⊤
+  · simp [hs] at h
+    --maybe there is a better way
+    have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
+    convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
+    sorry
+  · simp [hs] at h
+    have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
+      have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
+      have hnt: i_[L/K] s = (WithTop.untop (i_[L/K] s) hs) := by sorry
+      rw [hnt]
+      convert (le_min_iff.1 h').right
+      sorry
+    convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
+    sorry
 
-theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := sorry
+theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
+  constructor
+  apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
+  rintro hs
+  unfold ValAlgEquiv.truncatedLowerIndex
+  by_cases hc : i_[L/K] s = ⊤
+  · simp [hc]
+    linarith [h]
+  · have : ⌈u⌉.toNat + 1 ≤ i_[L/K] s := by
+      sorry
+      --apply (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).1 hs
+    simp [hc]
+    sorry
 
-theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐv[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := sorry
 
 @[simp]
 theorem lowerIndex_restrictScalars (s : L ≃ₐv[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl

@@ -8,3 +8,6 @@
 1. add instances of intermediate field being ValAlg correctly
 2. change lemmas from requiring intermediate field to IsScalarTower
 3. (high!) make restrictNormal works good, put in the correct file  also  restrictScalarsₘ restrictScalars
+
+4.4
+1. (high!) Try to change all theorems using ValHom and ValAlgEquiv into simple RingHom ALgHom. Then G_-1 will be a subgroup of GalGroup. Add IsValExtension K' L (do I need injectivity?) to state theorem for L/K'/K
