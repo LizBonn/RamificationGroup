@@ -175,7 +175,6 @@ theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom
     sorry
 
 
-
 @[simp]
 theorem herbrand' [Normal K K'] (v : ℚ) : G(L/K)^[v].map (ValAlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
   convert herbrand (psi K L v)
