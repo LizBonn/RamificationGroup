@@ -18,6 +18,7 @@ noncomputable def relindex' : ℚ :=
 
 end
 
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
 -- scoped notation:max  " φ_[" L:max "/" K:max "]" => phi K L
 
