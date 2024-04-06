@@ -25,6 +25,7 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
         exact hb x
       _ = _ := max_self _
     one_mem' := by
+<<<<<<< HEAD
       simp
       intro a b
       simp [one_lift_refl]
@@ -38,17 +39,37 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
       -- _ ≤ (.coe (.ofAdd (- i - 1))) := by apply hx (x⁻¹ a)
       -- sorry
 
+=======
+      simp only [ValAlgEquiv.one_def, integer_val_coe, AddSubgroupClass.coe_sub, ofAdd_sub,
+        ofAdd_neg, Subtype.forall, Set.mem_setOf_eq]
+      rintro a b
+      simp
+    inv_mem' := by
+      rintro s hs a
+      calc
+      _ = v (s⁻¹ a - a) := rfl
+      _ = v ( s⁻¹ a - s (s⁻¹ a) ) := by
+        congr 1
+        simp only [sub_right_inj]
+        exact (EquivLike.apply_inv_apply s ↑a).symm
+      _ = v ( s (s⁻¹ a) - s ⁻¹ a) := by
+        rw [← Valuation.map_neg]
+        congr
+        simp
+      _ ≤ _ := hs (s.liftInteger⁻¹ a)
+>>>>>>> 2715e4d60ee302d127898a71cdf43a7fc23f1f97
 
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
-  unfold Antitone lowerRamificationGroup
   rintro a b hab
-  simp
+  simp only [lowerRamificationGroup, integer_val_coe, AddSubgroupClass.coe_sub,
+    ValAlgEquiv.coe_liftInteger, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mk_le_mk,
+    Set.setOf_subset_setOf]
   rintro s hs
   have hle : ((Multiplicative.ofAdd b)⁻¹ / Multiplicative.ofAdd 1) ≤ ((Multiplicative.ofAdd a)⁻¹ / Multiplicative.ofAdd 1) := by
     simpa using hab
-  rintro a_1 b_1
+  intro x hx
   apply le_trans
-  apply hs a_1 b_1
+  apply hs x hx
   convert hle
   simp
 
@@ -221,7 +242,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐv[K] L} : i_[L/K] s = ⊤ ↔
         intro x
         apply le_of_eq at hs
         rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
-        exact (ciSup_le_iff' sorry).mp hs x
+        exact (ciSup_le_iff' sorry).mp hs x -- this sorry is should be filled with bounded by one
       sorry
     · simp only [ValAlgEquiv.lowerIndex, integer_val_coe, AddSubgroupClass.coe_sub,
       dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
