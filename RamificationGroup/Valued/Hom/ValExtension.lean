@@ -54,7 +54,7 @@ class IsValExtension (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring
 
 namespace IsValExtension
 
-section
+section CoeLemma
 
 variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
@@ -81,13 +81,9 @@ instance id : IsValExtension R R where
     simp only [Algebra.id.map_eq_id, comap_id]
     rfl
 
-end
+end CoeLemma
 
-section
-
-variable {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
+section mk'
 
 def of_integer_comap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
@@ -106,6 +102,38 @@ def of_valuationSubring_comap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R]
     rw [show vR.v.integer = 𝒪[R].toSubring by rfl, ← h]
     rfl
 
-end
+end mk'
+
+section lift
+
+instance integerAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
+  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] : Algebra vR.v.integer vA.v.integer where
+    smul r a := ⟨r • a, sorry⟩
+    toFun r := ⟨algebraMap R A r, sorry⟩
+    map_one' := by
+      ext
+      simp
+    map_mul' _ _ := by
+      ext
+      simp
+    map_zero' := by
+      ext
+      simp
+    map_add' _ _ := by
+      ext
+      simp
+    commutes' _ _ := by
+      ext
+      exact Algebra.commutes _ _
+    smul_def' _ _ := by
+      ext
+      exact Algebra.smul_def _ _
+
+instance valuationSubringAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
+  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] : Algebra 𝒪[R] 𝒪[A] := inferInstanceAs <| Algebra vR.v.integer vA.v.integer
+
+end lift
 
 end IsValExtension
