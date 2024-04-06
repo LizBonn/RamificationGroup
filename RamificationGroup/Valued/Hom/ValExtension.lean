@@ -109,8 +109,24 @@ section lift
 instance integerAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
   [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] : Algebra vR.v.integer vA.v.integer where
-    smul r a := ⟨r • a, sorry⟩
-    toFun r := ⟨algebraMap R A r, sorry⟩
+    smul r a := {
+      val := r • a,
+      property := by
+        rw [Valuation.mem_integer_iff,
+          show r • ↑a = algebraMap R A r * a by exact (Algebra.smul_def r (a : A))]
+        norm_num
+        apply mul_le_one'
+        · simp only [val_map_le_one_iff]
+          exact r.2
+        · exact a.2
+    }
+    toFun r := {
+      val := algebraMap R A r,
+      property := by
+        simp only [Valuation.mem_integer_iff,
+          val_map_le_one_iff]
+        exact r.2
+    }
     map_one' := by
       ext
       simp
@@ -133,6 +149,18 @@ instance integerAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring
 instance valuationSubringAlgebra {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
   [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] : Algebra 𝒪[R] 𝒪[A] := inferInstanceAs <| Algebra vR.v.integer vA.v.integer
+
+instance {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
+  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] : IsLocalRingHom (algebraMap 𝒪[R] 𝒪[A]) where
+    map_nonunit r hr := by
+      apply Valuation.Integers.isUnit_of_one (v := vR.v)
+      · exact Valuation.integer.integers (v := vR.v)
+      · rw [isUnit_iff_ne_zero]
+        simp
+        sorry
+      · simp
+        sorry
 
 end lift
 
