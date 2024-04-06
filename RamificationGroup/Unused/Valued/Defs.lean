@@ -14,9 +14,6 @@ end check
 
 namespace Valued
 
-
-/-
-
 section Preorder
 
 variable {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]
@@ -38,8 +35,6 @@ theorem zero_le (x y : R) : 0 ≤ x := sorry
 
 end Preorder
 
--/
-
 
 /-- An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]` -/
 @[reducible]
@@ -47,7 +42,7 @@ def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedC
 
 scoped notation:max " 𝒪[" K:max "] " => Valued.valuationSubring K
 
-/-
+
 
 section IntegerValued
 variable (R K : Type*) [Ring R] [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vR : Valued R Γ] [vK : Valued K Γ]
@@ -87,7 +82,6 @@ theorem integer_val_le_one (x : vR.v.integer) : Valued.v x ≤ 1 := (mem_integer
 
 end IntegerValued
 
--/
 
 -- `theorems about the relation between order and valuation?`
 
