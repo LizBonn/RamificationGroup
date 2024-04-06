@@ -20,6 +20,7 @@ end
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
 
+
 -- scoped notation:max  " φ_[" L:max "/" K:max "]" => phi K L
 
 noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
@@ -645,10 +646,10 @@ theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * 
 -- scoped notation:max  " ψ_[" L:max "/" K:max "]" => psi K L
 
 -- this is not useful, see theorem below
-theorem leftInverse_phi_psi : Function.LeftInverse (psi R S) (phi R S)  := sorry
+theorem leftInverse_phi_psi : Function.LeftInverse (phi R S) (psi R S)  := sorry
 
 @[simp]
-theorem phi_psi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := leftInverse_phi_psi R S u
+theorem phi_psi_eq_self (u : ℚ) : (phi R S) ((psi R S) u) = u := leftInverse_phi_psi R S u
 
 theorem phi_strictMono : StrictMono (phi R S) := sorry
 

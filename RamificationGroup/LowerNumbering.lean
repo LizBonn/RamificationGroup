@@ -25,21 +25,6 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
         exact hb x
       _ = _ := max_self _
     one_mem' := by
-<<<<<<< HEAD
-      simp
-      intro a b
-      simp [one_lift_refl]
-    inv_mem' := by
-      simp
-      intro x hx a b
-      sorry
-      -- calc
-      -- _ = v (x⁻¹ a - (x * x⁻¹) a) := rfl
-      -- _ = v (x⁻¹ a - (x (x⁻¹ a))) := rfl
-      -- _ ≤ (.coe (.ofAdd (- i - 1))) := by apply hx (x⁻¹ a)
-      -- sorry
-
-=======
       simp only [ValAlgEquiv.one_def, integer_val_coe, AddSubgroupClass.coe_sub, ofAdd_sub,
         ofAdd_neg, Subtype.forall, Set.mem_setOf_eq]
       rintro a b
@@ -57,7 +42,6 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
         congr
         simp
       _ ≤ _ := hs (s.liftInteger⁻¹ a)
->>>>>>> 2715e4d60ee302d127898a71cdf43a7fc23f1f97
 
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
   rintro a b hab

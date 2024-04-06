@@ -66,6 +66,8 @@ section
 -- principle : first try to state a theorem in IsScalarTower, then try IntermediateField
 variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vL : Valued L ℤₘ₀] [ValAlgebra K L] {H : Subgroup (L ≃ₐ[K] L)} [Subgroup.Normal H] {K' : IntermediateField K L}
 
+variable (K' : Type*) [Field K'] [vK' : Valued K' ℤₘ₀] [ValAlgebra K K'] [ValAlgebra K L] [ValAlgebra K' L] [IsScalarTower K K' L]
+
 /-
 --lemma 4
 theorem Varphi_With_i (σ : (L ≃ₐ[K] L) ⧸ H) : (varphi K L (Sup (i_[L/K] ((mk' H)⁻¹' {σ})))) = (i_[L/K'] σ) - (1 : WithTop ℤ):= by sorry
@@ -95,7 +97,7 @@ theorem psi_comp_of_intermediateField : (psi K' L) ∘ (psi K K') = psi K L := b
 end HerbrandFunction
 
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
-def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐv[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
+noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐv[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
 
 scoped [Valued] notation:max " G(" L:max "/" K:max ")^[" u:max "] " => upperRamificationGroup_aux K L u
 
@@ -165,10 +167,13 @@ theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom
   ext σ
   calc
   _ ↔ truncatedJ (u + 1) σ - 1 ≥ u := (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
-  _ ↔ phi K' L (truncatedJ (u + 1) σ - 1) ≥ phi K' L u := (phi_strictMono K L).le_iff_le.symm
-  _ ↔ σ.truncatedLowerIndex K K' ((phi K L u) + 1) - 1 ≥ phi K' L u := by
+  _ ↔ phi K' L (truncatedJ (u + 1) σ - 1) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
+  _ ↔ σ.truncatedLowerIndex K K' ((phi K' L u) + 1) - 1 ≥ phi K' L u := by
     simp [phi_truncatedJ_sub_one]
-  _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup σ (phi K L u) _ (by linarith)
+  _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := by
+    apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup σ (phi K' L u) _
+
+
 
 @[simp]
 theorem herbrand' [Normal K K'] (v : ℚ) : G(L/K)^[v].map (ValAlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
