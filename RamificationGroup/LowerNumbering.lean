@@ -1,11 +1,15 @@
 import RamificationGroup.Valued.Hom.Lift
+import RamificationGroup.Valued.Hom.Defs
 import Mathlib.FieldTheory.Galois
 
-open DiscreteValuation Valued Valuation
+open DiscreteValuation Valued Valuation ValAlgEquiv
 
 section
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
+
+-- for valued
+theorem one_lift_refl : (1 : S ≃ₐv[R] S).liftInteger = .refl := rfl
 
 def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
     carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
@@ -22,12 +26,18 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
       _ = _ := max_self _
     one_mem' := by
       simp
-      rintro a b
-      erw [one_apply]
+      intro a b
+      simp [one_lift_refl]
     inv_mem' := by
       simp
-      rintro x hx
+      intro x hx a b
       sorry
+      -- calc
+      -- _ = v (x⁻¹ a - (x * x⁻¹) a) := rfl
+      -- _ = v (x⁻¹ a - (x (x⁻¹ a))) := rfl
+      -- _ ≤ (.coe (.ofAdd (- i - 1))) := by apply hx (x⁻¹ a)
+      -- sorry
+
 
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
   unfold Antitone lowerRamificationGroup
@@ -232,10 +242,11 @@ theorem mem_lowerRamificationGroup_iff {s : L ≃ₐv[K] L} (n : ℕ) : s ∈ G(
     simp [hs]
   · simp at hs
     simp [hs]
-
+    sorry
   simp
-  rintro h
+  rintro h a ha
   sorry
+
 
 theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐv[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
   unfold ValAlgEquiv.truncatedLowerIndex at h
