@@ -2,73 +2,23 @@ import RamificationGroup.Valued.Hom.ValExtension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 
-open DiscreteValuation Valued Valuation
-
 /-
-section preparation
+# Lower Numbering Ramification Group
 
-namespace RingHom
+## Main Definitions
 
-variable {R : Type*} {ΓR : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero ΓR] {v : Valuation R ΓR}
+## Main Theorem
 
-def liftValuationInteger {f : R →+* R} (hf : ∀ x : v.integer, v (f x - x) ≤ 1) : v.integer →+* v.integer where
-  toFun r := {
-    val := f r
-    property := by
-      calc
-        v (f r) = v (f r - r + r) := by
-          congr
-          simp
-        _ ≤ max (v (f r - r)) (v (r : R)) := Valuation.map_add _ _ _
-        _ ≤ 1 := max_le (hf r) r.2
-  }
-  map_one' := by
-    ext
-    simp
-  map_mul' _ _ := by
-    ext
-    simp
-  map_zero' := by
-    ext
-    simp
-  map_add' _ _ := by
-    ext
-    simp
+## TODO
 
-end RingHom
+add theorems
+1. in the case of complete discrete valued field,
+this filtration is exhausive
+2. in the case of local field, this filtration is separated at u = max v (s x - x)
 
-variable {R : Type*} {ΓR : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero ΓR] (v : Valuation R ΓR)
-
-variable {K : Type*} {ΓK : outParam Type*} [Field K] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
-
-theorem Valuation.integer.val_symm_sub_le_one {s : R ≃+* R} (hs : ∀ x : v.integer, v (s x - x) ≤ 1) (r : v.integer): v (s.symm r - r) ≤ 1 := by
-  calc
-    _ = v (s (s.symm r) - s.symm r) := by
-      rw [← Valuation.map_neg]
-      congr 1
-      simp
-    _ ≤ 1 := hs (s.symm r)
-
-namespace RingEquiv
-
--- 1 = .coe (.ofAdd 0)
-def liftValuationInteger {s : R ≃+* R} (hs : ∀ x : v.integer, v (s x - x) ≤ 1) : v.integer ≃+* v.integer := {
-  s.toRingHom.liftValuationInteger hs with
-  invFun := _
-  left_inv := _
-  right_inv := _
-}
-  -- {
-  --   (s : R →+* R).liftValuationInteger with
-  --   invFun := sorry
-  -- }
-
-def liftValuedValuationSubring {s : K ≃+* K} (hs : ∀ x : vK.v.integer, Valued.v (s x - x) ≤ 1) : 𝒪[K] ≃+* 𝒪[K] := sorry
-
-end RingEquiv
-
-end preparation
 -/
+
+open DiscreteValuation Valued Valuation
 
 section DecompositionGroup
 
@@ -153,17 +103,6 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
       Multiplicative.ofAdd_le]
     exact hab
 
-
--- -- Is such a bundled version better? OrderDual can be add at either source or target.
--- def lowerRamificationGroup' : OrderHom ℤᵒᵈ (Subgroup (S ≃ₐv[R] S)) where
---   toFun i := {
---     carrier := {s | ∀ x : vS.v.integer, vS.v (s x - x) ≤ .coe (.ofAdd (- OrderDual.ofDual i - 1)) }
---     mul_mem' := sorry
---     one_mem' := sorry
---     inv_mem' := sorry
---   }
---   monotone' := sorry
-
 end
 
 
@@ -212,50 +151,36 @@ scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRami
 
 scoped [Valued] notation:max " i_[" S:max "/" R:max "]" => AlgEquiv.lowerIndex R S
 
-noncomputable def ValAlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐ[R] S)) : ℚ :=
+noncomputable def AlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐ[R] S)) : ℚ :=
   if h : i_[S/R] s = ⊤ then u
   else min u ((i_[S/R] s).untop h)
 
-scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => ValAlgEquiv.truncatedLowerIndex K L
+scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => AlgEquiv.truncatedLowerIndex K L
 
-#check ValAlgEquiv.truncatedLowerIndex
+#check AlgEquiv.truncatedLowerIndex
 
 end lowerIndex
 
-#check AlgEquiv.restrictScalars
-
-variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [Field K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
-[LinearOrderedCommGroupWithZero ΓK']
-[vK : Valued K ΓK] [vK' : Valued K' ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L] --{H : Subgroup (L ≃ₐ[K] L)} [H.Normal]
-[Algebra K K'] [Algebra K' L] [IsScalarTower K K' L]
-
-section
-
-variable (R : Type*) {S A B : Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing S] [Ring A] [Ring B]
-[LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-[LinearOrderedCommGroupWithZero ΓA]
-[LinearOrderedCommGroupWithZero ΓB]
-[vR : Valued R ΓR] [vS : Valued S ΓS] [vA : Valued A ΓA] [vB : Valued B ΓB]
-[Algebra R S] [Algebra R A] [Algebra S A] [Algebra R B] [Algebra S B] [IsScalarTower R S A] [IsScalarTower R S B]
-
-#synth CommSemiring R
-
-#check AlgEquiv.restrictScalars
-
-end
+variable (R : Type*) {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
+[vS : Valued S ℤₘ₀]
+[Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
 
 @[simp]
-theorem lowerIndex_refl : (i_[L/K] .refl) = ⊤ := by
+theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
   simp [AlgEquiv.lowerIndex]
 
 @[simp]
-theorem truncatedLowerIndex_refl (u : ℚ) : ValAlgEquiv.truncatedLowerIndex K L u .refl = u := by
-  simp [ValAlgEquiv.truncatedLowerIndex]
+theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
+  simp [AlgEquiv.truncatedLowerIndex]
 /-
 noncomputable def ValAlgEquiv.lowerIndex (s : S ≃ₐv[R] S) : ℕ∞ :=
   if h : iSup (fun x : vS.v.integer => (Valued.v (s.liftInteger x - x))) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
 -/
+
+variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [CommRing K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
+[LinearOrderedCommGroupWithZero ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L]
+[Algebra K K'] [Algebra K' L] [IsScalarTower K K' L]
 
 @[simp]
 theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} : i_[L/K] s = ⊤ ↔ s = .refl := by
@@ -281,8 +206,9 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} : i_[L/K] s = ⊤ ↔ 
   · simp [AlgEquiv.lowerIndex, h]
 
 --the type of n should be changed
+-- instead, change when use this theorem
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
-  simp [ValAlgEquiv.truncatedLowerIndex]
+  simp [AlgEquiv.truncatedLowerIndex]
   constructor <;>
   unfold lowerRamificationGroup AlgEquiv.lowerIndex
   simp
@@ -298,7 +224,7 @@ theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L
 
 
 theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐ[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
-  unfold ValAlgEquiv.truncatedLowerIndex at h
+  unfold AlgEquiv.truncatedLowerIndex at h
   by_cases hs : i_[L/K] s = ⊤
   · simp [hs] at h
     --maybe there is a better way
@@ -319,7 +245,7 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
   constructor
   apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
   rintro hs
-  unfold ValAlgEquiv.truncatedLowerIndex
+  unfold AlgEquiv.truncatedLowerIndex
   by_cases hc : i_[L/K] s = ⊤
   · simp [hc]
     linarith [h]
@@ -331,10 +257,10 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
 
 
 @[simp]
-theorem lowerIndex_restrictScalars (s : L ≃ₐ[K'] L) : i_[L/K] (s.restrictScalars K) =  i_[L/K'] s := rfl
+theorem lowerIndex_restrictScalars (s : S ≃ₐ[R'] S) : i_[S/R] (s.restrictScalars R) =  i_[S/R'] s := rfl
 
 @[simp]
-theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : L ≃ₐ[K'] L) : i_[L/K]ₜ u (s.restrictScalars K) = i_[L/K']ₜ u s := rfl
+theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : S ≃ₐ[R'] S) : i_[S/R]ₜ u (s.restrictScalars R) = i_[S/R']ₜ u s := rfl
 
 @[simp]
-theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(L/K)_[u].comap (AlgEquiv.restrictScalarsHom K) = G(L/K')_[u] := rfl
+theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(S/R)_[u].comap (AlgEquiv.restrictScalarsHom R) = G(S/R')_[u] := rfl
