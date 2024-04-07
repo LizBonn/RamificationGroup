@@ -45,7 +45,7 @@ end Preorder
 @[reducible]
 def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : ValuationSubring K := (Valued.v).valuationSubring
 
-scoped notation:max " 𝒪[" K:max "] " => Valued.valuationSubring K
+scoped notation:max "𝒪[" K:max "]" => Valued.valuationSubring K
 
 /-
 
@@ -95,7 +95,7 @@ end IntegerValued
 @[reducible]
 def maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
 
-scoped notation:max " 𝓂[" K:max "] " => maximalIdeal K
+scoped notation:max "𝓂[" K:max "]" => maximalIdeal K
 
 /-
 theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : 𝓂[K] = (Valued.v).ltIdeal 1 := sorry
@@ -105,7 +105,7 @@ theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrder
 @[reducible]
 def ResidueField (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] := LocalRing.ResidueField (𝒪[K])
 
-scoped notation:max " 𝓀[" K:max "] " => ResidueField K
+scoped notation:max "𝓀[" K:max "]" => ResidueField K
 
 /- -- is this needed?
 instance valuationSubring.coeResidueField {K : Type*} {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Field K] [Valued K Γ] : Coe 𝒪[K] 𝓀[K] where

@@ -3,7 +3,7 @@ use approximation lemma
 normalize to `integer` or `valuationSubring`?
 -/
 
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Hom.ValExtension
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import RamificationGroup.Valuation.Discrete
 
@@ -178,26 +178,26 @@ end value_ext
 
 end DiscreteValuation
 
-namespace ValAlgEquiv
-
-open DiscreteValuation
+namespace DiscreteValuation
 
 variable [CompleteSpace K] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀]
-variable [ValAlgebra K L] [FiniteDimensional K L]
+variable [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
 
-theorem algEnd_preserve_val (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := by
+theorem algHom_preserve_val_of_complete (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := by
   apply unique_val_of_ext (K := K)
-  · apply ValAlgebra.val_isEquiv_comap
+  · apply IsValExtension.val_isEquiv_comap
   · rw [Valuation.isEquiv_iff_val_le_one]
     simp only [comap_apply, RingHom.coe_coe, AlgHom.commutes]
     intro x
     rw [← Valuation.comap_apply (algebraMap K L)]
     revert x
     rw [← Valuation.isEquiv_iff_val_le_one]
-    apply ValAlgebra.val_isEquiv_comap
+    apply IsValExtension.val_isEquiv_comap
 
-theorem algEquiv_preserve_val (f : L ≃ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := algEnd_preserve_val f.toAlgHom
+theorem algEquiv_preserve_val_of_complete (f : L ≃ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := algHom_preserve_val_of_complete f.toAlgHom
 
+/-
+-- `should be changed into G_-1 = Top, into a later file`
 variable (K L) in
 def fromAlgEquiv : (L ≃ₐ[K] L) →* (L ≃ₐv[K] L) where
   toFun := fun f ↦ mk' f <| algEquiv_preserve_val f
@@ -211,5 +211,6 @@ def equivAlgEquiv : (L ≃ₐ[K] L) ≃* (L ≃ₐv[K] L) := {
   left_inv := sorry
   right_inv := sorry
 }
+-/
 
-end ValAlgEquiv
+end DiscreteValuation

@@ -1,35 +1,137 @@
-import RamificationGroup.Valued.Hom.Lift
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Hom.ValExtension
 import Mathlib.FieldTheory.Galois
 
-open DiscreteValuation Valued Valuation ValAlgEquiv
+open DiscreteValuation Valued Valuation
 
+/-
+section preparation
+
+namespace RingHom
+
+variable {R : Type*} {ΓR : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero ΓR] {v : Valuation R ΓR}
+
+def liftValuationInteger {f : R →+* R} (hf : ∀ x : v.integer, v (f x - x) ≤ 1) : v.integer →+* v.integer where
+  toFun r := {
+    val := f r
+    property := by
+      calc
+        v (f r) = v (f r - r + r) := by
+          congr
+          simp
+        _ ≤ max (v (f r - r)) (v (r : R)) := Valuation.map_add _ _ _
+        _ ≤ 1 := max_le (hf r) r.2
+  }
+  map_one' := by
+    ext
+    simp
+  map_mul' _ _ := by
+    ext
+    simp
+  map_zero' := by
+    ext
+    simp
+  map_add' _ _ := by
+    ext
+    simp
+
+end RingHom
+
+variable {R : Type*} {ΓR : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero ΓR] (v : Valuation R ΓR)
+
+variable {K : Type*} {ΓK : outParam Type*} [Field K] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
+
+theorem Valuation.integer.val_symm_sub_le_one {s : R ≃+* R} (hs : ∀ x : v.integer, v (s x - x) ≤ 1) (r : v.integer): v (s.symm r - r) ≤ 1 := by
+  calc
+    _ = v (s (s.symm r) - s.symm r) := by
+      rw [← Valuation.map_neg]
+      congr 1
+      simp
+    _ ≤ 1 := hs (s.symm r)
+
+namespace RingEquiv
+
+-- 1 = .coe (.ofAdd 0)
+def liftValuationInteger {s : R ≃+* R} (hs : ∀ x : v.integer, v (s x - x) ≤ 1) : v.integer ≃+* v.integer := {
+  s.toRingHom.liftValuationInteger hs with
+  invFun := _
+  left_inv := _
+  right_inv := _
+}
+  -- {
+  --   (s : R →+* R).liftValuationInteger with
+  --   invFun := sorry
+  -- }
+
+def liftValuedValuationSubring {s : K ≃+* K} (hs : ∀ x : vK.v.integer, Valued.v (s x - x) ≤ 1) : 𝒪[K] ≃+* 𝒪[K] := sorry
+
+end RingEquiv
+
+end preparation
+-/
+
+section DecompositionGroup
+
+variable (R S : Type*) {ΓS : outParam Type*} [CommRing R] [Ring S]
+[LinearOrderedCommGroupWithZero ΓS] [vS : Valued S ΓS] [Algebra R S]
+
+variable {S} in
+theorem Valuation.IsEquiv_comap_symm {s : S ≃+* S} (h : vS.v.IsEquiv (vS.v.comap s)) : vS.v.IsEquiv (vS.v.comap s.symm) := by
+  intro x y
+  convert (h (s.symm x) (s.symm y)).symm using 2 <;>
+  simp
+
+def Valued.decompositionGroup : Subgroup (S ≃ₐ[R] S) where
+  carrier := {s | vS.v.IsEquiv <| vS.v.comap s}
+  mul_mem' {s} {s'} hs hs' x y := by
+    calc
+      _ ↔ (vS.v.comap s' x) ≤ (vS.v.comap s') y := hs' x y
+      _ ↔ _ := hs _ _
+  one_mem' := by
+    apply Valuation.IsEquiv.refl
+  inv_mem' {_} {h} := by
+    apply Valuation.IsEquiv_comap_symm
+    exact h
+
+end DecompositionGroup
+
+-- <-1 decomposition group
+-- >= -1 decompositiongroup and v (s x - x) ≤ 1
 section
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
--- for valued
-theorem one_lift_refl : (1 : S ≃ₐv[R] S).liftInteger = .refl := rfl
+variable (K L : Type*) {ΓL : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ℤₘ₀] [Algebra K L]
 
-def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐv[R] S) where
-    carrier := {s | ∀ x : vS.v.integer, Valued.v (s.liftInteger x - x) ≤ .coe (.ofAdd (- i - 1))}
+-- -- 1 = .coe (.ofAdd 0)
+-- def AlgEquiv.liftValuedInteger {s : S ≃ₐ[R] S} (hs : ∀ x : vS.v.integer, Valued.v (s x - x) ≤ 1) : vS.v.integer ≃+* vS.v.integer := sorry
+
+-- def AlgEquiv.liftValuationSubring {s : L ≃ₐ[K] L} (hs : ∀ x : vL.v.integer, Valued.v (s x - x) ≤ 1) : 𝒪[L] ≃+* 𝒪[L] := sorry
+
+-- -- for valued
+-- theorem one_lift_refl : (1 : S ≃ₐv[R] S).liftInteger = .refl := rfl
+
+def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
+    carrier := {s | s ∈ decompositionGroup R S ∧ ∀ x : vS.v.integer, Valued.v (s x - x) ≤ .coe (.ofAdd (- i - 1))}
     mul_mem' {a} {b} ha hb := by
-      intro x
-      calc
-      _ = v (a (b x) - x) := rfl
-      _ = v ((a (b x) - b x) + (b x - x)) := by congr; simp
-      _ ≤ max (v (a (b x) - b x)) (v (b x - x)) := Valuation.map_add _ _ _
-      _ ≤ max (.coe (.ofAdd (- i - 1))) (.coe (.ofAdd (- i - 1))) := by
-        apply max_le_max
-        exact ha (b.liftInteger x)
-        exact hb x
-      _ = _ := max_self _
+      constructor
+      · exact mul_mem ha.1 hb.1
+      · intro x
+        calc
+          _ = v (a (b x) - x) := rfl
+          _ = v ((a (b x) - b x) + (b x - x)) := by congr; simp
+          _ ≤ max (v (a (b x) - b x)) (v (b x - x)) := Valuation.map_add _ _ _
+          _ ≤ max (.coe (.ofAdd (- i - 1))) (.coe (.ofAdd (- i - 1))) := by
+            apply max_le_max
+            · exact ha.2 ⟨b x, (val_map_le_one_iff hb.1 x).mpr x.2⟩
+            · exact hb.2 x
+          _ = _ := max_self _
     one_mem' := by
-      simp only [ValAlgEquiv.one_def, integer_val_coe, AddSubgroupClass.coe_sub, ofAdd_sub,
-        ofAdd_neg, Subtype.forall, Set.mem_setOf_eq]
-      rintro a b
-      simp
-    inv_mem' := by
+      constructor
+      · exact one_mem _
+      · simp
+    inv_mem' {s} hs := by
+      constructor
+      · exact inv_mem hs.1
       rintro s hs a
       calc
       _ = v (s⁻¹ a - a) := rfl

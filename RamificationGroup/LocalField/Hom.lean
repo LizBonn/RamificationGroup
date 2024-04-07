@@ -1,4 +1,4 @@
-import RamificationGroup.Valued.Hom.Lift
+import RamificationGroup.Valued.Hom.ValExtension
 
 /-
 uniqueness of extension of valuation and the isom between L ≃ₐ[K] L and  L ≃ₐv[K] L
@@ -14,6 +14,8 @@ theorem unique_of_valuation_extension (v₁ v₂ : Valuation L ΓL) (h₁ : v₁
 
 end
 
+-- should be changed G_[-1] = ⊤
+/-
 section
 variable [Valued K ΓK] [CompleteSpace K] [Valued L ΓL] [ValAlgebra K L]
 
@@ -25,3 +27,4 @@ def toValAlgEquiv : (L ≃ₐ[K] L) ≃* (L ≃ₐv[K] L) where
   map_mul' := _
 
 end
+-/
