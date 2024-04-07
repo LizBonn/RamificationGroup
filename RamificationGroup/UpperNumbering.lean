@@ -55,7 +55,9 @@ noncomputable def restrictNormalHom : (L ≃ₐv[K] L) →* K' ≃ₐv[K] K' whe
       _ = _ := rfl
 
 
-theorem restrictNormalHom_surjective : Function.Surjective (restrictNormalHom K' (K := K) (L := L)) := sorry
+theorem restrictNormalHom_surjective : Function.Surjective (restrictNormalHom K' (K := K) (L := L)) := by
+  rintro a
+  sorry
 
 end ValAlgEquiv
 
@@ -136,30 +138,60 @@ theorem preimage_singleton_nonempty {σ : K' ≃ₐv[K] K'} : ((ValAlgEquiv.rest
 
 noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ℚ := Finset.max' (((ValAlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐv[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
-theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ∃ s : L ≃ₐv[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := sorry
+
+#check Finset.max'_mem
+#check Finset.max'_image
+theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ∃ s : L ≃ₐv[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := by
+  simp
+  unfold truncatedJ
+  sorry
 
 variable {σ : K' ≃ₐv[K] K'}
 
 #synth Fintype ((ValAlgEquiv.restrictNormalHom K' ( L := L ))⁻¹' {σ})
 
-theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐv[K] K') : phi K' L ((truncatedJ u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by sorry
+theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐv[K] K') : phi K' L ((truncatedJ u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by
+  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ u σ
+  sorry
 
-theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := sorry
+--for ValAlgEquiv
+theorem ValAlgEquiv.resNormal_of_resScalar_eq_refl {x : L ≃ₐv[K'] L} : (ValAlgEquiv.restrictNormalHom ↥K') (ValAlgEquiv.restrictScalars K x) = ValAlgEquiv.refl := by
+  ext a
+  sorry
+
+theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
+  simp only [Subgroup.mem_map]
+  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ r σ
+  simp at s_in
+  have hs : s ∈ G(L/K)_[⌈u⌉] := by
+    apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
+    rw [hs]
+    linarith [h]
+  use s
 
 theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
-  simp only [Subgroup.mem_map]
-  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ u σ
-  simp at s_in
-  let f : (L ≃ₐv[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
-    fun x => ⟨s * (x.restrictScalars K), by
-      simp [s_in]
-      ext a
-      sorry⟩
-  have : Function.Bijective f := sorry
-  have : ∀ x : (L ≃ₐv[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
   constructor
-  sorry
-  sorry
+  · apply mem_lowerRamificationGroup_of_le_truncatedJ_sub_one
+  · --simp only [Subgroup.mem_map]
+    rintro hx
+    obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ r σ
+    simp at s_in
+    let f : (L ≃ₐv[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
+      fun x => ⟨s * (x.restrictScalars K), by
+        simp [s_in]
+        apply ValAlgEquiv.resNormal_of_resScalar_eq_refl⟩
+    have hbij : Function.Bijective f := by
+      constructor
+      · rintro a1 a2 h
+        simp [f] at h
+        sorry
+      · rintro b
+        sorry
+    have hi : ∀ x : (L ≃ₐv[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
+    have hs' : s ∈ G(L/K)_[⌈u⌉] := by
+      sorry
+    rw [← hs]
+    apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
 
 -- Lemma 5
 @[simp]
