@@ -14,9 +14,6 @@ end check
 
 namespace Valued
 
-
-/-
-
 section Preorder
 
 variable {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]
@@ -38,16 +35,14 @@ theorem zero_le (x y : R) : 0 ≤ x := sorry
 
 end Preorder
 
--/
-
 
 /-- An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]` -/
 @[reducible]
 def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : ValuationSubring K := (Valued.v).valuationSubring
 
-scoped notation:max "𝒪[" K:max "]" => Valued.valuationSubring K
+scoped notation:max " 𝒪[" K:max "] " => Valued.valuationSubring K
 
-/-
+
 
 section IntegerValued
 variable (R K : Type*) [Ring R] [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vR : Valued R Γ] [vK : Valued K Γ]
@@ -87,7 +82,6 @@ theorem integer_val_le_one (x : vR.v.integer) : Valued.v x ≤ 1 := (mem_integer
 
 end IntegerValued
 
--/
 
 -- `theorems about the relation between order and valuation?`
 
@@ -95,7 +89,7 @@ end IntegerValued
 @[reducible]
 def maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
 
-scoped notation:max "𝓂[" K:max "]" => maximalIdeal K
+scoped notation:max " 𝓂[" K:max "] " => maximalIdeal K
 
 /-
 theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : 𝓂[K] = (Valued.v).ltIdeal 1 := sorry
@@ -105,7 +99,7 @@ theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrder
 @[reducible]
 def ResidueField (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] := LocalRing.ResidueField (𝒪[K])
 
-scoped notation:max "𝓀[" K:max "]" => ResidueField K
+scoped notation:max " 𝓀[" K:max "] " => ResidueField K
 
 /- -- is this needed?
 instance valuationSubring.coeResidueField {K : Type*} {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Field K] [Valued K Γ] : Coe 𝒪[K] 𝓀[K] where

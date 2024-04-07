@@ -1,7 +1,7 @@
 import LocalClassFieldTheory.DiscreteValuationRing.Complete
 import LocalClassFieldTheory.DiscreteValuationRing.DiscreteNorm
 import RamificationGroup.ForMathlib.Henselian
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Defs
 
 
 

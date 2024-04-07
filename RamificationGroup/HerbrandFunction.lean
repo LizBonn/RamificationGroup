@@ -12,13 +12,13 @@ namespace HerbrandFunction
 section
 
 variable {G : Type*} [Group G] (H L K : Subgroup G)
-
-noncomputable def relindex' : ℚ :=
+-- `can be changed to use relindex`
+noncomputable def _root_.Subgroup.relindex' : ℚ :=
   (K.index : ℚ) / (H.index: ℚ)
 
 end
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [ValAlgebra R S]
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 
 -- scoped notation:max  " φ_[" L:max "/" K:max "]" => phi K L
@@ -545,23 +545,9 @@ theorem phi_inv_psi : ∀ a : ℚ , phi R S (psi R S a) = a := by
 open scoped Classical
 
 
-variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vS : Valued L ℤₘ₀] [ValAlgebra K L]
+variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vS : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
-instance : Fintype (L ≃ₐv[K] L) where
-  elems := by sorry
-  complete := by sorry
-
-#check Finset.sum_disjiUnion
-#check Set.PairwiseDisjoint
-#check disjiUnion
-#check Finset (Subgroup (L ≃ₐv[K] L))
-#check Finset (L ≃ₐv[K] L)
-#check Finset G(L/K)_[10]
-#check ((G(L/K)_[10] : Set (L ≃ₐv[K] L)) \ (G(L/K)_[11] : Set (L ≃ₐv[K] L))).toFinset
-#check SDiff
-#check (G(L/K)_[(-1)] : Set (L ≃ₐv[K] L)).toFinset
-
-noncomputable def G_diff (i : ℤ) : Finset (L ≃ₐv[K] L) := ((G(L/K)_[i] : Set (L ≃ₐv[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐv[K] L))).toFinset
+noncomputable def G_diff (i : ℤ) : Finset (L ≃ₐ[K] L) := ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset
 
 theorem G_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(Finset.Icc (-1) (n - 1))) (G_diff K L)) := by
   induction' n with n ih
@@ -570,10 +556,10 @@ theorem G_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(Finset.Icc (-1) (n
   sorry
   sorry
 
-theorem G_n_or_G_lt_n {n : ℤ} (x : (L ≃ₐv[K] L)) (h : x ∉ G(L/K)_[n]) : ∃ a, (-1 ≤ a ∧ a ≤ n - 1) ∧ x ∈ G_diff K L a := by
+theorem G_n_or_G_lt_n {n : ℤ} (x : (L ≃ₐ[K] L)) (h : x ∉ G(L/K)_[n]) : ∃ a, (-1 ≤ a ∧ a ≤ n - 1) ∧ x ∈ G_diff K L a := by
   sorry
 
-theorem G_split (n : ℤ) : (⊤ : Finset (L ≃ₐv[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (G_diff K L) (G_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset := by
+theorem G_split (n : ℤ) : (⊤ : Finset (L ≃ₐ[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (G_diff K L) (G_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset := by
   ext x
   constructor
   simp
@@ -584,10 +570,10 @@ theorem G_split (n : ℤ) : (⊤ : Finset (L ≃ₐv[K] L)) = (disjiUnion (Finse
   apply G_n_or_G_lt_n K L x h
   simp
 
-theorem Sum_Trunc_lower_Index_of_G_n (n : ℤ) (u : ℚ) (h : u ≤ n) : (Finset.sum (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (u + 1) * (Nat.card (G(L/K)_[n])) := by
+theorem Sum_Trunc_lower_Index_of_G_n (n : ℤ) (u : ℚ) (h : u ≤ n) : (Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (u + 1) * (Nat.card (G(L/K)_[n])) := by
   calc
-  (Finset.sum (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = Finset.sum (G(L/K)_[n] : Set (L ≃ₐv[K] L)).toFinset (fun (x : _) => u + 1) := by
-    apply sum_equiv (.refl (L ≃ₐv[K] L))
+  (Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset (fun (x : _) => u + 1) := by
+    apply sum_equiv (.refl (L ≃ₐ[K] L))
     simp
     rintro s hs
     sorry
@@ -595,10 +581,10 @@ theorem Sum_Trunc_lower_Index_of_G_n (n : ℤ) (u : ℚ) (h : u ≤ n) : (Finset
     norm_num
     ring
 
-theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Finset.sum (G_diff K L n) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (n + 1) * (Nat.card (G_diff K L n)) := by
+theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Finset.sum (G_diff K L n) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (n + 1) * (Nat.card (G_diff K L n)) := by
   calc
-  (Finset.sum (G_diff K L n) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (Finset.sum (G_diff K L n) (fun (x : _) => ((n : ℚ) + 1))) := by
-    apply sum_equiv (.refl (L ≃ₐv[K] L))
+  (Finset.sum (G_diff K L n) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (Finset.sum (G_diff K L n) (fun (x : _) => ((n : ℚ) + 1))) := by
+    apply sum_equiv (.refl (L ≃ₐ[K] L))
     simp
     rintro s hs
     sorry
@@ -606,26 +592,26 @@ theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Fin
     norm_num
     ring
 
-theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐv[K] L)) (ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
+theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
   by_cases h : u ≥ 1
   · simp [h]
-    have hsplit : (Finset.sum (⊤ : Finset (L ≃ₐv[K] L)) (ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset)) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
+    have hsplit : (Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
       calc
-      (Finset.sum (⊤ : Finset (L ≃ₐv[K] L)) (ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) ∪ (G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset)) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
+      (Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) ∪ (G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
         congr
         apply G_split
-      _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset)) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
+      _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
         have : Disjoint (disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) (toFinset ↑ G(L/K)_[⌈u⌉]) := by sorry
         apply sum_union
         apply this
-    have hsplit' : (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = Finset.sum _ fun (i : ℤ) => Finset.sum _ fun (x : _) => (ValAlgEquiv.truncatedLowerIndex K L (u + 1) x) := by
+    have hsplit' : (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = Finset.sum _ fun (i : ℤ) => Finset.sum _ fun (x : _) => (AlgEquiv.truncatedLowerIndex K L (u + 1) x) := by
       apply sum_disjiUnion
     simp at hsplit hsplit'
     rw [hsplit, hsplit']
-    have hu : (Finset.sum ((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐv[K] L)).toFinset) ((ValAlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
+    have hu : (Finset.sum ((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
       convert Sum_Trunc_lower_Index_of_G_n K L ⌈u⌉ u (by apply le_ceil)
     rw [hu]
-    have hd : Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) (fun (i : ℤ) => Finset.sum (G_diff K L i) (fun (x : _) => (ValAlgEquiv.truncatedLowerIndex K L (u + 1) x))) = Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) fun (i : ℤ) => (i + 1) * (Nat.card ((G(L/K)_[i] : Set (L ≃ₐv[K] L)) \ G(L/K)_[(i + 1)] : Set (L ≃ₐv[K] L))):= by
+    have hd : Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) (fun (i : ℤ) => Finset.sum (G_diff K L i) (fun (x : _) => (AlgEquiv.truncatedLowerIndex K L (u + 1) x))) = Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) fun (i : ℤ) => (i + 1) * (Nat.card ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))):= by
       norm_num
       apply sum_equiv (.refl ℤ)
       simp
@@ -645,7 +631,6 @@ theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * 
 
 -- scoped notation:max  " ψ_[" L:max "/" K:max "]" => psi K L
 
--- this is not useful, see theorem below
 theorem leftInverse_phi_psi : Function.LeftInverse (phi R S) (psi R S)  := sorry
 
 @[simp]
