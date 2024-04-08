@@ -73,30 +73,6 @@ variable {K' : Type*} [Field K'] [vK' : Valued K' ℤₘ₀] [Algebra K K'] [Alg
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S] (x : ℚ)
 #check Int.ceil
 
-namespace HerbrandFunction
-
--- Prop 15
-@[simp]
-theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
-  ext u
-  sorry
-
-@[simp]
-theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
-  sorry
-
---Prop 15
-@[simp]
-theorem psi_comp_of_isValExtension : (psi K' L) ∘ (psi K K') = psi K L := by
-  ext v
-  sorry
-
-@[simp]
-theorem psi_comp_of_isValExtension' (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
-  sorry
-
-end HerbrandFunction
-
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
 noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
 
@@ -125,7 +101,7 @@ noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') :
 
 #check Finset.max'_mem
 #check Finset.max'_image
-theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K') : ∃ s : L ≃ₐv[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := by
+theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := by
   simp
   unfold truncatedJ
   sorry
@@ -133,15 +109,6 @@ theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐv[K] K'
 variable {σ : K' ≃ₐ[K] K'}
 
 theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by sorry
-
-theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐv[K] K') : phi K' L ((truncatedJ u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by
-  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ u σ
-  sorry
-
---for ValAlgEquiv
-theorem ValAlgEquiv.resNormal_of_resScalar_eq_refl {x : L ≃ₐv[K'] L} : (ValAlgEquiv.restrictNormalHom ↥K') (ValAlgEquiv.restrictScalars K x) = ValAlgEquiv.refl := by
-  ext a
-  sorry
 
 theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
   simp only [Subgroup.mem_map]
@@ -160,10 +127,11 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
     rintro hx
     obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ r σ
     simp at s_in
-    let f : (L ≃ₐv[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
+    let f : (L ≃ₐ[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
       fun x => ⟨s * (x.restrictScalars K), by
         simp [s_in]
-        apply ValAlgEquiv.resNormal_of_resScalar_eq_refl⟩
+        sorry⟩
+        --apply ValAlgEquiv.resNormal_of_resScalar_eq_refl⟩
     have hbij : Function.Bijective f := by
       constructor
       · rintro a1 a2 h
@@ -171,7 +139,7 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
         sorry
       · rintro b
         sorry
-    have hi : ∀ x : (L ≃ₐv[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
+    have hi : ∀ x : (L ≃ₐ[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
     have hs' : s ∈ G(L/K)_[⌈u⌉] := by
       sorry
     rw [← hs]
@@ -197,11 +165,38 @@ theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G
     _ = G(L/K)_[⌈psi K L v⌉].map (AlgEquiv.restrictNormalHom K') := rfl
     _ = G(K'/K)_[⌈phi K' L (psi K L v)⌉] := herbrand _
     _ = G(K'/K)^[v] := by
-      rw [← psi_comp_of_isValExtension (K' := K') (L := L)]
-      simp only [Function.comp_apply, phi_psi_eq_self]
-      rfl
+      sorry
+      -- rw [← psi_comp_of_isValExtension (K' := K') (L := L)]
+      -- simp only [Function.comp_apply, phi_psi_eq_self]
+      -- rfl
 
 end
+
+namespace HerbrandFunction
+
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
+
+-- Prop 15
+@[simp]
+theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
+  ext u
+  sorry
+
+@[simp]
+theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
+  sorry
+
+--Prop 15
+@[simp]
+theorem psi_comp_of_isValExtension : (psi K' L) ∘ (psi K K') = psi K L := by
+  ext v
+  sorry
+
+@[simp]
+theorem psi_comp_of_isValExtension' (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
+  sorry
+
+end HerbrandFunction
 
 /-
 variable (K L) [Field K] [Field L] {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ℤₘ₀] [vL : Valued L ΓL] [ValAlgebra K L] {E : IntermediateField K L}
