@@ -172,31 +172,43 @@ theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G
 
 end
 
-namespace HerbrandFunction
+section ExhausiveSeperated
 
-variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
+variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
+[vS : Valued S ℤₘ₀] [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
 
--- Prop 15
-@[simp]
-theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
-  ext u
+theorem upperRamificationGroup_eq_decompositionGroup {v : ℚ} (h : v ≤ -1) :
+G(S/R)^[v] = decompositionGroup R S := by
+  simp only [upperRamificationGroup_aux]
+  rw [psi_eq_self_of_le_neg_one R S (by linarith [h])]
+  apply lowerRamificationGroup_eq_decompositionGroup
+  rw [Int.ceil_le]
+  exact_mod_cast h
+
+section
+
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L]
+
+theorem upperRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+  rw [upperRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
+
+end
+
+section
+
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀]
+
+-- this uses local fields and bichang's work, check if the condition is too strong...
+theorem exist_upperRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algebra K L] : ∃ v : ℚ, G(L/K)^[v] = ⊥ := by
+  obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
+  use ⌈phi K L u⌉
+  simp [upperRamificationGroup_aux]
   sorry
 
-@[simp]
-theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
-  sorry
 
---Prop 15
-@[simp]
-theorem psi_comp_of_isValExtension : (psi K' L) ∘ (psi K K') = psi K L := by
-  ext v
-  sorry
+end
 
-@[simp]
-theorem psi_comp_of_isValExtension' (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
-  sorry
-
-end HerbrandFunction
+end ExhausiveSeperated
 
 /-
 variable (K L) [Field K] [Field L] {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ℤₘ₀] [vL : Valued L ΓL] [ValAlgebra K L] {E : IntermediateField K L}

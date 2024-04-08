@@ -69,8 +69,7 @@ theorem Int.eq_of_ge_of_lt_add_one (a m : ℤ) (h1 : m ≤ a) (h2 : a < (m + 1))
   simp at hle
   apply ((LE.le.ge_iff_eq h1).1 hle).symm
 
-theorem phi'_eq_ceil : ∀ u : ℚ , phi' R S u = phi' R S ⌈u⌉ := by
-  rintro u
+theorem phi'_eq_ceil (u : ℚ) : phi' R S u = phi' R S ⌈u⌉ := by
   unfold phi' Index_of_G_i
   by_cases h : -1 < u
   · have hcl : ⌈u⌉ > (-1 : ℚ) := by
@@ -86,9 +85,8 @@ theorem phi'_eq_ceil : ∀ u : ℚ , phi' R S u = phi' R S ⌈u⌉ := by
     contradiction
   simp [h, hcl]
 
-theorem phi'_pos : ∀ u : ℚ , 0 < phi' R S u := by
+theorem phi'_pos (u : ℚ) : 0 < phi' R S u := by
   unfold phi' Index_of_G_i relindex' index
-  rintro u
   by_cases h : u > -1
   simp [h]
   apply div_pos_iff.2
@@ -96,8 +94,7 @@ theorem phi'_pos : ∀ u : ℚ , 0 < phi' R S u := by
   constructor <;> sorry
   simp [h]
 
-theorem phi'_neg_int_eq_one : ∀ u : ℤ , (u ≤ 0) → phi' R S u = 1 := by
-  rintro u hu
+theorem phi'_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phi' R S u = 1 := by
   unfold phi' Index_of_G_i
   by_cases hgt : (-1 : ℚ) < u
   · simp [hgt]
@@ -111,8 +108,7 @@ theorem phi'_neg_int_eq_one : ∀ u : ℤ , (u ≤ 0) → phi' R S u = 1 := by
     sorry
   simp [hgt]
 
-theorem phi_int_succ : ∀a : ℤ , (phi R S a) = (phi R S (a + 1)) - (phi' R S (a + 1)) := by
-  rintro a
+theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phi' R S (a + 1)) := by
   unfold phi
   by_cases hgeone : (1 : ℚ) ≤ a
   · have hgezero : (0 : ℚ) ≤ a := by linarith
@@ -137,7 +133,7 @@ theorem phi_int_succ : ∀a : ℤ , (phi R S a) = (phi R S (a + 1)) - (phi' R S 
     simp [hgeone, hgezero]
   simp [hgeone, hgezero]
   push_neg at *
-  ring
+  ring_nf
   apply mul_eq_mul_left_iff.2
   left
   rw [phi'_neg_int_eq_one]
@@ -147,13 +143,12 @@ theorem phi_int_succ : ∀a : ℤ , (phi R S a) = (phi R S (a + 1)) - (phi' R S 
       convert le_sub_one_iff.2 hgezero'
     linarith [hle]
   symm
-  convert phi'_neg_int_eq_one R S (1 + a) this
+  convert phi'_neg_int_eq_one R S this
   simp
   apply le_of_lt
   apply cast_lt.1 hgezero
 
-theorem phi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (phi R S a1) < (phi R S a2) := by
-  rintro a1 a2 h
+theorem phi_mono_int {a1 a2 : ℤ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) := by
   have hsub : a2 = a1 + (a2 - a1 - 1) + 1 := by ring
   rw [hsub]
   induction' a2 - a1 - 1 with n ih
@@ -175,18 +170,16 @@ theorem phi_mono_int : ∀a1 a2 : ℤ , a1 < a2 → (phi R S a1) < (phi R S a2) 
     apply phi'_pos
   sorry
 
-theorem phi_mono_int' : ∀a1 a2 : ℤ , a1 ≤ a2 → (phi R S a1) ≤ (phi R S a2) := by
-  rintro a1 a2 h
+theorem phi_mono_int' (a1 a2 : ℤ) (h : a1 ≤ a2) : (phi R S a1) ≤ (phi R S a2) := by
   by_cases heq : a1 = a2
   simp [heq]
   apply le_of_lt
   push_neg at *
   have hlt : a1 < a2 := by apply lt_of_le_of_ne h heq
-  apply phi_mono_int R S a1 a2 hlt
+  apply phi_mono_int R S hlt
 
 --i'll change this name
-theorem phi_rational_floor : ∀ a : ℚ , (phi R S a) = (phi R S ⌊a⌋) + ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (a - ⌊a⌋) := by
-  rintro a
+theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (a - ⌊a⌋) := by
   unfold phi
   by_cases ha : a ≥ 1
   · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
@@ -265,8 +258,7 @@ theorem phi_rational_floor : ∀ a : ℚ , (phi R S a) = (phi R S ⌊a⌋) + ((p
   sorry
 
 
-theorem phi_rational_ceil : ∀ a : ℚ , (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
-  rintro a
+theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
   unfold phi
   by_cases ha : (1 : ℚ) ≤ a
   · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
@@ -297,7 +289,7 @@ theorem phi_rational_ceil : ∀ a : ℚ , (phi R S a) = (phi R S (⌊a⌋ + 1)) 
         have hcl'' : ⌈a⌉ = ⌊a⌋ + 1:= by
           apply ceil_eq_floor_add_one_iff a hfl''
         sorry
-      ring
+      ring_nf
       nth_rw 3 [phi'_eq_ceil]
       unfold fract
       have heq : phi' R S (1 + ⌊a⌋) = phi' R S ⌈a⌉ := by
@@ -339,7 +331,7 @@ theorem phi_rational_ceil : ∀ a : ℚ , (phi R S a) = (phi R S (⌊a⌋ + 1)) 
         rw [this]
         simp [hfl']
       rw [hcl']
-    ring
+    ring_nf
     simp [h]
   simp [ha, hcl, hfl]
   push_neg at *
@@ -355,7 +347,7 @@ theorem phi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (phi R S a) > (phi R S 
   left
   constructor
   simp
-  convert phi_mono_int R S ⌊a⌋ (⌊a⌋ + 1) (by simp)
+  convert phi_mono_int R S (show ⌊a⌋ < ⌊a⌋ + 1 by linarith)
   simp
   apply fract_pos.2 ha
 
@@ -369,7 +361,7 @@ theorem phi_lt_ceil : ∀ a : ℚ , (phi R S a) < (phi R S (⌊a⌋ + 1)) := by
   left
   constructor
   simp
-  convert phi_mono_int R S ⌊a⌋ (⌊a⌋ + 1) (by simp)
+  convert phi_mono_int R S (show ⌊a⌋ < ⌊a⌋ + 1 by linarith)
   simp
   have h : a - 1 < ⌊a⌋ := by apply sub_one_lt_floor
   linarith [h]
@@ -398,7 +390,7 @@ theorem phi_mono_in_section : ∀ a1 a2 : ℚ , (⌊a1⌋ = ⌊a2⌋) ∧ (a1 < 
   left
   constructor
   simp
-  convert phi_mono_int R S ⌊a2⌋ (⌊a2⌋ + 1) (by simp)
+  convert phi_mono_int R S (show ⌊a2⌋ < ⌊a2⌋ + 1 by linarith)
   simp
   simp [h2]
 
@@ -474,9 +466,9 @@ theorem phi_mono_over_section : ∀ a1 a2 : ℚ , (⌊a1⌋ ≠ ⌊a2⌋) ∧ (a
 
 theorem phi_mono_iff : (∀a1 a2 : ℚ , a1 < a2 → (phi R S a1) < (phi R S a2)) ↔ (∀a1 a2 : ℤ , a1 < a2 → (phi R S a1) < (phi R S a2)) := by
   constructor
-  rintro h a1 a2
-  apply phi_mono_int R S a1 a2
-  rintro h a1 a2 h'
+  rintro _ a1 a2
+  apply phi_mono_int R S
+  rintro _ a1 a2 h'
   by_cases hfloor : ⌊a1⌋ = ⌊a2⌋
   apply phi_mono_in_section
   constructor <;> assumption
@@ -484,7 +476,8 @@ theorem phi_mono_iff : (∀a1 a2 : ℚ , a1 < a2 → (phi R S a1) < (phi R S a2)
   apply phi_mono_over_section
   constructor <;> assumption
 
-theorem phi_mono : ∀a1 a2 : ℚ , a1 < a2 → (phi R S a1) < (phi R S a2) := by
+theorem phi_mono {a1 a2 : ℚ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) := by
+  revert a1 a2
   apply (phi_mono_iff R S).2
   apply phi_mono_int
 
@@ -637,5 +630,9 @@ theorem leftInverse_phi_psi : Function.LeftInverse (phi R S) (psi R S)  := sorry
 theorem phi_psi_eq_self (u : ℚ) : (phi R S) ((psi R S) u) = u := leftInverse_phi_psi R S u
 
 theorem phi_strictMono : StrictMono (phi R S) := sorry
+
+theorem phi_eq_self_of_le_neg_one {u : ℚ} (hu : u ≤ 0) : phi R S u = u := sorry
+
+theorem psi_eq_self_of_le_neg_one {v : ℚ} (hv : v ≤ 0) : psi R S v = v := sorry
 
 end HerbrandFunction
