@@ -172,6 +172,32 @@ theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G
 
 end
 
+namespace HerbrandFunction
+
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
+
+-- Prop 15
+@[simp]
+theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
+  ext u
+  sorry
+
+@[simp]
+theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
+  sorry
+
+--Prop 15
+@[simp]
+theorem psi_comp_of_isValExtension : (psi K' L) ∘ (psi K K') = psi K L := by
+  ext v
+  sorry
+
+@[simp]
+theorem psi_comp_of_isValExtension' (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
+  sorry
+
+end HerbrandFunction
+
 section ExhausiveSeperated
 
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
