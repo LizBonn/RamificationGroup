@@ -283,19 +283,29 @@ noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
   (upperRamificationGroup_aux K (F : IntermediateField K L) v).comap (AlgEquiv.restrictNormalHom F))
 
 #check upperRamificationGroup
-
+-- this is easier to use
 noncomputable def upperRamificationGroup' (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
   carrier := {s | ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ upperRamificationGroup_aux K F v}
-  mul_mem' {s} {s'} hs hs' := by
-    intro F _ _
-    -- erw [AlgEquiv.restrictNormal_trans s' s F]
+  mul_mem' {s} {s'} hs hs' F _ _ := by
+    rw [show (s * s').restrictNormal F = s.restrictNormal F * s'.restrictNormal F by exact (AlgEquiv.restrictNormalHom F).map_mul s s']
     exact Subgroup.mul_mem (upperRamificationGroup_aux K F v) (hs F) (hs' F)
-  one_mem' := by
-    intro F _ _
-    rw [show AlgEquiv.restrictNormal F 1 = (1 : F ≃ₐ[K] F) by exact (AlgEquiv.restrictNormalHom F).map_one]
+  one_mem' F _ _ := by
+    rw [show AlgEquiv.restrictNormal 1 F = (1 : F ≃ₐ[K] F) by exact (AlgEquiv.restrictNormalHom F).map_one]
     exact Subgroup.one_mem (upperRamificationGroup_aux K F v)
-  inv_mem' := sorry
+  inv_mem' {s} hs F _ _ := by
+    rw [show AlgEquiv.restrictNormal s⁻¹ F = (AlgEquiv.restrictNormal s F)⁻¹ by exact (AlgEquiv.restrictNormalHom F).map_inv s]
+    exact Subgroup.inv_mem (upperRamificationGroup_aux K F v) (hs F)
+
+#check upperRamificationGroup'
+
+-- theorem relation with aux
+
+-- theorem compatible with quotient, finite quotient
+
+-- theorem exhausive and separated
+
+-- theorem relation with Krull topology
 
 end upperRamificationGroup
 
