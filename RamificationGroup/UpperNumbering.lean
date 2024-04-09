@@ -101,18 +101,24 @@ noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') :
 
 #check Finset.max'_mem
 #check Finset.max'_image
-theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  ValAlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ u σ := by
+theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (AlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  AlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ L u σ := by
   simp
   unfold truncatedJ
   sorry
 
+
 variable {σ : K' ≃ₐ[K] K'}
+
+#check exist_truncatedLowerIndex_eq_truncatedJ 1 σ
 
 theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by sorry
 
-theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
+#check FiniteDimensional K L
+#check FiniteDimensional K K'
+
+theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ L r σ - 1) : σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
   simp only [Subgroup.mem_map]
-  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ r σ
+  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ (L := L) r σ
   simp at s_in
   have hs : s ∈ G(L/K)_[⌈u⌉] := by
     apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
@@ -120,14 +126,14 @@ theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u �
     linarith [h]
   use s
 
-theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (ValAlgEquiv.restrictNormalHom K')) := by
+theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ L r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
   constructor
   · apply mem_lowerRamificationGroup_of_le_truncatedJ_sub_one
   · --simp only [Subgroup.mem_map]
     rintro hx
-    obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ r σ
+    obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ (L := L) r σ
     simp at s_in
-    let f : (L ≃ₐ[K'] L) → (ValAlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
+    let f : (L ≃ₐ[K'] L) → (AlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
       fun x => ⟨s * (x.restrictScalars K), by
         simp [s_in]
         sorry⟩
@@ -139,18 +145,21 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
         sorry
       · rintro b
         sorry
-    have hi : ∀ x : (L ≃ₐ[K'] L), ValAlgEquiv.truncatedLowerIndex K' L u x = ValAlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
+    have hi : ∀ x : (L ≃ₐ[K'] L), AlgEquiv.truncatedLowerIndex K' L u x = AlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
     have hs' : s ∈ G(L/K)_[⌈u⌉] := by
       sorry
-    rw [← hs]
-    apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
+    sorry
+    --rw [← hs]
+    --apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
 
 -- Lemma 5
 @[simp]
 theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
   ext σ
   calc
-  _ ↔ truncatedJ L (u + 1) σ - 1 ≥ u := (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
+  _ ↔ truncatedJ L (u + 1) σ - 1 ≥ u :=
+  sorry
+  --(le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
   _ ↔ phi K' L (truncatedJ L (u + 1) σ - 1) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
   _ ↔ σ.truncatedLowerIndex K K' ((phi K' L u) + 1) - 1 ≥ phi K' L u := by
     simp [phi_truncatedJ_sub_one]
