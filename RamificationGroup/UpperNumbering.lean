@@ -297,7 +297,7 @@ theorem inf_eq_bot (s : L ≃ₐ[K] L) : ∀ v, s ∈ G(L/K)^[v] ↔ s = 1 := so
 -- this theorem dont need so much hyp
 theorem isOpen {v : ℚ} : IsOpen (G(L/K)^[v] : Set (L ≃ₐ[K] L)) := sorry
 
--- should add `galNormalBasis` to Mathlib first
+-- should add `galNormalBasis` to Mathlib first, maybe just leave it later
 def basis : GroupFilterBasis (L ≃ₐ[K] L) := sorry
 
 
