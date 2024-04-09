@@ -4,6 +4,12 @@ import Mathlib.FieldTheory.KrullTopology
 import RamificationGroup.HerbrandFunction
 import RamificationGroup.Valued.Hom.Discrete'
 
+/-!
+
+## TODO
+rename theorems into UpperRamificationGroup.xxx
+-/
+
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation
 open HerbrandFunction
 
@@ -63,7 +69,7 @@ end ValAlgEquiv
 
 -/
 
-section
+section upperRamificationGroup_aux
 
 -- principle : first try to state a theorem in IsScalarTower, then try IntermediateField
 variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vL : Valued L ℤₘ₀] [Algebra K L]
@@ -78,7 +84,7 @@ noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S
 
 scoped [Valued] notation:max " G(" L:max "/" K:max ")^[" u:max "] " => upperRamificationGroup_aux K L u
 
-end
+end upperRamificationGroup_aux
 
 section
 
@@ -244,6 +250,56 @@ theorem exist_upperRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algeb
 end
 
 end ExhausiveSeperated
+
+section upperRamificationGroup
+-- need a set up that every intermidiate field has a valued instance. in the cdvf case, this is possible.
+
+-- Is this instance ok? it is possible to avoid instance and always use def, but I do think a scoped instance make statements much easier.
+
+namespace DiscreteValuation
+
+variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] {K' : IntermediateField K L} [FiniteDimensional K K']
+
+noncomputable instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
+
+/- -- success
+#synth IsDiscrete (valuedIntermediateField.v : Valuation K' _)
+-/
+
+-- this is needed, or #synth CompleteSpace K' fails
+instance (priority := 100) : CompleteSpace K' := DiscreteValuation.Extension.completeSpace K K'
+
+end DiscreteValuation
+
+variable (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K]
+
+variable {F : IntermediateField K L} [FiniteDimensional K F]
+#synth Valued F ℤₘ₀
+
+noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
+  iInf (fun F : {K' : IntermediateField K L // Normal K K' ∧ FiniteDimensional K K'} =>
+  letI : Normal K F := F.property.1
+  letI : FiniteDimensional K F := F.property.2
+  (upperRamificationGroup_aux K (F : IntermediateField K L) v).comap (AlgEquiv.restrictNormalHom F))
+
+#check upperRamificationGroup
+
+noncomputable def upperRamificationGroup' (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
+  carrier := {s | ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
+      s.restrictNormal F ∈ upperRamificationGroup_aux K F v}
+  mul_mem' {s} {s'} hs hs' := by
+    intro F _ _
+    -- erw [AlgEquiv.restrictNormal_trans s' s F]
+    exact Subgroup.mul_mem (upperRamificationGroup_aux K F v) (hs F) (hs' F)
+  one_mem' := by
+    intro F _ _
+    rw [show AlgEquiv.restrictNormal F 1 = (1 : F ≃ₐ[K] F) by exact (AlgEquiv.restrictNormalHom F).map_one]
+    exact Subgroup.one_mem (upperRamificationGroup_aux K F v)
+  inv_mem' := sorry
+
+end upperRamificationGroup
+
+
 
 /-
 variable (K L) [Field K] [Field L] {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ℤₘ₀] [vL : Valued L ΓL] [ValAlgebra K L] {E : IntermediateField K L}
