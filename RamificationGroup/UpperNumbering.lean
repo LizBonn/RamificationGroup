@@ -13,61 +13,6 @@ rename theorems into UpperRamificationGroup.xxx
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation
 open HerbrandFunction
 
-/-
-namespace ValAlgEquiv
-#check AlgEquiv.restrictNormalHom
-variable {K L} (K') {ΓK ΓK' ΓL : outParam Type*} [Field K] [Field K'] [Field L]
-[LinearOrderedCommGroupWithZero ΓK]
-[LinearOrderedCommGroupWithZero ΓK']
-[LinearOrderedCommGroupWithZero ΓL]
-[vK : Valued K ΓK] [vK' : Valued K' ΓK'] [vL : Valued L ΓL]
-[Algebra K K'] [Algebra K L] [Algebra K' L] [IsScalarTower K K' L] [Normal K K']
--- change this using IsScalatower
-open algebraMap
-
-theorem restrictNormalHom.val_isEquiv_comap_aux (f : (L ≃ₐ[K] L)): vK'.v.IsEquiv (vK'.v.comap (AlgEquiv.restrictNormalHom K' (f : L ≃ₐ[K] L)))  := by
-  intro x y
-  convert f.val_isEquiv_comap' (x : L) (y : L)
-  simp only [ValAlgebra.val_map_le_iff]
-  dsimp
-  rw [← ValAlgebra.val_map_le_iff (A := L), iff_eq_eq]
-  congr <;>
-  calc
-    _ = f _ := AlgEquiv.restrictNormal_commutes (f : L ≃ₐ[K] L) K' _
-    _ = _ := rfl
-
-noncomputable def restrictNormalHom : (L ≃ₐv[K] L) →* K' ≃ₐv[K] K' where
-  toFun f :=
-    {
-      AlgEquiv.restrictNormalHom K' (f : L ≃ₐ[K] L) with
-      val_isEquiv_comap' := restrictNormalHom.val_isEquiv_comap_aux K' f
-      map_le_map_iff' := map_le_map_iff_of_val_isEquiv_comap (restrictNormalHom.val_isEquiv_comap_aux K' f)
-      continuous_toFun := sorry
-      continuous_invFun := sorry
-    }
-  map_one' := by
-    ext a
-    calc
-      _ = ((AlgEquiv.restrictNormalHom K') (.refl : L ≃ₐ[K] L)) a := rfl
-      _ = _ := by
-        erw [_root_.map_one]
-        rfl
-  map_mul' s s' := by
-    ext a
-    calc
-      _ = (AlgEquiv.restrictNormalHom K' (s * s' : L ≃ₐ[K] L)) a := rfl
-      _ = ((AlgEquiv.restrictNormalHom K' (s : L ≃ₐ[K] L)) * (AlgEquiv.restrictNormalHom K' (s' : L ≃ₐ[K] L))) a := by
-        erw [_root_.map_mul]
-      _ = _ := rfl
-
-
-theorem restrictNormalHom_surjective : Function.Surjective (restrictNormalHom K' (K := K) (L := L)) := by
-  rintro a
-  sorry
-
-end ValAlgEquiv
-
--/
 
 section upperRamificationGroup_aux
 
@@ -82,9 +27,7 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
 noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
 
-scoped [Valued] notation:max " G(" L:max "/" K:max ")^[" u:max "] " => upperRamificationGroup_aux K L u
-
-end upperRamificationGroup_aux
+local notation:max " G(" L:max "/" K:max ")^[" v:max "] " => upperRamificationGroup_aux K L v
 
 section
 
@@ -251,6 +194,8 @@ end
 
 end ExhausiveSeperated
 
+end upperRamificationGroup_aux
+
 section upperRamificationGroup
 -- need a set up that every intermidiate field has a valued instance. in the cdvf case, this is possible.
 
@@ -299,6 +244,8 @@ noncomputable def upperRamificationGroup' (v : ℚ) : Subgroup (L ≃ₐ[K] L) w
 
 #check upperRamificationGroup'
 
+scoped [Valued] notation:max " G(" L:max "/" K:max ")^[" v:max "] " => upperRamificationGroup' K L v
+
 -- theorem relation with aux
 
 -- theorem compatible with quotient, finite quotient
@@ -308,37 +255,3 @@ noncomputable def upperRamificationGroup' (v : ℚ) : Subgroup (L ≃ₐ[K] L) w
 -- theorem relation with Krull topology
 
 end upperRamificationGroup
-
-
-
-/-
-variable (K L) [Field K] [Field L] {ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ℤₘ₀] [vL : Valued L ΓL] [ValAlgebra K L] {E : IntermediateField K L}
-
-variable {K L} in
-def discreteValuedOfFinite : Valued E ℤₘ₀ := sorry
-
-variable {K L} in
-def valAlgebraOfFinite : ValAlgebra K (A := E) (vA := discreteValuedOfFinite) := sorry
-variable {K L} in
-def valAlgebraOfFinite' : ValAlgebra (R := E) L (vR := discreteValuedOfFinite) := sorry
-
-def upperRamificationGroup (v : ℚ): (Subgroup (L ≃ₐv[K] L)) where
-  carrier := { s | ∀ E ∈ finiteExts K L,
-    letI : Valued E ℤₘ₀ := discreteValuedOfFinite;
-    letI : ValAlgebra K E := valAlgebraOfFinite
-    letI : ValAlgebra E L := valAlgebraOfFinite'
-    Normal K E → (ValAlgEquiv.restrictNormalHom (K' := E) s ∈ G(E/K)^[v]) }
-  mul_mem' := sorry
-  one_mem' := sorry
-  inv_mem' := sorry
-
-/-
-theorem upperRamificationGroup compatible with quotient
-
-theorem upperRamificationGroup = upperRamificationGroup_aux in finite case
-
--/
-
-#check finiteExts
-#check fixedByFinite
--/
