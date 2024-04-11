@@ -93,6 +93,8 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
       _ ≤ _ := hs.2 ⟨s⁻¹ a, (val_map_le_one_iff (f := (s.symm : S →+* S))
         (Valuation.IsEquiv_comap_symm hs.1) a.1).mpr a.2⟩
 
+scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
+
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
   rintro a b hab
   simp only [lowerRamificationGroup, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mk_le_mk,
@@ -143,15 +145,13 @@ end WithBot
 
 section lowerIndex
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
+variable (R S : Type*) [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 open Classical
 -- 0 if lower than 0
 noncomputable def AlgEquiv.lowerIndex (s : S ≃ₐ[R] S) : ℕ∞ :=
   if h : iSup (fun x : vS.v.integer => (Valued.v (s x - x))) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
-
-scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
 
 scoped [Valued] notation:max " i_[" S:max "/" R:max "]" => AlgEquiv.lowerIndex R S
 

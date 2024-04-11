@@ -9,14 +9,14 @@ open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators I
 
 namespace HerbrandFunction
 
-section
+-- section
 
-variable {G : Type*} [Group G] (H L K : Subgroup G)
--- `can be changed to use relindex`
-noncomputable def _root_.Subgroup.relindex' : ℚ :=
-  (K.index : ℚ) / (H.index: ℚ)
+-- variable {G : Type*} [Group G] (H L K : Subgroup G)
+-- -- `can be changed to use relindex`
+-- noncomputable def _root_.Subgroup.relindex' : ℚ :=
+--   (K.index : ℚ) / (H.index: ℚ)
 
-end
+-- end
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
