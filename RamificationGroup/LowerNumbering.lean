@@ -304,7 +304,7 @@ section
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀]
 
--- this uses local fields and bichang's work, check if the condition is too strong...
+-- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algebra K L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
 
 end
