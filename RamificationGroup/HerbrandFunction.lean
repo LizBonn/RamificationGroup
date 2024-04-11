@@ -151,7 +151,7 @@ theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phiDeriv R S
   apply cast_lt.1 hgezero
 
 theorem phi_eq_self_of_le_neg_one {u : ℚ} (hu : u ≤ 0) : phi R S u = u := by
-  unfold phi phi' Index_of_G_i relindex'
+  unfold phi phiDeriv Index_of_G_i relindex
   have hu' : ¬u ≥ 1 := by linarith [hu]
   simp [hu']
   by_cases hu' : -1 < u
@@ -160,7 +160,6 @@ theorem phi_eq_self_of_le_neg_one {u : ℚ} (hu : u ≤ 0) : phi R S u = u := by
       apply ceil_eq_iff.2
       constructor
       simp [hu']; simp [hu]
-    simp [hu'']
     sorry
 
 theorem phi_mono_int {a1 a2 : ℤ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) := by
@@ -273,7 +272,14 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
   push_neg at *
   have ha' : a < 0 := by sorry
   rw [phi_eq_self_of_le_neg_one R S (by linarith [ha']), phi_eq_self_of_le_neg_one R S (by linarith [hzero])]
+  unfold phi
+  have hzero' : ⌊a⌋ + 1 < 1 := by sorry
+  have hzero'' : ¬0 ≤ ⌊a⌋ := by sorry
+  simp [hzero', hzero'']
+  unfold fract
   sorry
+
+
 
 theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
   by_cases ha : (1 : ℚ) ≤ a
@@ -352,10 +358,11 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
     ring_nf
     simp [h]
   push_neg at *
-  have hcl' : ⌊a⌋ < 0 := by sorry
+  have hcl' : (⌊a⌋ : ℚ) ≤ 0 := by sorry
   have ha' : a < 0 := by sorry
-  simp [phi_eq_self_of_le_neg_one R S (by linarith [ha']), phi_eq_self_of_le_neg_one R S (by linarith [hcl'])]
+  simp [phi_eq_self_of_le_neg_one R S (by linarith [ha']), phi_eq_self_of_le_neg_one R S hcl']
   sorry
+
 
 theorem phi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (phi R S a) > (phi R S ⌊a⌋) := by
   rintro a ha
