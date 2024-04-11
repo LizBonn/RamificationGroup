@@ -25,18 +25,18 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
   if u > (-1) then
-    relindex' G(S/R)_[0] G(S/R)_[(Int.ceil u)]
+    relindex G(S/R)_[0] G(S/R)_[(Int.ceil u)]
   else
     1
 
-noncomputable def phi' (u : ℚ) : ℚ :=
+noncomputable def phiDeriv (u : ℚ) : ℚ :=
   1 / (Index_of_G_i R S u)
 
 noncomputable def phi (u : ℚ) :  ℚ :=
     if u ≥ 1 then
-    ∑ x in Finset.Icc 1 (Int.floor u), (phi' R S x) + (u - (Int.floor u)) * (phi' R S u)
+    ∑ x in Finset.Icc 1 (Int.floor u), (phiDeriv R S x) + (u - (Int.floor u)) * (phiDeriv R S u)
   else
-    u * (phi' R S u)
+    u * (phiDeriv R S u)
 
 --for mathlib
 theorem sub_of_sum (a : ℤ) (f : ℚ → ℚ) (h : 1 ≤ a): ∑ x in Icc 1 (a + 1), f x - ∑ x in Icc 1 a, f x = f (a + 1) := by
@@ -69,8 +69,8 @@ theorem Int.eq_of_ge_of_lt_add_one (a m : ℤ) (h1 : m ≤ a) (h2 : a < (m + 1))
   simp at hle
   apply ((LE.le.ge_iff_eq h1).1 hle).symm
 
-theorem phi'_eq_ceil (u : ℚ) : phi' R S u = phi' R S ⌈u⌉ := by
-  unfold phi' Index_of_G_i
+theorem phiDeriv_eq_ceil (u : ℚ) : phiDeriv R S u = phiDeriv R S ⌈u⌉ := by
+  unfold phiDeriv Index_of_G_i
   by_cases h : -1 < u
   · have hcl : ⌈u⌉ > (-1 : ℚ) := by
       apply lt_of_lt_of_le
@@ -85,17 +85,19 @@ theorem phi'_eq_ceil (u : ℚ) : phi' R S u = phi' R S ⌈u⌉ := by
     contradiction
   simp [h, hcl]
 
-theorem phi'_pos (u : ℚ) : 0 < phi' R S u := by
-  unfold phi' Index_of_G_i relindex' index
+theorem phiDeriv_pos (u : ℚ) : 0 < phiDeriv R S u := by
+  unfold phiDeriv Index_of_G_i relindex index
   by_cases h : u > -1
   simp [h]
-  apply div_pos_iff.2
-  left
-  constructor <;> sorry
-  simp [h]
+  sorry
+  sorry
+  -- apply div_pos_iff.2
+  -- left
+  -- constructor <;> sorry
+  -- simp [h]
 
-theorem phi'_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phi' R S u = 1 := by
-  unfold phi' Index_of_G_i
+theorem phiDeriv_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phiDeriv R S u = 1 := by
+  unfold phiDeriv Index_of_G_i
   by_cases hgt : (-1 : ℚ) < u
   · simp [hgt]
     have hzero : 0 = u := by
@@ -108,15 +110,15 @@ theorem phi'_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phi' R S u = 1 := by
     sorry
   simp [hgt]
 
-theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phi' R S (a + 1)) := by
+theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phiDeriv R S (a + 1)) := by
   unfold phi
   by_cases hgeone : (1 : ℚ) ≤ a
   · have hgezero : (0 : ℚ) ≤ a := by linarith
     simp [hgeone, hgezero]
-    have h : ∑ x in Icc 1 (a + 1), phi' R S ↑x = phi' R S (a + 1) + ∑ x in Icc 1 a, phi' R S ↑x := by
+    have h : ∑ x in Icc 1 (a + 1), phiDeriv R S ↑x = phiDeriv R S (a + 1) + ∑ x in Icc 1 a, phiDeriv R S ↑x := by
       have hgeone' : 1 ≤ a := by apply cast_le.1 hgeone
-      have h' : ∑ x in Finset.Icc 1 (a + 1), phi' R S ↑x - ∑ x in Finset.Icc 1 a, phi' R S ↑x = phi' R S (↑a + 1) := by
-        apply sub_of_sum a (phi' R S) hgeone'
+      have h' : ∑ x in Finset.Icc 1 (a + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 a, phiDeriv R S ↑x = phiDeriv R S (↑a + 1) := by
+        apply sub_of_sum a (phiDeriv R S) hgeone'
       linarith [h']
     simp [h]
   by_cases hgezero : (0 : ℚ) ≤ a
@@ -136,14 +138,14 @@ theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phi' R S (a 
   ring_nf
   apply mul_eq_mul_left_iff.2
   left
-  rw [phi'_neg_int_eq_one]
+  rw [phiDeriv_neg_int_eq_one]
   have : (1 + a) ≤ 0 := by
     have hgezero' : a < 0 := by apply cast_lt.1 hgezero
     have hle: a ≤ 0 - 1 := by
       convert le_sub_one_iff.2 hgezero'
     linarith [hle]
   symm
-  convert phi'_neg_int_eq_one R S this
+  convert phiDeriv_neg_int_eq_one R S this
   simp
   apply le_of_lt
   apply cast_lt.1 hgezero
@@ -156,18 +158,18 @@ theorem phi_mono_int {a1 a2 : ℤ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) :
     · apply sub_lt_zero.1
       rw [phi_int_succ R S a1]
       simp
-      apply phi'_pos
+      apply phiDeriv_pos
     apply lt_trans
     apply ih
     simp
     apply sub_lt_zero.1
-    have heq : phi R S (↑a1 + ↑n + 1) = phi R S (↑a1 + (↑n + 1) + 1) - (phi' R S (a1 + n + 1 + 1)) := by
+    have heq : phi R S (↑a1 + ↑n + 1) = phi R S (↑a1 + (↑n + 1) + 1) - (phiDeriv R S (a1 + n + 1 + 1)) := by
       convert phi_int_succ R S (a1 + n + 1)
       <;>simp
       ring
     rw [heq]
     simp
-    apply phi'_pos
+    apply phiDeriv_pos
   sorry
 
 theorem phi_mono_int' (a1 a2 : ℤ) (h : a1 ≤ a2) : (phi R S a1) ≤ (phi R S a2) := by
@@ -195,10 +197,10 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
     · right
       exact hzero
     left
-    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), phi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phi' R S ↑x = phi' R S (⌊a⌋ + 1) := by
+    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phiDeriv R S ↑x = phiDeriv R S (⌊a⌋ + 1) := by
       have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
-      apply sub_of_sum ⌊a⌋ (phi' R S) hfl'
-    rw [h, phi'_eq_ceil]
+      apply sub_of_sum ⌊a⌋ (phiDeriv R S) hfl'
+    rw [h, phiDeriv_eq_ceil]
     have hflcl : ⌈a⌉ = ⌊a⌋ + 1 := by
       unfold fract at hzero
       push_neg at hzero
@@ -251,7 +253,7 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
       constructor
       apply hgtzero
       apply le_of_lt ha
-    rw [phi'_eq_ceil, hcl]
+    rw [phiDeriv_eq_ceil, hcl]
     congr
   simp [ha, hfl, hzero]
   push_neg at *
@@ -267,11 +269,11 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
     have hcl : (1 : ℚ) ≤ (⌊a⌋ + 1) := by
       linarith [hfl]
     simp [ha, hcl, hfl]
-    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), phi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phi' R S ↑x = phi' R S (⌊a⌋ + 1) := by
+    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phiDeriv R S ↑x = phiDeriv R S (⌊a⌋ + 1) := by
       have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
-      apply sub_of_sum ⌊a⌋ (phi' R S) hfl'
-    have h' :  (∑ x in Finset.Icc 1 (⌊a⌋ + 1), phi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phi' R S ↑x) - fract a * phi' R S a -
-    (∑ x in Finset.Icc 1 (⌊a⌋ + 1), phi' R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phi' R S ↑x) * (↑⌊a⌋ - a + 1) = 0 := by
+      apply sub_of_sum ⌊a⌋ (phiDeriv R S) hfl'
+    have h' :  (∑ x in Finset.Icc 1 (⌊a⌋ + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phiDeriv R S ↑x) - fract a * phiDeriv R S a -
+    (∑ x in Finset.Icc 1 (⌊a⌋ + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phiDeriv R S ↑x) * (↑⌊a⌋ - a + 1) = 0 := by
       rw [h]
       by_cases hfl' : a - ⌊a⌋ = 0
       · unfold fract
@@ -290,9 +292,9 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
           apply ceil_eq_floor_add_one_iff a hfl''
         sorry
       ring_nf
-      nth_rw 3 [phi'_eq_ceil]
+      nth_rw 3 [phiDeriv_eq_ceil]
       unfold fract
-      have heq : phi' R S (1 + ⌊a⌋) = phi' R S ⌈a⌉ := by
+      have heq : phiDeriv R S (1 + ⌊a⌋) = phiDeriv R S ⌈a⌉ := by
         rw [hcl']
         have : 1 + (⌊a⌋ : ℚ) = (⌊a⌋ : ℚ) + 1 := by ring
         rw [this]
@@ -317,9 +319,9 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
     simp [hfl']
     by_cases hzero : a = 0
     · simp [hzero]
-    have h : phi' R S a = phi' R S 1 := by
-      have h' : phi' R S a = phi' R S ⌈a⌉ := by
-        apply phi'_eq_ceil
+    have h : phiDeriv R S a = phiDeriv R S 1 := by
+      have h' : phiDeriv R S a = phiDeriv R S ⌈a⌉ := by
+        apply phiDeriv_eq_ceil
       rw [h']
       have hcl' : ⌈a⌉ = (1 : ℚ) := by
         have hnefl : a ≠ ⌊a⌋ := by
@@ -497,7 +499,7 @@ theorem phi_bij : Function.Bijective (phi R S) := by
     exact lt_of_le_of_ne h1 h
   apply ne_of_lt hlt
   rintro b
-  unfold phi phi'
+  unfold phi phiDeriv
   by_cases hb : b < 0
   sorry
   sorry
@@ -518,7 +520,7 @@ theorem phi_zero_eq_zero : phi R S 0 = 0 := by
   simp
 
 noncomputable def psi' (v : ℚ): ℚ :=
-  1 / (phi' R S (psi R S v))
+  1 / (phiDeriv R S (psi R S v))
 
 theorem psi_zero_eq_zero : psi R S 0 = 0 := by
   unfold psi
@@ -585,7 +587,7 @@ theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Fin
     norm_num
     ring
 
-theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
+theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
   by_cases h : u ≥ 1
   · simp [h]
     have hsplit : (Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
