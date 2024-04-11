@@ -5,7 +5,7 @@ import Mathlib.Logic.Function.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.Algebra.BigOperators.Basic
 
-open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators Int Valued
+open DiscreteValuation Subgroup Set Function MeasureTheory Finset BigOperators Int Valued Eq
 
 namespace HerbrandFunction
 
@@ -148,6 +148,19 @@ theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phi' R S (a 
   apply le_of_lt
   apply cast_lt.1 hgezero
 
+theorem phi_eq_self_of_le_neg_one {u : ℚ} (hu : u ≤ 0) : phi R S u = u := by
+  unfold phi phi' Index_of_G_i relindex'
+  have hu' : ¬u ≥ 1 := by linarith [hu]
+  simp [hu']
+  by_cases hu' : -1 < u
+  <;> simp [hu']
+  · have hu'' : ⌈u⌉ = 0 := by
+      apply ceil_eq_iff.2
+      constructor
+      simp [hu']; simp [hu]
+    simp [hu'']
+    sorry
+
 theorem phi_mono_int {a1 a2 : ℤ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) := by
   have hsub : a2 = a1 + (a2 - a1 - 1) + 1 := by ring
   rw [hsub]
@@ -180,9 +193,9 @@ theorem phi_mono_int' (a1 a2 : ℤ) (h : a1 ≤ a2) : (phi R S a1) ≤ (phi R S 
 
 --i'll change this name
 theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (a - ⌊a⌋) := by
-  unfold phi
   by_cases ha : a ≥ 1
-  · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
+  · unfold phi
+    have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
       convert le_floor.2 ha
       simp
       apply cast_le
@@ -219,7 +232,8 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
       apply cast_le.symm
     contradiction
   by_cases hzero : (0 : ℚ) ≤ ⌊a⌋
-  · simp [ha, hfl, hzero]
+  · unfold phi
+    simp [ha, hfl, hzero]
     push_neg at *
     --and this is the same
     have hflzero : 0 = ⌊a⌋ := by
@@ -255,13 +269,14 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
     congr
   simp [ha, hfl, hzero]
   push_neg at *
+  have ha' : a < 0 := by sorry
+  rw [phi_eq_self_of_le_neg_one R S (by linarith [ha']), phi_eq_self_of_le_neg_one R S (by linarith [hzero])]
   sorry
 
-
 theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((phi R S (⌊a⌋ + 1)) - (phi R S ⌊a⌋)) * (⌊a⌋ - a + 1) := by
-  unfold phi
   by_cases ha : (1 : ℚ) ≤ a
-  · have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
+  · unfold phi
+    have hfl : (1 : ℚ) ≤ ⌊a⌋ := by
       convert le_floor.2 ha
       apply cast_le
     have hcl : (1 : ℚ) ≤ (⌊a⌋ + 1) := by
@@ -308,7 +323,8 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
       apply cast_le.symm
     contradiction
   by_cases hcl : (1 : ℚ) ≤ (⌊a⌋ + 1)
-  · simp [ha, hcl, hfl]
+  · unfold phi
+    simp [ha, hcl, hfl]
     push_neg at *
     have hfl' : ⌊a⌋ = 0 := by
       simp at hcl
@@ -333,8 +349,10 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
       rw [hcl']
     ring_nf
     simp [h]
-  simp [ha, hcl, hfl]
   push_neg at *
+  have hcl' : ⌊a⌋ < 0 := by sorry
+  have ha' : a < 0 := by sorry
+  simp [phi_eq_self_of_le_neg_one R S (by linarith [ha']), phi_eq_self_of_le_neg_one R S (by linarith [hcl'])]
   sorry
 
 theorem phi_gt_floor : ∀ a : ℚ , (a ≠ ⌊a⌋) → (phi R S a) > (phi R S ⌊a⌋) := by
@@ -476,7 +494,8 @@ theorem phi_mono_iff : (∀a1 a2 : ℚ , a1 < a2 → (phi R S a1) < (phi R S a2)
   apply phi_mono_over_section
   constructor <;> assumption
 
-theorem phi_mono {a1 a2 : ℚ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) := by
+theorem phi_strictMono : StrictMono (phi R S) := by
+  rintro a1 a2
   revert a1 a2
   apply (phi_mono_iff R S).2
   apply phi_mono_int
@@ -487,11 +506,11 @@ theorem phi_bij : Function.Bijective (phi R S) := by
   contrapose! h
   by_cases h1 : a1 > a2
   have hlt : (phi R S a2) < (phi R S a1) := by
-    apply phi_mono
+    apply phi_strictMono
     apply h1
   apply ne_of_gt hlt
   have hlt : (phi R S a2) > (phi R S a1) := by
-    apply phi_mono
+    apply phi_strictMono
     apply lt_of_not_ge
     push_neg at *
     exact lt_of_le_of_ne h1 h
@@ -529,10 +548,20 @@ theorem psi_zero_eq_zero : psi R S 0 = 0 := by
   rw [← invFun_comp Inj]
   simp
 
-theorem phi_inv_psi : ∀ a : ℚ , phi R S (psi R S a) = a := by
+theorem leftInverse_phi_psi : Function.LeftInverse (phi R S) (psi R S)  := by
   rintro a
   apply invFun_eq
   apply (phi_bij R S).surjective
+
+@[simp]
+theorem phi_psi_eq_self (u : ℚ) : (phi R S) ((psi R S) u) = u := leftInverse_phi_psi R S u
+
+
+theorem psi_eq_self_of_le_neg_one {v : ℚ} (hv : v ≤ 0) : psi R S v = v := by
+  have h1 : phi R S (psi R S v) = v := by apply phi_psi_eq_self
+  have h2 : phi R S v = v := by apply phi_eq_self_of_le_neg_one R S hv
+  apply (phi_bij R S).injective
+  simp [h1, h2]
 
 --lemma 3
 open scoped Classical
@@ -549,8 +578,50 @@ theorem G_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(Finset.Icc (-1) (n
   sorry
   sorry
 
-theorem G_n_or_G_lt_n {n : ℤ} (x : (L ≃ₐ[K] L)) (h : x ∉ G(L/K)_[n]) : ∃ a, (-1 ≤ a ∧ a ≤ n - 1) ∧ x ∈ G_diff K L a := by
+--i don't know how to name them
+theorem x_in_G_n {x : (L ≃ₐ[K] L)} (hx : x ≠ .refl): ∃ (n : ℤ) , -1 ≤ n ∧ x ∈ G(L/K)_[n] ∧ x ∉ G(L/K)_[(n + 1)] := by
+  by_contra hc
+  push_neg at *
   sorry
+
+
+theorem mem_all_lowerRamificationGroup_iff {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by
+  constructor
+  <;>rintro h
+  have htop : i_[L/K] x = ⊤ := by
+    by_contra hc
+    simp at hc
+    push_neg at *
+    obtain ⟨m, hx, hx', hx''⟩ := x_in_G_n K L hc
+    apply hx''
+    apply h
+  apply lowerIndex_eq_top_iff_eq_refl.1 htop
+  rintro n
+  have : x ∈ G(L/K)_[n.toNat] := by
+    apply (mem_lowerRamificationGroup_iff n.toNat).2
+    rw [h, (lowerIndex_refl (R := K) (S := L))]
+    simp
+  sorry
+
+
+
+theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x ∈ G(L/K)_[m]) (hn : x ∉ G(L/K)_[n]) : m ≤ n - 1 := by
+  by_contra hc
+  push_neg at *
+  have h : G(L/K)_[m] ≤  G(L/K)_[n] := by
+    convert lowerRamificationGroup.antitone K L hc
+    simp
+  sorry
+
+theorem G_n_or_G_lt_n {n : ℤ} {x : (L ≃ₐ[K] L)} (h : x ∉ G(L/K)_[n]) : ∃ a, (-1 ≤ a ∧ a ≤ n - 1) ∧ x ∈ G_diff K L a := by
+  have hx : x ≠ .refl := by
+    by_contra hc
+    have : x ∈ G(L/K)_[n] := by apply (mem_all_lowerRamificationGroup_iff K L).2 hc
+    contradiction
+  obtain ⟨m, ⟨hmgt, hx, hx'⟩⟩ := (x_in_G_n K L hx)
+  have hm' : m ≤ n - 1 := by apply m_lt_n_of_in_G_m_of_notin_G_n K L hx h
+  have hx'' : x ∈ G_diff K L m := by simp [G_diff, hx, hx']
+  use m
 
 theorem G_split (n : ℤ) : (⊤ : Finset (L ≃ₐ[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (G_diff K L) (G_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset := by
   ext x
@@ -560,12 +631,12 @@ theorem G_split (n : ℤ) : (⊤ : Finset (L ≃ₐ[K] L)) = (disjiUnion (Finset
   · right
     assumption
   left
-  apply G_n_or_G_lt_n K L x h
+  apply G_n_or_G_lt_n K L h
   simp
 
 theorem Sum_Trunc_lower_Index_of_G_n (n : ℤ) (u : ℚ) (h : u ≤ n) : (Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (u + 1) * (Nat.card (G(L/K)_[n])) := by
   calc
-  (Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset (fun (x : _) => u + 1) := by
+  _ = Finset.sum (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset (fun (x : _) => u + 1) := by
     apply sum_equiv (.refl (L ≃ₐ[K] L))
     simp
     rintro s hs
@@ -576,7 +647,7 @@ theorem Sum_Trunc_lower_Index_of_G_n (n : ℤ) (u : ℚ) (h : u ≤ n) : (Finset
 
 theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Finset.sum (G_diff K L n) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (n + 1) * (Nat.card (G_diff K L n)) := by
   calc
-  (Finset.sum (G_diff K L n) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (Finset.sum (G_diff K L n) (fun (x : _) => ((n : ℚ) + 1))) := by
+  _ = (Finset.sum (G_diff K L n) (fun (x : _) => ((n : ℚ) + 1))) := by
     apply sum_equiv (.refl (L ≃ₐ[K] L))
     simp
     rintro s hs
@@ -585,12 +656,12 @@ theorem Sum_Trunc_lower_Index_of_diff_G (n : ℤ) (u : ℚ) (h : n ≤ u) : (Fin
     norm_num
     ring
 
-theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
+theorem phi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
   by_cases h : u ≥ 1
   · simp [h]
     have hsplit : (Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
       calc
-      (Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) ∪ (G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
+      _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) ∪ (G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
         congr
         apply G_split
       _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
@@ -623,16 +694,5 @@ theorem Varphi_eq_Sum_Inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * 
   sorry
 
 -- scoped notation:max  " ψ_[" L:max "/" K:max "]" => psi K L
-
-theorem leftInverse_phi_psi : Function.LeftInverse (phi R S) (psi R S)  := sorry
-
-@[simp]
-theorem phi_psi_eq_self (u : ℚ) : (phi R S) ((psi R S) u) = u := leftInverse_phi_psi R S u
-
-theorem phi_strictMono : StrictMono (phi R S) := sorry
-
-theorem phi_eq_self_of_le_neg_one {u : ℚ} (hu : u ≤ 0) : phi R S u = u := sorry
-
-theorem psi_eq_self_of_le_neg_one {v : ℚ} (hv : v ≤ 0) : psi R S v = v := sorry
 
 end HerbrandFunction
