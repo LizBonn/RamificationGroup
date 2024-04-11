@@ -12,10 +12,9 @@ import LocalClassFieldTheory.LocalField
 
 ## TODO
 
-add theorems
-1. in the case of complete discrete valued field,
-this filtration is exhausive
-2. in the case of local field, this filtration is separated at u = max v (s x - x)
+prove theorems using Bichang's preparation in section SeparatedExhausive
+
+rename theorems, many theorem should be named as LowerRamificationGroup.xxx, not lowerRamificationGroup_xxx
 
 -/
 
