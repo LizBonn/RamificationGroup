@@ -1,11 +1,32 @@
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Hom.ValExtension
 import Mathlib.FieldTheory.IntermediateField
+import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 
 open Valuation Valued DiscreteValuation
 
+-- an instance of Valued for intermediate field (??)
+-- two instance of IsValExtension for maria's valued, K to K' and K' to K''
+
+namespace DiscreteValuation
+
+variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [Field K] [Field L]
+[vK : Valued K ℤₘ₀] [CompleteSpace K]
+[IsDiscrete vK.v] [Algebra K L] {K' K'' : IntermediateField K L} [FiniteDimensional K K'] [FiniteDimensional K K'']
+
+-- `Maybe this is bad`
+noncomputable scoped instance intermidateFieldValued : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
+
+scoped instance intermidateFieldIsValExtension : IsValExtension K K' where
+  val_isEquiv_comap := sorry
+
+scoped instance intermidateFieldIsDiscrete: IsDiscrete (DiscreteValuation.Extension.valued K K').v := DiscreteValuation.Extension.isDiscrete_of_finite K K'
+
+end DiscreteValuation
+
+/-
 variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [Field K] [Field K'] [Field L]
 [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀]
-[IsDiscrete vK.v] [IsDiscrete vL.v] [ValAlgebra K L] [FiniteDimensional K L] {K' : IntermediateField K L}
+[IsDiscrete vK.v] [IsDiscrete vL.v] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L] {K' : IntermediateField K L}
 
 --{H : Subgroup (L ≃ₐ[K] L)} [H.Normal]
 
@@ -19,22 +40,10 @@ scoped instance : IsDiscrete ((valuedIntermediateField (K':= K')).v) := sorry
 
 #synth Algebra K' L
 
-attribute [-instance] Subtype.preorder
 
-scoped instance : ValAlgebra K' L :=
-  {
-    Subalgebra.toAlgebra K'.toSubalgebra with
-    monotone' := sorry
-    val_isEquiv_comap' := sorry
-    continuous_toFun := sorry
-  }
+scoped instance : IsValExtension K' L := sorry
 #synth Algebra K K'
-scoped instance : ValAlgebra K K' :=
-  {
-    IntermediateField.algebra K' with
-    monotone' := sorry
-    val_isEquiv_comap' := sorry
-    continuous_toFun := sorry
-  }
+scoped instance : IsValExtension K K' := sorry
 
 end DiscreteValuation
+-/

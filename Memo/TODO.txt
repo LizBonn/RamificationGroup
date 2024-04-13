@@ -11,3 +11,14 @@
 
 4.4
 1. (high!) Try to change all theorems using ValHom and ValAlgEquiv into simple RingHom ALgHom. Then G_-1 will be a subgroup of GalGroup. Add IsValExtension K' L (do I need injectivity?) to state theorem for L/K'/K
+
+4.7  Finished!!
+IsValExt gives alg structure for integer and valsubring
+lower
+upper 
+
+4.8
+add exhausive and seperated for upper
+
+4.10
+renaming (for presentation)
