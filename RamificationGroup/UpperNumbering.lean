@@ -26,6 +26,7 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 #check Int.ceil
 
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
+
 noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
 
 end definition_aux
@@ -292,14 +293,14 @@ variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valu
 theorem inf_eq_bot (s : L ≃ₐ[K] L) : ∀ v, s ∈ G(L/K)^[v] ↔ s = 1 := sorry
 
 
-
--- theorem relation with Krull topology (?) top bases(how to state this ??)
+/-
+-- For apf extensions, theorem relation with Krull topology (?) top bases(how to state this ??)
 -- this theorem dont need so much hyp
 theorem isOpen {v : ℚ} : IsOpen (G(L/K)^[v] : Set (L ≃ₐ[K] L)) := sorry
 
 -- should add `galNormalBasis` to Mathlib first, maybe just leave it later
 def basis : GroupFilterBasis (L ≃ₐ[K] L) := sorry
-
+-/
 
 end UpperRamificationGroup
 
