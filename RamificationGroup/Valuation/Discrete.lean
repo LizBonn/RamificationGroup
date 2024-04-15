@@ -47,7 +47,7 @@ theorem ofAdd_eq_neg_one_of_pow_eq_neg_one {x : ℤₘ₀} (h1 : x ≤ 1) {n : �
       contradiction
     | .coe (.ofAdd a)  =>
       change ((ofAdd (n * a) : Multiplicative ℤ) : ℤₘ₀) = (ofAdd (-1 : ℤ)) at hn
-      change ↑(ofAdd a) ≤ (((ofAdd (0:ℤ)): Multiplicative ℤ) : ℤₘ₀) at h1
+      change ↑(ofAdd a) ≤ (((ofAdd (0 : ℤ)): Multiplicative ℤ) : ℤₘ₀) at h1
       rw [coe_le_coe, Multiplicative.ofAdd_le] at h1
       rw [coe_inj] at *
       show a = -1
@@ -120,10 +120,12 @@ variable {K : Type*} [Field K] {ΓK ΓK': outParam Type*}
 #check ValuationSubring.valuation_eq_one_iff
 #check Valuation.isEquiv_valuation_valuationSubring
 
-theorem val_valuationSubring_unit {u : v.valuationSubringˣ} : v u = 1 := by
+theorem val_valuationSubring_unit {u : v.valuationSubringˣ} :
+  v u = 1 := by
   rw [(isEquiv_iff_val_eq_one v v.valuationSubring.valuation).mp (isEquiv_valuation_valuationSubring v), ValuationSubring.valuation_unit]
 
-theorem isUnit_in_valuationSubring_of_val_eq_one {x : K} (h : v x = 1) : IsUnit (⟨x, le_of_eq h⟩ : v.valuationSubring) := by
+theorem isUnit_in_valuationSubring_of_val_eq_one {x : K} (h : v x = 1) :
+  IsUnit (⟨x, le_of_eq h⟩ : v.valuationSubring) := by
   rw [ValuationSubring.valuation_eq_one_iff, ← (isEquiv_iff_val_eq_one v v.valuationSubring.valuation).mp (isEquiv_valuation_valuationSubring v), h]
 
 /-- create a term of `v.valuationSubringˣ` from a term `x : K` with `v x = 1`-/
@@ -137,8 +139,6 @@ theorem UnitOfValOne_elem {x : K} (h : v x = 1) : (UnitOfValOne h).1 = x := by
 theorem val_UnitOfValOne_eq_one {x : K} (h : v x = 1) : v (UnitOfValOne h).1 = 1 := by
   rw [UnitOfValOne_elem]
   exact h
-
-#check ValuationSubring.mem_unitGroup_iff
 
 end field
 
@@ -183,26 +183,53 @@ theorem pow_Uniformizer' {x : K} (h0 : x ≠ 0) (hx : v x ≤ 1) (π : Uniformiz
 
 #check Valuation.unit_map_eq
 theorem val_pow_Uniformizer {π : Uniformizer v} {n : ℕ} {u : v.valuationSubringˣ} :
-  v ((π.1 : K) ^ n * u.1) = Multiplicative.ofAdd (-n : ℤ) := by
+  v ((π.1 : K) ^ n * u.1) = ofAdd (-n : ℤ) := by
   rw [v.map_mul, Valuation.map_pow, π.2, val_valuationSubring_unit, mul_one, ← WithZero.coe_pow]
   congr 1
   simp only [Int.reduceNeg, ofAdd_neg, inv_pow, ← ofAdd_nsmul, nsmul_eq_mul, mul_one]
 
--- TODO: `map_zpow` for `ℤ`-pow
-theorem val_pow_Uniformizer_all {π : Uniformizer v} {n : ℤ} {u : v.valuationSubringˣ} : v ((π.1 : K) ^ n * u.1) = Multiplicative.ofAdd (-n : ℤ) := by
+theorem val_pow_Uniformizer_all {π : Uniformizer v} {n : ℤ} {u : v.valuationSubringˣ} :
+  v ((π.1 : K) ^ n * u.1) = ofAdd (-n : ℤ) := by
   rw [v.map_mul, Valuation.map_zpow, π.2, val_valuationSubring_unit, mul_one, ← WithZero.coe_zpow]
   congr 1
   change n * -1 = -n
   exact mul_neg_one n
 
+theorem val_pow_Uniformizer_all' {π : K} (hπ : IsUniformizer v π) {n : ℤ} {u : v.valuationSubringˣ} :
+  v (π ^ n * u.1) = ofAdd (-n : ℤ) := by
+  let ϖ := Uniformizer.mk' _ _ hπ
+  rw [show π = ϖ.1 by rfl, val_pow_Uniformizer_all]
+
+
 /--If `π : K` is a uniformizer for `v`, and `v x ≤ 1 → v' x ≤ 1 ∀x : K`, then `π` is also a uniformizer for `v'`.-/
-lemma isUniformizer_of_uniformizer_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) (π : Uniformizer v) : IsUniformizer v' π.1 := by
+lemma isUniformizer_of_uniformizer_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1)
+    (π : Uniformizer v) : IsUniformizer v' π.1 := by
   rcases exists_Uniformizer_ofDiscrete v' with ⟨π', hπ'⟩
   rcases pow_Uniformizer_all (Uniformizer_ne_zero v' hπ') π with ⟨m, u, hmu⟩
   replace hmu := congrArg v' hmu
   rw [_root_.map_mul, map_zpow₀,
     eq_one_of_eq_one_of_le_one_le_one h val_valuationSubring_unit, mul_one, hπ'] at hmu
   rw [IsUniformizer, WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one (h <| le_of_lt <| Uniformizer_valuation_lt_one v π.2) hmu.symm]
+
+/--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`. Bundled version.-/
+theorem isUniformizer_of_uniformizer_of_equiv (h : v.IsEquiv v')
+    (π : Uniformizer v) : IsUniformizer v' π.1 := isUniformizer_of_uniformizer_of_le_one_le_one
+  (fun {_} hx ↦ ((isEquiv_iff_val_le_one v v').mp h).mp hx) π
+
+-- /--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.-/
+-- theorem isUniformizer_of_uniformizer_of_equiv' (h : v.IsEquiv v')
+--     {π : K} (hπ : IsUniformizer v π) : IsUniformizer v' π := by
+--   sorry
+
+theorem val_pow_Uniformizer_all_of_equiv (h : v.IsEquiv v') {π : Uniformizer v} {n : ℤ} {u : v.valuationSubringˣ} :
+  v' ((π.1 : K) ^ n * u.1) = ofAdd (-n : ℤ) := by
+  rw [v'.map_mul, Valuation.map_zpow,
+    isUniformizer_of_uniformizer_of_equiv h]
+  have : v' (u : K) = 1 := by
+    rw [← (isEquiv_iff_val_eq_one _ _).mp h, val_valuationSubring_unit]
+  simp only [Int.reduceNeg, ofAdd_neg, WithZero.coe_inv, inv_zpow', zpow_neg, this, mul_one,
+    inv_inj]
+  simp only [← WithZero.coe_zpow, ← ofAdd_zsmul, smul_eq_mul, mul_one] -- WithZero.coe_zpow theorem should be tagged with @[norm_cast], but it is not.
 
 /-- Two discrete valuations `v` and `v'` on a field `K` are equivalent, if `v x ≤ 1 → v' x ≤ 1, ∀x : K`. -/
 theorem isEquiv_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) :
@@ -223,8 +250,12 @@ theorem isEquiv_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) :
 
 theorem isEquiv_iff_eq : v.IsEquiv v' ↔ v = v' := by
   constructor
-  ·
-    sorry
+  · intro heq; ext x
+    by_cases h0 : x = 0
+    · simp only [h0, _root_.map_zero]
+    · rcases exists_Uniformizer_ofDiscrete v with ⟨π, hπ⟩
+      rcases pow_Uniformizer_all h0 ⟨π, hπ⟩ with ⟨n, u, hnu⟩
+      rw [hnu, val_pow_Uniformizer_all, val_pow_Uniformizer_all_of_equiv heq]
   · exact IsEquiv.of_eq
 
 
