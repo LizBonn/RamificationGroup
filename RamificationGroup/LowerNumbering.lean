@@ -57,8 +57,8 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 -- variable (K L : Type*) {ΓL : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ℤₘ₀] [Algebra K L]
 
-def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
-    carrier := {s | s ∈ decompositionGroup R S ∧ ∀ x : vS.v.integer, Valued.v (s x - x) ≤ .coe (.ofAdd (- i - 1))}
+def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
+    carrier := {s | s ∈ decompositionGroup R S ∧ ∀ x : vS.v.integer, Valued.v (s x - x) ≤ .coe (.ofAdd (- u - 1))}
     mul_mem' {a} {b} ha hb := by
       constructor
       · exact mul_mem ha.1 hb.1
@@ -67,7 +67,7 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
           _ = v (a (b x) - x) := rfl
           _ = v ((a (b x) - b x) + (b x - x)) := by congr; simp
           _ ≤ max (v (a (b x) - b x)) (v (b x - x)) := Valuation.map_add _ _ _
-          _ ≤ max (.coe (.ofAdd (- i - 1))) (.coe (.ofAdd (- i - 1))) := by
+          _ ≤ max (.coe (.ofAdd (- u - 1))) (.coe (.ofAdd (- u - 1))) := by
             apply max_le_max
             · exact ha.2 ⟨b x, (val_map_le_one_iff hb.1 x).mpr x.2⟩
             · exact hb.2 x
@@ -93,7 +93,7 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
       _ ≤ _ := hs.2 ⟨s⁻¹ a, (val_map_le_one_iff (f := (s.symm : S →+* S))
         (Valuation.IsEquiv_comap_symm hs.1) a.1).mpr a.2⟩
 
-scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
+scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" u:max "] " => lowerRamificationGroup R S u
 
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
   rintro a b hab
