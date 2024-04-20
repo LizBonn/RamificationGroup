@@ -23,18 +23,16 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 -- scoped notation:max  " φ_[" L:max "/" K:max "]" => phi K L
 
-noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
-  if u > (-1) then
-    relindex G(S/R)_[0] G(S/R)_[(Int.ceil u)]
-  else
-    1
-
 noncomputable def phiDeriv (u : ℚ) : ℚ :=
-  1 / (Index_of_G_i R S u)
+  1 /
+    if u > (-1) then
+      Subgroup.relindex G(S/R)_[0] G(S/R)_[(Int.ceil u)]
+    else
+      1
 
 noncomputable def phi (u : ℚ) :  ℚ :=
     if u ≥ 1 then
-    ∑ x in Finset.Icc 1 (Int.floor u), (phiDeriv R S x) + (u - (Int.floor u)) * (phiDeriv R S u)
+    ∑ x in Finset.Icc 1 (⌊u⌋), (phiDeriv R S x) + (u - (⌊u⌋)) * (phiDeriv R S u)
   else
     u * (phiDeriv R S u)
 
@@ -70,7 +68,7 @@ theorem Int.eq_of_ge_of_lt_add_one (a m : ℤ) (h1 : m ≤ a) (h2 : a < (m + 1))
   apply ((LE.le.ge_iff_eq h1).1 hle).symm
 
 theorem phiDeriv_eq_ceil (u : ℚ) : phiDeriv R S u = phiDeriv R S ⌈u⌉ := by
-  unfold phiDeriv Index_of_G_i
+  unfold phiDeriv
   by_cases h : -1 < u
   · have hcl : ⌈u⌉ > (-1 : ℚ) := by
       apply lt_of_lt_of_le
@@ -86,7 +84,7 @@ theorem phiDeriv_eq_ceil (u : ℚ) : phiDeriv R S u = phiDeriv R S ⌈u⌉ := by
   simp [h, hcl]
 
 theorem phiDeriv_pos (u : ℚ) : 0 < phiDeriv R S u := by
-  unfold phiDeriv Index_of_G_i relindex index
+  unfold phiDeriv relindex index
   by_cases h : u > -1
   simp [h]
   sorry
@@ -97,7 +95,7 @@ theorem phiDeriv_pos (u : ℚ) : 0 < phiDeriv R S u := by
   -- simp [h]
 
 theorem phiDeriv_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phiDeriv R S u = 1 := by
-  unfold phiDeriv Index_of_G_i
+  unfold phiDeriv
   by_cases hgt : (-1 : ℚ) < u
   · simp [hgt]
     have hzero : 0 = u := by
