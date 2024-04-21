@@ -31,7 +31,7 @@ noncomputable def phiDeriv (u : ℚ) : ℚ :=
       1
 
 noncomputable def phi (u : ℚ) :  ℚ :=
-  if 0 < u then
+  if u ≥ 0 then
     ∑ x in Finset.Icc 1 ⌊u⌋, (phiDeriv R S x) + (u - ⌊u⌋) * (phiDeriv R S u)
   else
     u
