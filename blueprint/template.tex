@@ -1,0 +1,26 @@
+
+((* for full_name, features in structure_dict.statements.items() *))
+((* if features[1] in ["theorem", "lemma", "definition"] *))
+\begin{((( features[1] )))}\label{((( full_name )))}
+    ((* if features[2] *))
+    \leanok
+    ((* endif *))
+    \lean{((( full_name )))}
+    ((* if structure_dict.dependencies[full_name] *))
+    \uses{((( ','.join(structure_dict.dependencies[full_name]) )))}
+    ((* endif *))
+    ((* if structure_dict.docs[full_name] *))
+        ((( structure_dict.docs[full_name] )))
+    ((* else *))
+        No documentation.
+    ((* endif *))
+\end{((( features[1] )))}
+
+((* endif *))
+((* if features[1] in ["theorem", "lemma"] and features[2] *))
+\begin{proof}
+    \leanok
+\end{proof}
+
+((* endif *))
+((* endfor *))
