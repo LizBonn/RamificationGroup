@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 
-PROJECT = DemoProject
+PROJECT = RamificationGroup
 
 .PHONY: all build blueprint analyze serve
 
