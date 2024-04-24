@@ -1,2 +1,5 @@
 /.lake
 /RamificationGroup/Valuation/test.lean
+/.venv
+/blueprint/web
+/blueprint/print
