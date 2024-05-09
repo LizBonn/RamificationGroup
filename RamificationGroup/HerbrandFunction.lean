@@ -23,20 +23,18 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 -- scoped notation:max  " φ_[" L:max "/" K:max "]" => phi K L
 
-noncomputable def Index_of_G_i (u : ℚ) : ℚ :=
-  if u > (-1) then
-    relindex G(S/R)_[0] G(S/R)_[(Int.ceil u)]
-  else
-    1
-
 noncomputable def phiDeriv (u : ℚ) : ℚ :=
-  1 / (Index_of_G_i R S u)
+  1 /
+    if u ≥ 0 then
+      Subgroup.relindex G(S/R)_[0] G(S/R)_[⌈u⌉]
+    else
+      1
 
 noncomputable def phi (u : ℚ) :  ℚ :=
-    if u ≥ 1 then
-    ∑ x in Finset.Icc 1 (Int.floor u), (phiDeriv R S x) + (u - (Int.floor u)) * (phiDeriv R S u)
+  if u ≥ 0 then
+    ∑ x in Finset.Icc 1 ⌊u⌋, (phiDeriv R S x) + (u - ⌊u⌋) * (phiDeriv R S u)
   else
-    u * (phiDeriv R S u)
+    u
 
 --for mathlib
 theorem sub_of_sum (a : ℤ) (f : ℚ → ℚ) (h : 1 ≤ a): ∑ x in Icc 1 (a + 1), f x - ∑ x in Icc 1 a, f x = f (a + 1) := by
@@ -70,13 +68,14 @@ theorem Int.eq_of_ge_of_lt_add_one (a m : ℤ) (h1 : m ≤ a) (h2 : a < (m + 1))
   apply ((LE.le.ge_iff_eq h1).1 hle).symm
 
 theorem phiDeriv_eq_ceil (u : ℚ) : phiDeriv R S u = phiDeriv R S ⌈u⌉ := by
-  unfold phiDeriv Index_of_G_i
+  unfold phiDeriv
   by_cases h : -1 < u
-  · have hcl : ⌈u⌉ > (-1 : ℚ) := by
-      apply lt_of_lt_of_le
-      apply h
-      apply le_ceil
-    simp [h, hcl]
+  · sorry
+  --  have hcl : ⌈u⌉ > (-1 : ℚ) := by
+  --     apply lt_of_lt_of_le
+  --     apply h
+  --     apply le_ceil
+  --  simp [h, hcl]
   have hcl : ¬⌈u⌉ > (-1 : ℚ) := by
     by_contra hc
     have hcl' : -1 < ⌈u⌉ := by apply cast_lt.1 hc
@@ -84,9 +83,10 @@ theorem phiDeriv_eq_ceil (u : ℚ) : phiDeriv R S u = phiDeriv R S ⌈u⌉ := by
       apply lt_ceil.1 hcl'
     contradiction
   simp [h, hcl]
+  sorry
 
 theorem phiDeriv_pos (u : ℚ) : 0 < phiDeriv R S u := by
-  unfold phiDeriv Index_of_G_i relindex index
+  unfold phiDeriv relindex index
   by_cases h : u > -1
   simp [h]
   sorry
@@ -97,7 +97,7 @@ theorem phiDeriv_pos (u : ℚ) : 0 < phiDeriv R S u := by
   -- simp [h]
 
 theorem phiDeriv_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phiDeriv R S u = 1 := by
-  unfold phiDeriv Index_of_G_i
+  unfold phiDeriv
   by_cases hgt : (-1 : ℚ) < u
   · simp [hgt]
     have hzero : 0 = u := by
@@ -109,18 +109,20 @@ theorem phiDeriv_neg_int_eq_one {u : ℤ} (hu : u ≤ 0) : phiDeriv R S u = 1 :=
     have hzero' : u = (0 : ℚ) := by simp [hzero]
     sorry
   simp [hgt]
+  sorry
 
 theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phiDeriv R S (a + 1)) := by
   unfold phi
   by_cases hgeone : (1 : ℚ) ≤ a
-  · have hgezero : (0 : ℚ) ≤ a := by linarith
-    simp [hgeone, hgezero]
-    have h : ∑ x in Icc 1 (a + 1), phiDeriv R S ↑x = phiDeriv R S (a + 1) + ∑ x in Icc 1 a, phiDeriv R S ↑x := by
-      have hgeone' : 1 ≤ a := by apply cast_le.1 hgeone
-      have h' : ∑ x in Finset.Icc 1 (a + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 a, phiDeriv R S ↑x = phiDeriv R S (↑a + 1) := by
-        apply sub_of_sum a (phiDeriv R S) hgeone'
-      linarith [h']
-    simp [h]
+  · sorry
+    -- have hgezero : (0 : ℚ) ≤ a := by linarith
+    -- simp [hgeone, hgezero]
+    -- have h : ∑ x in Icc 1 (a + 1), phiDeriv R S ↑x = phiDeriv R S (a + 1) + ∑ x in Icc 1 a, phiDeriv R S ↑x := by
+    --   have hgeone' : 1 ≤ a := by apply cast_le.1 hgeone
+    --   have h' : ∑ x in Finset.Icc 1 (a + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 a, phiDeriv R S ↑x = phiDeriv R S (↑a + 1) := by
+    --     apply sub_of_sum a (phiDeriv R S) hgeone'
+    --   linarith [h']
+    -- simp [h]
   by_cases hgezero : (0 : ℚ) ≤ a
   · have heqzero : (0 : ℚ) = a := by
       --this
@@ -136,19 +138,20 @@ theorem phi_int_succ (a : ℤ) : (phi R S a) = (phi R S (a + 1)) - (phiDeriv R S
   simp [hgeone, hgezero]
   push_neg at *
   ring_nf
-  apply mul_eq_mul_left_iff.2
-  left
-  rw [phiDeriv_neg_int_eq_one]
-  have : (1 + a) ≤ 0 := by
-    have hgezero' : a < 0 := by apply cast_lt.1 hgezero
-    have hle: a ≤ 0 - 1 := by
-      convert le_sub_one_iff.2 hgezero'
-    linarith [hle]
-  symm
-  convert phiDeriv_neg_int_eq_one R S this
-  simp
-  apply le_of_lt
-  apply cast_lt.1 hgezero
+  sorry
+  -- apply mul_eq_mul_left_iff.2
+  -- left
+  -- rw [phiDeriv_neg_int_eq_one]
+  -- have : (1 + a) ≤ 0 := by
+  --   have hgezero' : a < 0 := by apply cast_lt.1 hgezero
+  --   have hle: a ≤ 0 - 1 := by
+  --     convert le_sub_one_iff.2 hgezero'
+  --   linarith [hle]
+  -- symm
+  -- convert phiDeriv_neg_int_eq_one R S this
+  -- simp
+  -- apply le_of_lt
+  -- apply cast_lt.1 hgezero
 
 theorem phi_mono_int {a1 a2 : ℤ} (h : a1 < a2) : (phi R S a1) < (phi R S a2) := by
   have hsub : a2 = a1 + (a2 - a1 - 1) + 1 := by ring
@@ -192,26 +195,27 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
       linarith [hfl]
     simp [ha, hfl, hfl']
     nth_rw 2 [mul_comm]
-    apply mul_eq_mul_left_iff.2
-    by_cases hzero : fract a = 0
-    · right
-      exact hzero
-    left
-    have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phiDeriv R S ↑x = phiDeriv R S (⌊a⌋ + 1) := by
-      have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
-      apply sub_of_sum ⌊a⌋ (phiDeriv R S) hfl'
-    rw [h, phiDeriv_eq_ceil]
-    have hflcl : ⌈a⌉ = ⌊a⌋ + 1 := by
-      unfold fract at hzero
-      push_neg at hzero
-      have : a ≠ ⌊a⌋ := by
-        by_contra hc
-        have hc' : a - ⌊a⌋ = 0 := by linarith
-        contradiction
-      apply ceil_eq_floor_add_one_iff a this
-    rw [hflcl]
-    congr
-    simp
+    sorry
+    -- apply mul_eq_mul_left_iff.2
+    -- by_cases hzero : fract a = 0
+    -- · right
+    --   exact hzero
+    -- left
+    -- have h : ∑ x in Finset.Icc 1 (⌊a⌋ + 1), phiDeriv R S ↑x - ∑ x in Finset.Icc 1 ⌊a⌋, phiDeriv R S ↑x = phiDeriv R S (⌊a⌋ + 1) := by
+    --   have hfl' : (1 : ℤ) ≤ ⌊a⌋ := by apply cast_le.1 hfl
+    --   apply sub_of_sum ⌊a⌋ (phiDeriv R S) hfl'
+    -- rw [h, phiDeriv_eq_ceil]
+    -- have hflcl : ⌈a⌉ = ⌊a⌋ + 1 := by
+    --   unfold fract at hzero
+    --   push_neg at hzero
+    --   have : a ≠ ⌊a⌋ := by
+    --     by_contra hc
+    --     have hc' : a - ⌊a⌋ = 0 := by linarith
+    --     contradiction
+    --   apply ceil_eq_floor_add_one_iff a this
+    -- rw [hflcl]
+    -- congr
+    -- simp
   have hfl : ¬ (1 : ℚ) ≤ ↑⌊a⌋ := by
     by_contra h'
     have h'' : (1 : ℚ) ≤ a := by
@@ -234,27 +238,28 @@ theorem phi_rational_floor (a : ℚ) : (phi R S a) = (phi R S ⌊a⌋) + ((phi R
     unfold fract
     simp [hflzero.symm]
     rw [mul_comm]
-    apply mul_eq_mul_right_iff.2
-    by_cases hzero' : a = 0
-    · right
-      exact hzero'
-    left
-    have hcl : ⌈a⌉ = 1 := by
-      have hgtzero : (0 : ℚ) < a := by
-        apply lt_of_le_of_ne
-        have : ⌊a⌋ ≤ a := by apply floor_le
-        apply le_trans
-        apply hzero
-        apply this
-        push_neg at hzero'
-        apply hzero'.symm
-      apply ceil_eq_on_Ioc
-      simp
-      constructor
-      apply hgtzero
-      apply le_of_lt ha
-    rw [phiDeriv_eq_ceil, hcl]
-    congr
+    sorry
+    -- apply mul_eq_mul_right_iff.2
+    -- by_cases hzero' : a = 0
+    -- · right
+    --   exact hzero'
+    -- left
+    -- have hcl : ⌈a⌉ = 1 := by
+    --   have hgtzero : (0 : ℚ) < a := by
+    --     apply lt_of_le_of_ne
+    --     have : ⌊a⌋ ≤ a := by apply floor_le
+    --     apply le_trans
+    --     apply hzero
+    --     apply this
+    --     push_neg at hzero'
+    --     apply hzero'.symm
+    --   apply ceil_eq_on_Ioc
+    --   simp
+    --   constructor
+    --   apply hgtzero
+    --   apply le_of_lt ha
+    -- rw [phiDeriv_eq_ceil, hcl]
+    -- congr
   simp [ha, hfl, hzero]
   push_neg at *
   sorry
@@ -300,7 +305,8 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
         rw [this]
       rw [heq]
       ring
-    linarith [h']
+    sorry
+    -- linarith [h']
   have hfl : ¬(1 : ℚ) ≤ ⌊a⌋ := by
     by_contra hc
     have hge : (1 : ℚ) ≤ a := by
@@ -335,6 +341,7 @@ theorem phi_rational_ceil (a : ℚ) : (phi R S a) = (phi R S (⌊a⌋ + 1)) - ((
       rw [hcl']
     ring_nf
     simp [h]
+    sorry
   simp [ha, hcl, hfl]
   push_neg at *
   sorry

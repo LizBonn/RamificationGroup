@@ -2,7 +2,7 @@
 # of WARNINGs : 1
 -/
 
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Defs
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import RamificationGroup.ForMathlib.Henselian
 

@@ -1,4 +1,4 @@
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Defs
 import Mathlib.FieldTheory.Galois
 
 open DiscreteValuation Valuation

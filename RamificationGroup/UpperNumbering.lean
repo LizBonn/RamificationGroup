@@ -13,6 +13,8 @@ rename theorems into UpperRamificationGroup.xxx
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation
 open HerbrandFunction
 
+noncomputable
+section
 
 section upperRamificationGroup_aux
 
@@ -22,12 +24,12 @@ variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [LinearOrdered
 
 variable {K' : Type*} [Field K'] [vK' : Valued K' ℤₘ₀] [Algebra K K'] [Algebra K L] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] -- `I hope this is enough`
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S] (x : ℚ)
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 #check Int.ceil
 
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
 
-noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
+def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
 
 end definition_aux
 
@@ -49,7 +51,7 @@ theorem preimage_singleton_nonempty {σ : K' ≃ₐ[K] K'} : ((AlgEquiv.restrict
   exact Set.Nonempty.preimage (Set.singleton_nonempty _) (AlgEquiv.restrictNormalHom_surjective (F := K) (E := L) (K₁ := K'))
 
 variable (L) in
-noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
+def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
 
 #check Finset.max'_mem
@@ -208,7 +210,7 @@ namespace DiscreteValuation
 
 variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] {K' : IntermediateField K L} [FiniteDimensional K K']
 
-noncomputable instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
+instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
 
 /- -- success
 #synth IsDiscrete (valuedIntermediateField.v : Valuation K' _)
@@ -230,7 +232,7 @@ noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
 -/
 
 -- this is easier to use
-noncomputable def upperRamificationGroup (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
+def upperRamificationGroup (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
   carrier := {s | ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ upperRamificationGroup_aux K F v}
   mul_mem' {s} {s'} hs hs' F _ _ := by
