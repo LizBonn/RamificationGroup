@@ -99,9 +99,6 @@ end Valuation
 
 namespace DiscreteValuation
 
-open IsRankOne
-open scoped NNReal
-
 variable {K : Type*} [Field K]
   {v v' : Valuation K ℤₘ₀} [IsDiscrete v] [IsDiscrete v']
 
@@ -155,7 +152,7 @@ theorem val_pow_Uniformizer_all' {π : K} (hπ : IsUniformizer v π) {n : ℤ} {
 
 /--If `π : K` is a uniformizer for `v`, and `v x ≤ 1 → v' x ≤ 1, ∀ x : K`, then `π` is also a uniformizer for `v'`.-/
 lemma isUniformizer_of_uniformizer_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1)
-    (π : Uniformizer v) : IsUniformizer v' π.1 := by
+  (π : Uniformizer v) : IsUniformizer v' π.1 := by
   rcases exists_Uniformizer_ofDiscrete v' with ⟨π', hπ'⟩
   rcases pow_Uniformizer_all (Uniformizer_ne_zero v' hπ') π with ⟨m, u, hmu⟩
   replace hmu := congrArg v' hmu
@@ -165,7 +162,7 @@ lemma isUniformizer_of_uniformizer_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 �
 
 /--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.-/
 theorem isUniformizer_of_uniformizer_of_equiv (h : v.IsEquiv v')
-    (π : Uniformizer v) : IsUniformizer v' π.1 := isUniformizer_of_uniformizer_of_le_one_le_one
+  (π : Uniformizer v) : IsUniformizer v' π.1 := isUniformizer_of_uniformizer_of_le_one_le_one
   (fun {_} hx ↦ ((isEquiv_iff_val_le_one v v').mp h).mp hx) π
 
 -- /--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.-/
@@ -184,8 +181,7 @@ theorem val_pow_Uniformizer_all_of_equiv (h : v.IsEquiv v') {π : Uniformizer v}
 
 -- theorem val_lt_one_iff {x : K} {π : Uniformizer v} : v x < 1 ↔ x ∈ Ideal.span {π.1} := by sorry
 
-theorem lt_one_lt_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) {x : K} (hx :
-  v x < 1) : v' x < 1 := by
+theorem lt_one_lt_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) {x : K} (hx : v x < 1) : v' x < 1 := by
   by_cases xne0 : x = 0
   · simp only [xne0, _root_.map_zero, zero_lt_one]
   rcases exists_Uniformizer_ofDiscrete v with ⟨π, hπ⟩
@@ -199,8 +195,7 @@ theorem lt_one_lt_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1
   have : v' u.1 = 1 := eq_one_of_eq_one_of_le_one_le_one h val_valuationSubring_unit
   rw [show (u.1 : K) = (unitOfValOne this).1 by rw [unitOfValOne_elem]] at hnu
   let π' : Uniformizer v' := Uniformizer.mk' v' _ (isUniformizer_of_uniformizer_of_le_one_le_one h ⟨π, hπ⟩)
-  have : π.1 = π'.1 := by
-    simp only [Uniformizer.mk', π']
+  have : π.1 = π'.1 := by simp only [Uniformizer.mk', π']
   rw [this] at hnu
   apply congrArg v' at hnu
   rw [hnu, val_pow_Uniformizer]
@@ -234,6 +229,36 @@ theorem isEquiv_iff_eq : v.IsEquiv v' ↔ v = v' := by
   · exact IsEquiv.of_eq
 
 end DiscreteValuation
+
+section nontrivial
+
+variable {R : Type*} [CommRing R]
+variable {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+
+namespace Valuation
+
+class Nontrivial (v : Valuation R Γ) : Prop where
+  nontrivial : ∃ r : R, v r ≠ 0 ∧ v r ≠ 1
+
+end Valuation
+
+namespace DiscreteValuation
+
+def ofNontrivial (v : Valuation R ℤₘ₀) [Nontrivial v] : Valuation R ℤₘ₀ := sorry
+
+-- theorem instNontrivialToIsDiscrete (v : Valuation R ℤₘ₀) [IsDiscrete v] : v.Nontrivial := by
+--   sorry
+
+variable (v : Valuation R ℤₘ₀) [Nontrivial v]
+
+
+theorem isEquiv_ofNontrivial : v.IsEquiv (ofNontrivial v) := by sorry
+
+instance instIsDiscreteToOfNontrivial : IsDiscrete (ofNontrivial v) := by sorry
+
+end DiscreteValuation
+
+end nontrivial
 
 end approximation
 

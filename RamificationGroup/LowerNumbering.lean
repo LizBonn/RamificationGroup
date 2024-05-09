@@ -206,7 +206,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} : i_[L/K] s = ⊤ ↔ 
       sorry
   · simp [AlgEquiv.lowerIndex, h]
 
---the type of n should be changed
+--the type of `n` should be changed
 -- instead, change when use this theorem
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [AlgEquiv.truncatedLowerIndex]
@@ -297,7 +297,13 @@ variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Value
 
 -- this completeness implies unique extension of valuation, need to use Bichang's work
 @[simp]
-theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := sorry
+theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
+  sorry
+
+@[simp]
+theorem decompositionGroup_eq_top_weak [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
+
+  sorry
 
 theorem lowerRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
   rw [lowerRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
