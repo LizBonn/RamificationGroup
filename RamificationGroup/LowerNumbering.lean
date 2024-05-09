@@ -1,4 +1,4 @@
-import RamificationGroup.Valued.Hom.ValExtension
+import RamificationGroup.Valued.Hom.Discrete
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 import LocalClassFieldTheory.LocalField
@@ -267,7 +267,6 @@ theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : S ≃ₐ[R'] S) : i_[
 @[simp]
 theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(S/R)_[u].comap (AlgEquiv.restrictScalarsHom R) = G(S/R')_[u] := rfl
 
-
 section ExhausiveSeperated
 
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
@@ -293,17 +292,15 @@ G(S/R)_[u] = decompositionGroup R S := by
 
 section
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
--- this completeness implies unique extension of valuation, need to use Bichang's work
 @[simp]
 theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
-  sorry
-
-@[simp]
-theorem decompositionGroup_eq_top_weak [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
-
-  sorry
+  rw [Subgroup.eq_top_iff']
+  intro f
+  unfold decompositionGroup
+  simp only [Subgroup.mem_mk, Set.mem_setOf_eq]
+  apply algEquiv_preserve_val_of_complete
 
 theorem lowerRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
   rw [lowerRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
