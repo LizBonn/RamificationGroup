@@ -217,6 +217,7 @@ instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Exte
 -/
 
 -- this is needed, or #synth CompleteSpace K' fails
+-- `when is this needed?`
 instance (priority := 100) : CompleteSpace K' := DiscreteValuation.Extension.completeSpace K K'
 
 end DiscreteValuation
