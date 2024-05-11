@@ -10,20 +10,27 @@ import RamificationGroup.Valuation.Discrete
 
 open Valuation Valued DiscreteValuation
 
-
-section hensel
+section non_discrete
 
 open Polynomial
 
 namespace Valuation
+
+theorem isEquiv_iff_integer {K : Type*} [DivisionRing K] {Γ₀ Γ'₀ : outParam Type*} [LinearOrderedCommGroupWithZero Γ₀] [LinearOrderedCommGroupWithZero Γ'₀] (v : Valuation K Γ₀) (v' : Valuation K Γ'₀) :
+  v.IsEquiv v' ↔ v.integer = v'.integer := by
+  rw [isEquiv_iff_val_le_one]
+  constructor <;> intro h
+  · ext x; rw [mem_integer_iff, mem_integer_iff]
+    exact h
+  · intro x
+    rw [← mem_integer_iff, ← mem_integer_iff]
+    simp only [h]
 
 variable {K L : Type*} {ΓK ΓL: outParam Type*} [Field K] [Field L]
   [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
   [vK : Valued K ΓK] {v : Valuation L ΓL}
   [Algebra K L] [FiniteDimensional K L]
 -- variable [HenselianLocalRing vK.valuationSubring]
-
-#check extendedValuation
 
 theorem eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one {f : L[X]}
     (hf : ∀n : ℕ, v (f.coeff n) ≤ 1) (h0 : f.coeff 0 = 0)
@@ -49,41 +56,6 @@ theorem aeval_valuationSubring_lt_one_of_lt_one
     apply ((isEquiv_iff_val_le_one _ _).mp h).mp (f.coeff n).2
   · simp only [coeff_map, h0, _root_.map_zero]
 
--- theorem val_coeff_le_val_const_of_irreducible_of_monic {f : K[X]}
---     (h_irr : Irreducible f) (h_monic : f.Monic) (n : ℕ) :
---   vK.v (f.coeff n) ≤ vK.v (f.coeff 0) := by
---   -- have to use Hensel's lemma
---   sorry
-
--- theorem val_minpoly_coeff_le_val_const_of_integer (x : L) (n : ℕ) : vK.v ((minpoly K x).coeff n) ≤ vK.v ((minpoly K x).coeff 0) := by
---   apply val_coeff_le_val_const_of_irreducible_of_monic (minpoly.irreducible <| IsIntegral.of_finite K x) (minpoly.monic <| IsIntegral.of_finite K x)
-
--- theorem val_minpoly_const_le_one_of_integer
---     (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
---     (hx : x ∈ v.integer) : vK.v ((minpoly K x).coeff 0) ≤ 1 := by
---   -- have to use Hensel's lemma
---   sorry
-
-
--- theorem val_coeff_minpoly_of_integer
---     (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
---     (hx : x ∈ v.integer) (n : ℕ) :
---   (minpoly K x).coeff n ∈ 𝒪[K] := by
---   rw [mem_valuationSubring_iff]
---   apply le_trans (b := vK.v ((minpoly K x).coeff 0))
---   · apply val_minpoly_coeff_le_val_const_of_integer
---   · sorry
-
--- theorem isIntegral_valuationSubring_of_integer
---     (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) {x : L}
---     (hx : x ∈ v.integer) :
---   IsIntegral 𝒪[K] x := by
---   use intPolynomial vK.v <| val_coeff_minpoly_of_integer h hx
---   constructor
---   · simp only [IntPolynomial.monic_iff]
---     apply minpoly.monic <| IsIntegral.of_finite K x
---   · rw [IntPolynomial.eval₂_eq, minpoly.aeval]
-
 theorem mem_integer_of_mem_integral_closure (h : vK.v.IsEquiv <| v.comap (algebraMap K L))
     {x : L} (hx : x ∈ integralClosure vK.valuationSubring L) :
   x ∈ v.integer := by
@@ -107,22 +79,9 @@ theorem mem_integer_of_mem_integral_closure (h : vK.v.IsEquiv <| v.comap (algebr
     rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, h_eval]
   rw [this, map_neg, map_one]
 
--- theorem eq_integer_of_subset_integer {ΓL' : outParam Type*}
---     [LinearOrderedCommGroupWithZero ΓL'] {v' : Valuation L ΓL'}
---     (h : ∀x : L, x ∈ v.integer → x ∈ v'.integer) :
---   v.integer = v'.integer := by
---   sorry
-
-theorem eq_integer_of_subset_integer {ΓL' : outParam Type*}
-    [LinearOrderedCommGroupWithZero ΓL'] {v' : Valuation L ΓL'}
-    (h : ∀x : L, x ∈ v.integer → x ∈ v'.integer) :
-  v.integer = v'.integer := by
-  -- use approximation lemma
-  sorry
-
 end Valuation
 
-end hensel
+end non_discrete
 
 variable {K : Type*} [Field K] [vK : Valued K ℤₘ₀]
 variable {L : Type*} [Field L]
@@ -134,23 +93,37 @@ variable [Algebra K L] [FiniteDimensional K L]
 section int_closure_discrete
 
 variable [IsDiscrete vK.v] [CompleteSpace K]
-variable {v : Valuation L ℤₘ₀}
+variable {vL : Valuation L ℤₘ₀}
 
-#check extendedValuation K L
+theorem nontrivial_of_valuation_extension (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) : vL.Nontrivial := by
+  rcases exists_Uniformizer_ofDiscrete vK.v with ⟨π, hp⟩
+  use (algebraMap K L) π
+  constructor
+  · rw [← comap_apply, ← IsEquiv.ne_zero h, hp]
+    decide
+  · apply ne_of_lt
+    rw [← comap_apply, ← (isEquiv_iff_val_lt_one _ _).mp h, hp]
+    decide
 
-theorem aux0 (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
-  v.integer = (extendedValuation K L).integer := by
-  apply Eq.symm
-  apply eq_integer_of_subset_integer
+/-- use transitivity of equivalence -/
+theorem unique_valuation_extension
+  (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
+    vL.IsEquiv (extendedValuation K L) := by
+  letI : vL.Nontrivial := nontrivial_of_valuation_extension h
+  apply IsEquiv.trans (isEquiv_ofNontrivial vL) (isEquiv_of_le_one_le_one _).symm
   intro x
-  rw [mem_integer_iff, ← mem_valuationSubring_iff, ← ValuationSubring.mem_toSubring,
-    ← Extension.integralClosure_eq_integer]
+  rw [← mem_valuationSubring_iff, ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, ← (isEquiv_iff_val_le_one _ _).mp (isEquiv_ofNontrivial vL)]
   apply mem_integer_of_mem_integral_closure h
 
+theorem unique_valuation_extension' (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
+  vL.integer = (extendedValuation K L).integer := by
+  rw [← isEquiv_iff_integer]
+  exact unique_valuation_extension h
+
 theorem integral_closure_eq_integer_of_complete_discrete
-    (h : vK.v.IsEquiv <| v.comap (algebraMap K L)) :
-  (integralClosure vK.valuationSubring L).toSubring = v.integer := by
-  rw [Extension.integralClosure_eq_integer, aux0 h]
+    (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
+  (integralClosure vK.valuationSubring L).toSubring = vL.integer := by
+  rw [Extension.integralClosure_eq_integer, unique_valuation_extension' h]
   ext
   rw [ValuationSubring.mem_toSubring, mem_valuationSubring_iff, mem_integer_iff]
 
@@ -169,7 +142,8 @@ theorem unique_valuationSubring_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algeb
     ← Valuation.mem_integer_iff, ← Valuation.mem_integer_iff,
     ← integral_closure_eq_integer_of_complete_discrete h₁, ← integral_closure_eq_integer_of_complete_discrete h₂]
 
-theorem unique_val_of_ext (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
+theorem unique_val_of_ext
+  (h₁ : vK.v.IsEquiv <| v₁.comap (algebraMap K L))
   (h₂ : vK.v.IsEquiv <| v₂.comap (algebraMap K L)) :
     v₁.IsEquiv v₂ :=
   (Valuation.isEquiv_iff_valuationSubring _ _).mpr <| unique_valuationSubring_of_ext h₁ h₂
