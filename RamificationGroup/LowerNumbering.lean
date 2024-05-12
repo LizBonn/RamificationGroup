@@ -111,7 +111,6 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
 
 end
 
-
 section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
 open Classical
