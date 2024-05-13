@@ -178,7 +178,8 @@ section
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L]
 
-theorem UpperRamificationGroup_aux.eq_top [IsValExtension K L] [CompleteSpace K] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+-- Should this have `[IsDiscrete vK.v]`?
+theorem UpperRamificationGroup_aux.eq_top [IsValExtension K L] [CompleteSpace K] [IsDiscrete vK.v] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
   rw [UpperRamificationGroup_aux.eq_decompositionGroup h, decompositionGroup_eq_top]
 
 end
