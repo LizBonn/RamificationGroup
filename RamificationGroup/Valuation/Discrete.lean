@@ -6,6 +6,7 @@ import LocalClassFieldTheory.DiscreteValuationRing.Complete
 import LocalClassFieldTheory.DiscreteValuationRing.DiscreteNorm
 import RamificationGroup.ForMathlib.Henselian
 import RamificationGroup.Valued.Defs
+import LocalClassFieldTheory.ForMathlib.RankOneValuation
 
 open Valuation Valued DiscreteValuation Multiplicative
 
@@ -165,11 +166,6 @@ theorem isUniformizer_of_uniformizer_of_equiv (h : v.IsEquiv v')
   (π : Uniformizer v) : IsUniformizer v' π.1 := isUniformizer_of_uniformizer_of_le_one_le_one
   (fun {_} hx ↦ ((isEquiv_iff_val_le_one v v').mp h).mp hx) π
 
--- /--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.-/
--- theorem isUniformizer_of_uniformizer_of_equiv' (h : v.IsEquiv v')
---     {π : K} (hπ : IsUniformizer v π) : IsUniformizer v' π := by
---   sorry
-
 theorem val_pow_Uniformizer_all_of_equiv (h : v.IsEquiv v') {π : Uniformizer v} {n : ℤ} {u : v.valuationSubringˣ} :
   v' ((π.1 : K) ^ n * u.1) = ofAdd (-n : ℤ) := by
   rw [v'.map_mul, Valuation.map_zpow,
@@ -178,8 +174,6 @@ theorem val_pow_Uniformizer_all_of_equiv (h : v.IsEquiv v') {π : Uniformizer v}
     rw [← (isEquiv_iff_val_eq_one _ _).mp h, val_valuationSubring_unit]
   simp only [Int.reduceNeg, ofAdd_neg, WithZero.coe_inv, inv_zpow', zpow_neg, this, mul_one, inv_inj,
     ← WithZero.coe_zpow, ← ofAdd_zsmul, smul_eq_mul, mul_one] -- `WithZero.coe_zpow` should be tagged with @[norm_cast], but it is not.
-
--- theorem val_lt_one_iff {x : K} {π : Uniformizer v} : v x < 1 ↔ x ∈ Ideal.span {π.1} := by sorry
 
 theorem lt_one_lt_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) {x : K} (hx : v x < 1) : v' x < 1 := by
   by_cases xne0 : x = 0
@@ -232,31 +226,41 @@ end DiscreteValuation
 
 section nontrivial
 
-variable {R : Type*} [CommRing R]
 variable {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+
+section non_field
+
+variable {R : Type*} [CommRing R]
 
 namespace Valuation
 
 class Nontrivial (v : Valuation R Γ) : Prop where
   nontrivial : ∃ r : R, v r ≠ 0 ∧ v r ≠ 1
 
+instance instNontrivialToRankOne (v : Valuation R Γ) [IsRankOne v] : v.Nontrivial where
+  nontrivial := IsRankOne.nontrivial
+
 end Valuation
+
+end non_field
+
+section field
+
+variable {R : Type*} [Field R]
 
 namespace DiscreteValuation
 
 def ofNontrivial (v : Valuation R ℤₘ₀) [Nontrivial v] : Valuation R ℤₘ₀ := sorry
 
--- theorem instNontrivialToIsDiscrete (v : Valuation R ℤₘ₀) [IsDiscrete v] : v.Nontrivial := by
---   sorry
-
 variable (v : Valuation R ℤₘ₀) [Nontrivial v]
-
 
 theorem isEquiv_ofNontrivial : v.IsEquiv (ofNontrivial v) := by sorry
 
 instance instIsDiscreteToOfNontrivial : IsDiscrete (ofNontrivial v) := by sorry
 
 end DiscreteValuation
+
+end field
 
 end nontrivial
 

@@ -171,9 +171,6 @@ theorem adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive
   rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
   apply aeval_mem_adjoin_singleton
 
-
-variable (A) (B)
-
 /-- For a finite extension of DVR `A ↪ B` with seperable residue field extension,
 there exists `x : B` s.t. `B = A[x]`-/
 theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
@@ -189,6 +186,6 @@ theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : 
 noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
   letI := NoZeroSMulDivisors.of_algebraMap_injective h;
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
-    (AlgEquiv.ofTop (exists_primitive _ _ h).choose_spec)
+    (AlgEquiv.ofTop (exists_primitive h).choose_spec)
 
 end ExtDVR
