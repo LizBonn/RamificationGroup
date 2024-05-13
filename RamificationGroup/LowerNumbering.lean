@@ -1,4 +1,5 @@
 import RamificationGroup.Valued.Hom.Discrete
+import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 import LocalClassFieldTheory.LocalField
@@ -51,7 +52,7 @@ end DecompositionGroup
 
 -- <-1 decomposition group
 -- >= -1 decompositiongroup and v (s x - x) ≤ 1
-section
+section def_lower_rami_grp
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
@@ -109,7 +110,7 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
       Multiplicative.ofAdd_le]
     exact hab
 
-end
+end def_lower_rami_grp
 
 section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
@@ -138,7 +139,7 @@ noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : Conditionall
 
 instance {α} [Add α] [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrder (Multiplicative α) := inferInstanceAs (ConditionallyCompleteLinearOrder α)
 
--- instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
+-- noncomputable instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
 
 end WithBot
 
@@ -164,6 +165,8 @@ scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => AlgEquiv.truncated
 
 end lowerIndex
 
+section ScalarTower
+
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
@@ -176,7 +179,7 @@ theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
   simp [AlgEquiv.truncatedLowerIndex]
 
-section
+section lowerIndex_inequality
 
 variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [CommRing K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
 [LinearOrderedCommGroupWithZero ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L]
@@ -255,7 +258,7 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
     simp [hc]
     sorry
 
-end
+end lowerIndex_inequality
 
 @[simp]
 theorem lowerIndex_restrictScalars (s : S ≃ₐ[R'] S) : i_[S/R] (s.restrictScalars R) =  i_[S/R'] s := rfl
@@ -265,6 +268,8 @@ theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : S ≃ₐ[R'] S) : i_[
 
 @[simp]
 theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(S/R)_[u].comap (AlgEquiv.restrictScalarsHom R) = G(S/R')_[u] := rfl
+
+end ScalarTower
 
 section ExhausiveSeperated
 
@@ -289,7 +294,7 @@ G(S/R)_[u] = decompositionGroup R S := by
       show (0 : ℤ) ≤ - u - 1
       linarith
 
-section
+section eq_top
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
@@ -298,21 +303,21 @@ theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decom
   rw [Subgroup.eq_top_iff']
   intro f
   unfold decompositionGroup
-  simp only [Subgroup.mem_mk, Set.mem_setOf_eq]
+  rw [Subgroup.mem_mk, Set.mem_setOf_eq]
   apply algEquiv_preserve_val_of_complete
 
 theorem lowerRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
   rw [lowerRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
 
-end
+end eq_top
 
-section
+section eq_bot
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algebra K L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
 
-end
+end eq_bot
 
 end ExhausiveSeperated
