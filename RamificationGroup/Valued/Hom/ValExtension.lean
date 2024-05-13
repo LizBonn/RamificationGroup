@@ -204,4 +204,14 @@ end ValuationSubring
 
 end lift
 
+section injective
+
+variable {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
+  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
+  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
+
+-- theorem AlgebraMap
+
+end injective
+
 end IsValExtension
