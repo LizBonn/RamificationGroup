@@ -313,10 +313,25 @@ end eq_top
 
 section eq_bot
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
+open ExtDVR IsValExtension
+
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [Nontrivial vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
+
+-- Might be too strong
+instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] := by sorry
+
+instance instNoethertianToValuationSubringExtension : IsNoetherian 𝒪[K] 𝒪[L] := by
+  sorry
+
+#check PowerBasis.exists_eq_aeval
+
+noncomputable def PowerBasisValExtension [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : PowerBasis 𝒪[K] 𝒪[L] :=
+  letI : Nontrivial vL.v := nontrivial_of_valExtension K L
+  letI : DiscreteValuationRing 𝒪[L] := inferInstance
+  PowerBasisExtDVR (integerAlgebra_injective K L)
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algebra K L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
+theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
 
 end eq_bot
 

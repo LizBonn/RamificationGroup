@@ -5,7 +5,10 @@ namespace DiscreteValuationRing
 
 open LocalRing
 
-variable {A : Type*} [CommRing A] [LocalRing A] [IsDomain A] [DiscreteValuationRing A]
+variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
+
+section uniformiser
+
 variable {ϖ x : A} (hϖ : Irreducible ϖ)
 
 theorem unit_mul_irreducible_of_irreducible (hx : Irreducible x) : ∃u : A, IsUnit u ∧ x = u * ϖ := by
@@ -43,3 +46,5 @@ theorem irreducible_of_irreducible_add_addVal_ge_two (hx : Irreducible x) {y : A
 
 theorem maximalIdeal_pow_eq_span_irreducible_pow (n : ℕ) : maximalIdeal A ^ n = Ideal.span {ϖ ^ n} := by
   rw [Irreducible.maximalIdeal_eq hϖ, Ideal.span_singleton_pow]
+
+end uniformiser

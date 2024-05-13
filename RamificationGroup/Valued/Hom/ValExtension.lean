@@ -1,4 +1,5 @@
 import RamificationGroup.Valued.Defs
+import RamificationGroup.Valuation.Discrete
 
 /-!
 # Extension of Valuation
@@ -200,18 +201,32 @@ instance : IsLocalRingHom (algebraMap 𝒪[R] 𝒪[A]) where
           simp only [coe_algebraMap_valuationSubring, val_map_eq_one_iff] at hr
           exact hr
 
+variable (R A) in
+theorem integerAlgebra_injective : Function.Injective (algebraMap 𝒪[R] 𝒪[A]) := by
+  intro x y h
+  simp only [Subtype.ext_iff, coe_algebraMap_valuationSubring] at h
+  ext
+  apply RingHom.injective (algebraMap R A) h
+
 end ValuationSubring
 
 end lift
 
-section injective
+section nontrivial
 
-variable {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
+variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
+  [Algebra R A] [vR : Valued R ΓR] [Nontrivial vR.v] [vA : Valued A ΓA] [IsValExtension R A]
 
--- theorem AlgebraMap
+variable (R A) in
+theorem nontrivial_of_valExtension : Nontrivial vA.v where
+  nontrivial := by
+    rcases vR.v.nontrivial_def with ⟨r, h0, h1⟩
+    use (algebraMap R A) r
+    simp [h1]
+    rw [show (0 : ΓA) = vA.v (0) by simp, show (0 : A) = (algebraMap R A) 0 by simp, val_map_eq_iff]
+    simp [h0]
 
-end injective
+end nontrivial
 
 end IsValExtension

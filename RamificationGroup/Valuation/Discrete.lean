@@ -230,12 +230,15 @@ variable {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
 
 section non_field
 
-variable {R : Type*} [CommRing R]
+variable {R : Type*} [Ring R]
 
 namespace Valuation
 
 class Nontrivial (v : Valuation R Γ) : Prop where
   nontrivial : ∃ r : R, v r ≠ 0 ∧ v r ≠ 1
+
+@[deprecated]
+theorem nontrivial_def (v : Valuation R Γ) [Nontrivial v] : ∃ r : R, v r ≠ 0 ∧ v r ≠ 1 := Nontrivial.nontrivial
 
 instance instNontrivialToRankOne (v : Valuation R Γ) [IsRankOne v] : v.Nontrivial where
   nontrivial := IsRankOne.nontrivial
@@ -250,13 +253,23 @@ variable {R : Type*} [Field R]
 
 namespace DiscreteValuation
 
+theorem valuationSubring_DVR_of_equiv_discrete {v u : Valuation R ℤₘ₀} [IsDiscrete u]
+  (h : v.IsEquiv u) : DiscreteValuationRing v.valuationSubring := by
+  rw [(Valuation.isEquiv_iff_valuationSubring _ _).mp h]
+  infer_instance
+
 def ofNontrivial (v : Valuation R ℤₘ₀) [Nontrivial v] : Valuation R ℤₘ₀ := sorry
 
 variable (v : Valuation R ℤₘ₀) [Nontrivial v]
 
 theorem isEquiv_ofNontrivial : v.IsEquiv (ofNontrivial v) := by sorry
 
+#check DiscreteValuationRing
+
 instance instIsDiscreteToOfNontrivial : IsDiscrete (ofNontrivial v) := by sorry
+
+instance instDiscreteValuationRingToNontrivial : DiscreteValuationRing v.valuationSubring :=
+  valuationSubring_DVR_of_equiv_discrete (isEquiv_ofNontrivial v)
 
 end DiscreteValuation
 

@@ -12,15 +12,16 @@ open LocalRing Classical IntermediateField Polynomial Classical DiscreteValuatio
 
 namespace ExtDVR
 
-variable {A : Type*} [CommRing A] [LocalRing A] [IsDomain A] [DiscreteValuationRing A]
-variable {B : Type*} [CommRing B] [LocalRing B] [IsDomain B] [DiscreteValuationRing B]
+variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
+variable {B : Type*} [CommRing B] [IsDomain B] [DiscreteValuationRing B]
 variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
-variable [Module.Finite A B] [IsSeparable (ResidueField A) (ResidueField B)]
+variable [IsSeparable (ResidueField A) (ResidueField B)]
+variable [Module.Finite A B]
 
 instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
 
 variable (A) (B) in
-/--exists `x : B` generating `k_B` over `k_A` -/
+/-- There exists `x : B` generating `k_B` over `k_A` -/
 theorem exists_lift_residue_primitive : ∃x : B, (ResidueField A)⟮residue B x⟯ = ⊤ := by
   let x := (Field.exists_primitive_element (ResidueField A) (ResidueField B)).choose
   use (Ideal.Quotient.mk_surjective x).choose
@@ -54,7 +55,7 @@ lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top : to
   obtain ⟨g0, hg0⟩ : ∃g : (ResidueField A)[X], aeval (residue B x) g = residue B y := by
     rw [← AlgHom.mem_range, ← Algebra.adjoin_singleton_eq_range_aeval,
       ← IntermediateField.adjoin_simple_toSubalgebra_of_integral (IsIntegral.of_finite _ _), hx]
-    simp only[top_toSubalgebra, Algebra.mem_top]
+    simp only [top_toSubalgebra, Algebra.mem_top]
   let g : A[X] := (map_surjective (residue A) Ideal.Quotient.mk_surjective g0).choose
   rw [show y = g.eval₂ (algebraMap A B) x + (y - g.eval₂ (algebraMap A B) x) by rw [add_sub_cancel'_right]]
   apply Submodule.add_mem_sup
