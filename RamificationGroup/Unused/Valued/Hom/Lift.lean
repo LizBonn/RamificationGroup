@@ -1,5 +1,5 @@
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
-import RamificationGroup.Valued.Hom.Defs
+import RamificationGroup.Valued.Defs
 
 open DiscreteValuation Valuation Valued
 

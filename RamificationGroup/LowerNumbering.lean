@@ -1,4 +1,5 @@
-import RamificationGroup.Valued.Hom.ValExtension
+import RamificationGroup.Valued.Hom.Discrete
+import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 import LocalClassFieldTheory.LocalField
@@ -31,7 +32,9 @@ theorem Valuation.IsEquiv_comap_symm {s : S ≃+* S} (h : vS.v.IsEquiv (vS.v.com
   convert (h (s.symm x) (s.symm y)).symm using 2 <;>
   simp
 
-def Valued.decompositionGroup : Subgroup (S ≃ₐ[R] S) where
+namespace Valued
+
+def decompositionGroup : Subgroup (S ≃ₐ[R] S) where
   carrier := {s | vS.v.IsEquiv <| vS.v.comap s}
   mul_mem' {s} {s'} hs hs' x y := by
     calc
@@ -43,18 +46,20 @@ def Valued.decompositionGroup : Subgroup (S ≃ₐ[R] S) where
     apply Valuation.IsEquiv_comap_symm
     exact h
 
+end Valued
+
 end DecompositionGroup
 
 -- <-1 decomposition group
 -- >= -1 decompositiongroup and v (s x - x) ≤ 1
-section
+section def_lower_rami_grp
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 -- variable (K L : Type*) {ΓL : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ℤₘ₀] [Algebra K L]
 
-def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
-    carrier := {s | s ∈ decompositionGroup R S ∧ ∀ x : vS.v.integer, Valued.v (s x - x) ≤ .coe (.ofAdd (- i - 1))}
+def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
+    carrier := {s | s ∈ decompositionGroup R S ∧ ∀ x : vS.v.integer, Valued.v (s x - x) ≤ .coe (.ofAdd (- u - 1))}
     mul_mem' {a} {b} ha hb := by
       constructor
       · exact mul_mem ha.1 hb.1
@@ -63,7 +68,7 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
           _ = v (a (b x) - x) := rfl
           _ = v ((a (b x) - b x) + (b x - x)) := by congr; simp
           _ ≤ max (v (a (b x) - b x)) (v (b x - x)) := Valuation.map_add _ _ _
-          _ ≤ max (.coe (.ofAdd (- i - 1))) (.coe (.ofAdd (- i - 1))) := by
+          _ ≤ max (.coe (.ofAdd (- u - 1))) (.coe (.ofAdd (- u - 1))) := by
             apply max_le_max
             · exact ha.2 ⟨b x, (val_map_le_one_iff hb.1 x).mpr x.2⟩
             · exact hb.2 x
@@ -89,6 +94,8 @@ def lowerRamificationGroup (i : ℤ) : Subgroup (S ≃ₐ[R] S) where
       _ ≤ _ := hs.2 ⟨s⁻¹ a, (val_map_le_one_iff (f := (s.symm : S →+* S))
         (Valuation.IsEquiv_comap_symm hs.1) a.1).mpr a.2⟩
 
+scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" u:max "] " => lowerRamificationGroup R S u
+
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
   rintro a b hab
   simp only [lowerRamificationGroup, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mk_le_mk,
@@ -103,8 +110,7 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
       Multiplicative.ofAdd_le]
     exact hab
 
-end
-
+end def_lower_rami_grp
 
 section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
@@ -133,21 +139,19 @@ noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : Conditionall
 
 instance {α} [Add α] [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrder (Multiplicative α) := inferInstanceAs (ConditionallyCompleteLinearOrder α)
 
--- instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
+-- noncomputable instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
 
 end WithBot
 
 section lowerIndex
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
+variable (R S : Type*) [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 open Classical
 -- 0 if lower than 0
 noncomputable def AlgEquiv.lowerIndex (s : S ≃ₐ[R] S) : ℕ∞ :=
   if h : iSup (fun x : vS.v.integer => (Valued.v (s x - x))) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
-
-scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" n:max "] " => lowerRamificationGroup R S n
 
 scoped [Valued] notation:max " i_[" S:max "/" R:max "]" => AlgEquiv.lowerIndex R S
 
@@ -161,6 +165,8 @@ scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => AlgEquiv.truncated
 
 end lowerIndex
 
+section ScalarTower
+
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
@@ -173,7 +179,7 @@ theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
   simp [AlgEquiv.truncatedLowerIndex]
 
-section
+section lowerIndex_inequality
 
 variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [CommRing K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
 [LinearOrderedCommGroupWithZero ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L]
@@ -202,7 +208,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} : i_[L/K] s = ⊤ ↔ 
       sorry
   · simp [AlgEquiv.lowerIndex, h]
 
---the type of n should be changed
+--the type of `n` should be changed
 -- instead, change when use this theorem
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [AlgEquiv.truncatedLowerIndex]
@@ -252,7 +258,7 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
     simp [hc]
     sorry
 
-end
+end lowerIndex_inequality
 
 @[simp]
 theorem lowerIndex_restrictScalars (s : S ≃ₐ[R'] S) : i_[S/R] (s.restrictScalars R) =  i_[S/R'] s := rfl
@@ -263,6 +269,7 @@ theorem truncatedLowerIndex_restrictScalars (u : ℚ) (s : S ≃ₐ[R'] S) : i_[
 @[simp]
 theorem lowerRamificationGroup_restrictScalars (u : ℤ) : G(S/R)_[u].comap (AlgEquiv.restrictScalarsHom R) = G(S/R')_[u] := rfl
 
+end ScalarTower
 
 section ExhausiveSeperated
 
@@ -287,26 +294,30 @@ G(S/R)_[u] = decompositionGroup R S := by
       show (0 : ℤ) ≤ - u - 1
       linarith
 
-section
+section eq_top
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
--- this completeness implies unique extension of valuation, need to use Bichang's work
 @[simp]
-theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := sorry
+theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
+  rw [Subgroup.eq_top_iff']
+  intro f
+  unfold decompositionGroup
+  rw [Subgroup.mem_mk, Set.mem_setOf_eq]
+  apply algEquiv_preserve_val_of_complete
 
 theorem lowerRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
   rw [lowerRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
 
-end
+end eq_top
 
-section
+section eq_bot
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algebra K L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
 
-end
+end eq_bot
 
 end ExhausiveSeperated

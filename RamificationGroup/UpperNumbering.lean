@@ -13,6 +13,8 @@ rename theorems into UpperRamificationGroup.xxx
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation
 open HerbrandFunction
 
+noncomputable
+section
 
 section upperRamificationGroup_aux
 
@@ -22,11 +24,12 @@ variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [LinearOrdered
 
 variable {K' : Type*} [Field K'] [vK' : Valued K' ℤₘ₀] [Algebra K K'] [Algebra K L] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] -- `I hope this is enough`
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S] (x : ℚ)
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 #check Int.ceil
 
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
-noncomputable def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
+
+def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
 
 end definition_aux
 
@@ -48,7 +51,7 @@ theorem preimage_singleton_nonempty {σ : K' ≃ₐ[K] K'} : ((AlgEquiv.restrict
   exact Set.Nonempty.preimage (Set.singleton_nonempty _) (AlgEquiv.restrictNormalHom_surjective (F := K) (E := L) (K₁ := K'))
 
 variable (L) in
-noncomputable def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
+def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
 
 theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (AlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  AlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ L u σ := by
@@ -191,7 +194,8 @@ section
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L]
 
-theorem UpperRamificationGroup_aux.eq_top [IsValExtension K L] [CompleteSpace K] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+-- Should this have `[IsDiscrete vK.v]`?
+theorem UpperRamificationGroup_aux.eq_top [IsValExtension K L] [CompleteSpace K] [IsDiscrete vK.v] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
   rw [UpperRamificationGroup_aux.eq_decompositionGroup h, decompositionGroup_eq_top]
 
 end
@@ -223,13 +227,14 @@ namespace DiscreteValuation
 
 variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] {K' : IntermediateField K L} [FiniteDimensional K K']
 
-noncomputable instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
+instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
 
 /- -- success
 #synth IsDiscrete (valuedIntermediateField.v : Valuation K' _)
 -/
 
 -- this is needed, or #synth CompleteSpace K' fails
+-- `when is this needed?`
 instance (priority := 100) : CompleteSpace K' := DiscreteValuation.Extension.completeSpace K K'
 
 end DiscreteValuation
@@ -245,7 +250,7 @@ noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
 -/
 
 -- this is easier to use
-noncomputable def upperRamificationGroup (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
+def upperRamificationGroup (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
   carrier := {s | ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ upperRamificationGroup_aux K F v}
   mul_mem' {s} {s'} hs hs' F _ _ := by
@@ -270,7 +275,20 @@ namespace UpperRamificationGroup
 variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K]
 
 -- theorem relation with aux
-theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] (v : ℚ) : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := sorry
+theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
+  ext s
+  simp only [upperRamificationGroup, Subgroup.mem_mk, Set.mem_setOf_eq]
+  constructor
+  · intro h
+    -- simp [upperRamificationGroup_aux]
+    haveI := Normal.of_algEquiv (F := K) (E := L) (IntermediateField.topEquiv.symm)
+    have g := h ⊤
+    sorry
+    -- exact h (⊤ : IntermediateField K L) -- Add theorems of isom
+  · intro h F _ _
+    rw [← UpperRamificationGroup_aux.map_restrictNormalHom (L := L)]
+    apply Subgroup.mem_map_of_mem
+    exact h
 
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ upperRamificationGroup_aux K F v := by
@@ -278,7 +296,8 @@ theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s
 
 -- theorem compatible with quotient, finite quotient
 @[simp]
-theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := sorry
+theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+  sorry
 
 theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ G(F/K)^[v] := by
@@ -286,16 +305,16 @@ theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : In
     rhs
     intro F i i'
     rhs
-    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F) v)]
+    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F))]
 
 -- theorems about exhausive and separated
 -- under what condition this is correct? this is too strong?
-theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) :
+theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) :
 G(L/K)^[v] = decompositionGroup K L := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_decompositionGroup h
 
-theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_top h
 
@@ -308,14 +327,14 @@ variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valu
 theorem inf_eq_bot (s : L ≃ₐ[K] L) : ∀ v, s ∈ G(L/K)^[v] ↔ s = 1 := sorry
 
 
-
--- theorem relation with Krull topology (?) top bases(how to state this ??)
+/-
+-- For apf extensions, theorem relation with Krull topology (?) top bases(how to state this ??)
 -- this theorem dont need so much hyp
 theorem isOpen {v : ℚ} : IsOpen (G(L/K)^[v] : Set (L ≃ₐ[K] L)) := sorry
 
 -- should add `galNormalBasis` to Mathlib first, maybe just leave it later
 def basis : GroupFilterBasis (L ≃ₐ[K] L) := sorry
-
+-/
 
 end UpperRamificationGroup
 

@@ -1,4 +1,4 @@
-import RamificationGroup.Valued.Definitions
+import RamificationGroup.Valued.Defs
 import RamificationGroup.Valued.Hom.Basic
 import RamificationGroup.Valued.Hom.Discrete
 
