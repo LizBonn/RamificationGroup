@@ -259,7 +259,20 @@ namespace UpperRamificationGroup
 variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K]
 
 -- theorem relation with aux
-theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] (v : ℚ) : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := sorry
+theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
+  ext s
+  simp only [upperRamificationGroup, Subgroup.mem_mk, Set.mem_setOf_eq]
+  constructor
+  · intro h
+    -- simp [upperRamificationGroup_aux]
+    haveI := Normal.of_algEquiv (F := K) (E := L) (IntermediateField.topEquiv.symm)
+    have g := h ⊤
+    sorry
+    -- exact h (⊤ : IntermediateField K L) -- Add theorems of isom
+  · intro h F _ _
+    rw [← UpperRamificationGroup_aux.map_restrictNormalHom (L := L)]
+    apply Subgroup.mem_map_of_mem
+    exact h
 
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ upperRamificationGroup_aux K F v := by
@@ -275,16 +288,16 @@ theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : In
     rhs
     intro F i i'
     rhs
-    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F) v)]
+    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F))]
 
 -- theorems about exhausive and separated
 -- under what condition this is correct? this is too strong?
-theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) :
+theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) :
 G(L/K)^[v] = decompositionGroup K L := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_decompositionGroup h
 
-theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_top h
 
