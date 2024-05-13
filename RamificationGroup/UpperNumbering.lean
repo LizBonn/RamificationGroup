@@ -54,8 +54,6 @@ variable (L) in
 def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
 
-#check Finset.max'_mem
-#check Finset.max'_image
 theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (AlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  AlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ L u σ := by
   simp
   unfold truncatedJ
@@ -81,6 +79,8 @@ theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u �
     linarith [h]
   use s
 
+#check AlgEquiv
+
 theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ L r σ - 1 ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
   constructor
   · apply mem_lowerRamificationGroup_of_le_truncatedJ_sub_one
@@ -91,8 +91,9 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
     let f : (L ≃ₐ[K'] L) → (AlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
       fun x => ⟨s * (x.restrictScalars K), by
         simp [s_in]
+        ext k
+        simp
         sorry⟩
-        --apply ValAlgEquiv.resNormal_of_resScalar_eq_refl⟩
     have hbij : Function.Bijective f := by
       constructor
       · rintro a1 a2 h
@@ -103,9 +104,50 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
     have hi : ∀ x : (L ≃ₐ[K'] L), AlgEquiv.truncatedLowerIndex K' L u x = AlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
     have hs' : s ∈ G(L/K)_[⌈u⌉] := by
       sorry
-    sorry
-    --rw [← hs]
-    --apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
+    rw [← hs]
+    apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
+
+namespace HerbrandFunction
+
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
+
+-- Prop 15
+open Function HerbrandFunction
+
+@[simp]
+theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
+  --this line can be simper
+  rw [← comp_apply (f := (phi K K')) (g := (phi K' L)) (x := u)]
+  sorry
+
+@[simp]
+theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
+  ext u
+  exact phi_comp_of_isValExtension' u
+
+--Prop 15
+
+
+--for mathlib
+@[simp]
+theorem Function.comp_left_cancel {α β γ: Type*} [Nonempty α] {f1 f2 : β → γ} {g : α → β} (h : Bijective g) (h1 : f1 ∘ g = f2 ∘ g) : f1 = f2 := by
+  sorry
+
+@[simp]
+theorem psi_comp_of_isValExtension : (psi K' L) ∘ (psi K K') = psi K L := by
+  unfold psi
+  have hcomp : invFun (phi K' L) ∘ invFun (phi K K') ∘ (phi K K') ∘ (phi K' L) = invFun (phi K L) ∘ (phi K K') ∘ (phi K' L) := by
+    nth_rw 2 [phi_comp_of_isValExtension]
+    rw [invFun_comp (phi_bij K L).injective, ← comp.assoc (invFun (phi K K')) (phi K K') (phi K' L), invFun_comp (phi_bij K K').injective, id_comp, invFun_comp (phi_bij K' L).injective]
+  simp [Function.comp_left_cancel (phi_bij K' L)] at hcomp
+  apply Function.comp_left_cancel (phi_bij K L) hcomp
+
+@[simp]
+theorem psi_comp_of_isValExtension' (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
+  rw [← psi_comp_of_isValExtension (K := K) (K' := K') (L := L)]
+  simp
+
+end HerbrandFunction
 
 -- Lemma 5
 @[simp]
@@ -113,8 +155,7 @@ theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K'
   ext σ
   calc
   _ ↔ truncatedJ L (u + 1) σ - 1 ≥ u :=
-  sorry
-  --(le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
+  (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
   _ ↔ phi K' L (truncatedJ L (u + 1) σ - 1) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
   _ ↔ σ.truncatedLowerIndex K K' ((phi K' L u) + 1) - 1 ≥ phi K' L u := by
     simp [phi_truncatedJ_sub_one]
@@ -123,43 +164,18 @@ theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K'
     linarith
 
 
-namespace HerbrandFunction
-
-variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
-
--- Prop 15
 @[simp]
-theorem phi_comp : (phi K K') ∘ (phi K' L) = phi K L := by
-  ext u
-  sorry
-
-@[simp]
-theorem phi_phi (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
-  sorry
-
---Prop 15
-@[simp]
-theorem psi_comp : (psi K' L) ∘ (psi K K') = psi K L := by
-  ext v
-  sorry
-
-@[simp]
-theorem psi_psi (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
-  sorry
-
-end HerbrandFunction
-
-@[simp]
-theorem UpperRamificationGroup_aux.map_restrictNormalHom (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
   calc
     _ = G(L/K)_[⌈psi K L v⌉].map (AlgEquiv.restrictNormalHom K') := rfl
     _ = G(K'/K)_[⌈phi K' L (psi K L v)⌉] := herbrand _
     _ = G(K'/K)^[v] := by
-      rw [← psi_comp (K' := K') (L := L)]
+      rw [← psi_comp_of_isValExtension (K' := K') (L := L)]
       simp only [Function.comp_apply, phi_psi_eq_self]
       rfl
 
 end
+
 
 section ExhausiveSeperated
 
@@ -259,7 +275,20 @@ namespace UpperRamificationGroup
 variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K]
 
 -- theorem relation with aux
-theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] (v : ℚ) : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := sorry
+theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
+  ext s
+  simp only [upperRamificationGroup, Subgroup.mem_mk, Set.mem_setOf_eq]
+  constructor
+  · intro h
+    -- simp [upperRamificationGroup_aux]
+    haveI := Normal.of_algEquiv (F := K) (E := L) (IntermediateField.topEquiv.symm)
+    have g := h ⊤
+    sorry
+    -- exact h (⊤ : IntermediateField K L) -- Add theorems of isom
+  · intro h F _ _
+    rw [← UpperRamificationGroup_aux.map_restrictNormalHom (L := L)]
+    apply Subgroup.mem_map_of_mem
+    exact h
 
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ upperRamificationGroup_aux K F v := by
@@ -267,7 +296,8 @@ theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s
 
 -- theorem compatible with quotient, finite quotient
 @[simp]
-theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := sorry
+theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+  sorry
 
 theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ G(F/K)^[v] := by
@@ -275,16 +305,16 @@ theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : In
     rhs
     intro F i i'
     rhs
-    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F) v)]
+    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F))]
 
 -- theorems about exhausive and separated
 -- under what condition this is correct? this is too strong?
-theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) :
+theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) :
 G(L/K)^[v] = decompositionGroup K L := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_decompositionGroup h
 
-theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_top h
 
