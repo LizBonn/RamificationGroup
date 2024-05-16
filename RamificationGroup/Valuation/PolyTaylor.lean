@@ -9,7 +9,7 @@ namespace Polynomial
 #check Polynomial.aeval_def -- `aeval` seems useless, but it is used in `minpoly` :(
 #check Polynomial.eval_map -- ev(x) ∘ map(φ) = ev₂(x, φ)
 #check Polynomial.eval₂_map -- ev₂(x, ψ) ∘ map(φ) = ev₂(x, ψ ∘ φ)
-#check Polynomial.hom_eval₂ -- ψ ∘ ev(x, φ) = ev₂(ψ(x), ψ ∘ φ)
+#check Polynomial.hom_eval₂ -- ψ ∘ ev₂(x, φ) = ev₂(ψ(x), ψ ∘ φ)
 
 
 variable {A : Type*} [CommSemiring A]

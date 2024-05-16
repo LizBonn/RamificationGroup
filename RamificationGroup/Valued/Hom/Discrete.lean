@@ -1,5 +1,4 @@
 /-
-use approximation lemma
 normalize to `integer` or `valuationSubring`?
 -/
 
@@ -56,27 +55,34 @@ theorem aeval_valuationSubring_lt_one_of_lt_one
     apply ((isEquiv_iff_val_le_one _ _).mp h).mp (f.coeff n).2
   · simp only [coeff_map, h0, _root_.map_zero]
 
+theorem aeval_valuationSubring_lt_one_of_lt_one_self
+  (f : 𝒪[K][X]) (h0 : f.coeff 0 = 0) {x : K} (hx : vK.v x < 1) :
+    vK.v (aeval x f) < 1 := by
+  rw [aeval_def, ← eval_map]
+  apply eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one _ _ hx
+  · intro n
+    rw [coeff_map, show (algebraMap 𝒪[K] K) (f.coeff n) = (algebraMap K K) (f.coeff n) by rfl, ← comap_apply]
+    apply (f.coeff n).2
+  · simp only [coeff_map, h0, _root_.map_zero]
+
 theorem mem_integer_of_mem_integral_closure (h : vK.v.IsEquiv <| v.comap (algebraMap K L))
     {x : L} (hx : x ∈ integralClosure vK.valuationSubring L) :
   x ∈ v.integer := by
-  rcases hx with ⟨p, h_monic, h_eval⟩
+  rcases hx with ⟨p, hp⟩
   rw [mem_integer_iff]
   by_contra! vxgt1
   have xne0 : x ≠ 0 := (Valuation.ne_zero_iff v).mp <| ne_of_gt <| lt_trans (zero_lt_one' _) vxgt1
   letI : Invertible x := invertibleOfNonzero xne0
-  let g := p.reverse - 1
-  have : v (aeval x⁻¹ g) < 1 := by
+  have : v (aeval x⁻¹ (p.reverse - 1)) < 1 := by
     apply aeval_valuationSubring_lt_one_of_lt_one h
-    · rw [show g = p.reverse - 1 by rfl]
-      simp only [coeff_sub, coeff_zero_reverse, h_monic, Monic.leadingCoeff, coeff_one_zero,
-        sub_self]
+    · simp only [coeff_sub, coeff_zero_reverse, hp.1, Monic.leadingCoeff, coeff_one_zero, sub_self]
     · apply (one_lt_val_iff v xne0).mp vxgt1
   apply ne_of_lt this
-  have : aeval x⁻¹ g = -1 := by
+  have : aeval x⁻¹ (p.reverse - 1) = -1 := by
     rw [← add_neg_eq_zero]
     ring_nf
     simp only [_root_.map_add, _root_.map_neg, _root_.map_one, add_neg_cancel_left]
-    rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, h_eval]
+    rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, hp.2]
   rw [this, map_neg, map_one]
 
 end Valuation
@@ -105,8 +111,8 @@ theorem nontrivial_of_valuation_extension (h : vK.v.IsEquiv <| vL.comap (algebra
     rw [← comap_apply, ← (isEquiv_iff_val_lt_one _ _).mp h, hp]
     decide
 
-/-- use transitivity of equivalence -/
-theorem unique_valuation_extension
+/-- If a valuation `v : L → ℤₘ₀` extends the valuation on `K`, then `v` is equivalent to `extendedValuation K L`.-/
+theorem extension_valuation_equiv_extendedValuation_of_discrete
   (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
     vL.IsEquiv (extendedValuation K L) := by
   letI : vL.Nontrivial := nontrivial_of_valuation_extension h
@@ -115,15 +121,15 @@ theorem unique_valuation_extension
   rw [← mem_valuationSubring_iff, ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, ← (isEquiv_iff_val_le_one _ _).mp (isEquiv_ofNontrivial vL)]
   apply mem_integer_of_mem_integral_closure h
 
-theorem unique_valuation_extension' (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
+theorem extension_integer_eq_extendedValuation_of_discrete (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
   vL.integer = (extendedValuation K L).integer := by
   rw [← isEquiv_iff_integer]
-  exact unique_valuation_extension h
+  exact extension_valuation_equiv_extendedValuation_of_discrete h
 
 theorem integral_closure_eq_integer_of_complete_discrete
     (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
   (integralClosure vK.valuationSubring L).toSubring = vL.integer := by
-  rw [Extension.integralClosure_eq_integer, unique_valuation_extension' h]
+  rw [Extension.integralClosure_eq_integer, extension_integer_eq_extendedValuation_of_discrete h]
   ext
   rw [ValuationSubring.mem_toSubring, mem_valuationSubring_iff, mem_integer_iff]
 

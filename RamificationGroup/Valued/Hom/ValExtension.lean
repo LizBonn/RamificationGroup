@@ -186,6 +186,11 @@ variable {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
 
 instance valuationSubringAlgebra : Algebra 𝒪[R] 𝒪[A] := inferInstanceAs <| Algebra vR.v.integer vA.v.integer
 
+variable (R A) in
+theorem subtype_comp_algebraMap_eq_algebraMap : RingHom.comp 𝒪[A].subtype (algebraMap 𝒪[R] 𝒪[A]) = algebraMap 𝒪[R] A := rfl
+
+theorem subtype_comp_algebraMap_eq_algebraMap_apply (x : 𝒪[R]) : (algebraMap 𝒪[R] 𝒪[A] x).val = (algebraMap 𝒪[R] A) x := rfl
+
 @[simp, norm_cast]
 theorem coe_algebraMap_valuationSubring (r : 𝒪[R]) : ((algebraMap 𝒪[R] 𝒪[A]) r : A) = (algebraMap R A) (r : R) := rfl
 
@@ -195,7 +200,8 @@ instance : IsLocalRingHom (algebraMap 𝒪[R] 𝒪[A]) where
       · simp [h] at hr
       · apply Valuation.Integers.isUnit_of_one (v := vR.v)
         · exact Valuation.integer.integers (v := vR.v)
-        · simpa [isUnit_iff_ne_zero]
+        · simpa only [ValuationSubring.algebraMap_apply, isUnit_iff_ne_zero, ne_eq,
+          ZeroMemClass.coe_eq_zero]
         · apply Valuation.Integers.one_of_isUnit (Valuation.integer.integers (v := vA.v)) at hr
           change v (((algebraMap ↥𝒪[R] ↥𝒪[A]) r) : A) = 1 at hr
           simp only [coe_algebraMap_valuationSubring, val_map_eq_one_iff] at hr
@@ -207,6 +213,20 @@ theorem integerAlgebra_injective : Function.Injective (algebraMap 𝒪[R] 𝒪[A
   simp only [Subtype.ext_iff, coe_algebraMap_valuationSubring] at h
   ext
   apply RingHom.injective (algebraMap R A) h
+
+section scalar_tower
+
+attribute [local instance 1001] Algebra.toSMul
+
+instance instIsScalarTowerToValuationSubringToField : IsScalarTower 𝒪[R] 𝒪[A] A where
+  smul_assoc x y z := by
+    simp only [Algebra.smul_def]
+    calc
+      _ = (algebraMap 𝒪[A] A) ((algebraMap 𝒪[R] 𝒪[A]) x) * (algebraMap 𝒪[A] A) y * z := by simp only [_root_.map_mul,
+        ValuationSubring.algebraMap_apply, coe_algebraMap_valuationSubring]
+      _ = (algebraMap 𝒪[A] A) ((algebraMap 𝒪[R] 𝒪[A]) x) * ((algebraMap 𝒪[A] A) y * z) := mul_assoc _ _ _
+
+end scalar_tower
 
 end ValuationSubring
 
