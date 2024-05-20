@@ -151,9 +151,9 @@ theorem psi_comp_of_isValExtension : (psi K' L) ∘ (psi K K') = psi K L := by
   unfold psi
   have hcomp : invFun (phi K' L) ∘ invFun (phi K K') ∘ (phi K K') ∘ (phi K' L) = invFun (phi K L) ∘ (phi K K') ∘ (phi K' L) := by
     nth_rw 2 [phi_comp_of_isValExtension]
-    rw [invFun_comp (phi_bij K L).injective, ← comp.assoc (invFun (phi K K')) (phi K K') (phi K' L), invFun_comp (phi_bij K K').injective, id_comp, invFun_comp (phi_bij K' L).injective]
-  simp [Function.comp_left_cancel (phi_bij K' L)] at hcomp
-  apply Function.comp_left_cancel (phi_bij K L) hcomp
+    rw [invFun_comp (phi_Bijective K L).injective, ← comp.assoc (invFun (phi K K')) (phi K K') (phi K' L), invFun_comp (phi_Bijective K K').injective, id_comp, invFun_comp (phi_Bijective K' L).injective]
+  simp [Function.comp_left_cancel (phi_Bijective K' L)] at hcomp
+  apply Function.comp_left_cancel (phi_Bijective K L) hcomp
 
 @[simp]
 theorem psi_comp_of_isValExtension' (v : ℚ) : (psi K' L) ((psi K K') v) = psi K L v := by
