@@ -25,7 +25,6 @@ variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [LinearOrdered
 variable {K' : Type*} [Field K'] [vK' : Valued K' ℤₘ₀] [Algebra K K'] [Algebra K L] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] -- `I hope this is enough`
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
-#check Int.ceil
 
 -- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
 
@@ -34,6 +33,20 @@ def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRam
 end definition_aux
 
 local notation:max " G(" L:max "/" K:max ")^[" v:max "] " => upperRamificationGroup_aux K L v
+
+section autCongr
+
+variable {K L L': Type*} {ΓK : outParam Type*} [Field K] [Field L] [Field L'] [vL : Valued L ℤₘ₀] [vL' : Valued L' ℤₘ₀] [IsDiscrete vL.v] [IsDiscrete vL'.v] [Algebra K L] [Algebra K L']
+
+theorem autCongr_mem_upperRamificationGroup_aux_iff {f : L ≃ₐ[K] L'} (hf : ∀ a : L, v a = v (f a)) (s : L ≃ₐ[K] L) (v : ℚ) : s ∈ G(L/K)^[v] ↔ (AlgEquiv.autCongr f s : L' ≃ₐ[K] L') ∈ G(L'/K)^[v] := by
+  convert autCongr_mem_lowerRamificationGroup_iff hf s ⌈psi K L v⌉
+  simp only [upperRamificationGroup_aux]
+  congr 2
+  exact (psi_eq_ofEquiv _ _ _ hf v).symm
+
+
+end autCongr
+
 
 section
 
@@ -249,21 +262,19 @@ noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
 #check upperRamificationGroup
 -/
 
+open AlgEquiv
 -- this is easier to use
 def upperRamificationGroup (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
   carrier := {s | ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
-      s.restrictNormal F ∈ upperRamificationGroup_aux K F v}
+    restrictNormalHom F s ∈ upperRamificationGroup_aux K F v}
   mul_mem' {s} {s'} hs hs' F _ _ := by
-    rw [show (s * s').restrictNormal F = s.restrictNormal F * s'.restrictNormal F by
-        exact (AlgEquiv.restrictNormalHom F).map_mul s s']
+    rw [(restrictNormalHom F).map_mul s s']
     exact Subgroup.mul_mem (upperRamificationGroup_aux K F v) (hs F) (hs' F)
   one_mem' F _ _ := by
-    rw [show AlgEquiv.restrictNormal 1 F = (1 : F ≃ₐ[K] F) by
-        exact (AlgEquiv.restrictNormalHom F).map_one]
+    rw [(restrictNormalHom F).map_one]
     exact Subgroup.one_mem (upperRamificationGroup_aux K F v)
   inv_mem' {s} hs F _ _ := by
-    rw [show AlgEquiv.restrictNormal s⁻¹ F = (AlgEquiv.restrictNormal s F)⁻¹ by
-        exact (AlgEquiv.restrictNormalHom F).map_inv s]
+    rw [(restrictNormalHom F).map_inv s]
     exact Subgroup.inv_mem (upperRamificationGroup_aux K F v) (hs F)
 
 #check upperRamificationGroup
@@ -280,10 +291,9 @@ theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v
   simp only [upperRamificationGroup, Subgroup.mem_mk, Set.mem_setOf_eq]
   constructor
   · intro h
-    -- simp [upperRamificationGroup_aux]
     haveI := Normal.of_algEquiv (F := K) (E := L) (IntermediateField.topEquiv.symm)
-    have g := h ⊤
-    sorry
+    have htop := h ⊤
+    sorry -- `should use equiv of valuation on Top or L`
     -- exact h (⊤ : IntermediateField K L) -- Add theorems of isom
   · intro h F _ _
     rw [← UpperRamificationGroup_aux.map_restrictNormalHom (L := L)]
@@ -291,13 +301,38 @@ theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v
     exact h
 
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
-      s.restrictNormal F ∈ upperRamificationGroup_aux K F v := by
+      restrictNormalHom F s ∈ upperRamificationGroup_aux K F v := by
   rfl
+
+theorem upperRamificationGroup_eq_inf {v : ℚ} : G(L/K)^[v] = ⨅ (F : {F : IntermediateField K L // Normal K F ∧ FiniteDimensional K F}),
+    haveI := F.2.1
+    haveI := F.2.2
+    (upperRamificationGroup_aux K F.1 v).comap (restrictNormalHom (E := F.1)) := by
+  ext s
+  rw [mem_iff_mem_UpperRamificationGroup_aux, Subgroup.mem_iInf]
+  simp only [Subgroup.mem_comap, Subtype.forall]
+  constructor <;> intro h
+  · sorry
+  · sorry
+
 
 -- theorem compatible with quotient, finite quotient
 @[simp]
-theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
-  sorry
+theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] [Normal K L] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+  ext s
+  -- simp [upperRamificationGroup]
+  constructor <;> intro h
+  · simp only [Subgroup.mem_map] at h
+    obtain ⟨t, ⟨ht, rfl⟩⟩ := h
+    rw [mem_iff_mem_UpperRamificationGroup_aux] at ht ⊢
+    intro F _ _
+    have : ∀ x : L, x ∈ (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) ↔ x ∈ F := sorry
+    haveI : Normal K (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) := sorry
+    haveI : FiniteDimensional K (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) := sorry
+    have := ht (F.map (IsScalarTower.toAlgHom K K' L) : IntermediateField K L)
+    simp only [toSubalgebra_map] at this
+    rw [IntermediateField.coe_map] at this
+
 
 theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ G(F/K)^[v] := by
@@ -306,6 +341,15 @@ theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : In
     intro F i i'
     rhs
     rw [(eq_UpperRamificationGroup_aux (K := K) (L := F))]
+
+section autCongr
+
+variable {L': Type*} [Field L'] [Algebra K L']
+
+theorem autCongr_mem_upperRamificationGroup_iff {f : L ≃ₐ[K] L'} (s : L ≃ₐ[K] L) (v : ℚ) : s ∈ G(L/K)^[v] ↔ (AlgEquiv.autCongr f s : L' ≃ₐ[K] L') ∈ G(L'/K)^[v] := by
+  sorry
+
+end autCongr
 
 -- theorems about exhausive and separated
 -- under what condition this is correct? this is too strong?

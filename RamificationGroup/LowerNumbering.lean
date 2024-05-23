@@ -21,6 +21,37 @@ rename theorems, many theorem should be named as LowerRamificationGroup.xxx, not
 
 open DiscreteValuation Valued Valuation
 
+section hom_eq_iff_integer
+
+variable {R K L : Type*} {ΓK ΓL : outParam Type*} [CommRing R] [Field K] [Field L]
+[LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL]
+[Algebra R K] [Algebra R L]
+
+
+namespace Valued
+
+/-- Should parameterized over `MulHomLike` or something similar.-/
+theorem algEquiv_eq_iff_valuationSubring (f g : K ≃ₐ[R] L) :
+  f = g ↔ ∀ x : 𝒪[K], f x = g x := by
+  constructor <;> intro heq
+  · simp [heq]
+  · ext x
+    rcases ValuationSubring.mem_or_inv_mem 𝒪[K] x with h | h
+    · exact heq ⟨x, h⟩
+    · calc
+        _ = (f x⁻¹)⁻¹ := by
+          simp
+        _ = (g x⁻¹)⁻¹ := by
+          rw [inv_inj]
+          exact heq ⟨x⁻¹, h⟩
+        _ = g x := by
+          simp
+
+
+end Valued
+
+end hom_eq_iff_integer
+
 section DecompositionGroup
 
 variable (R S : Type*) {ΓS : outParam Type*} [CommRing R] [Ring S]
@@ -54,7 +85,7 @@ end DecompositionGroup
 -- >= -1 decompositiongroup and v (s x - x) ≤ 1
 section def_lower_rami_grp
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 -- variable (K L : Type*) {ΓL : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ℤₘ₀] [Algebra K L]
 
@@ -111,6 +142,24 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
     exact hab
 
 end def_lower_rami_grp
+
+section autCongr
+
+variable {R S S': Type*} {ΓR : outParam Type*} [CommRing R] [Ring S] [Ring S'] [vS : Valued S ℤₘ₀] [vS : Valued S' ℤₘ₀] [Algebra R S] [Algebra R S']
+
+theorem autCongr_mem_lowerRamificationGroup_iff {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (s : S ≃ₐ[R] S) (u : ℤ) : s ∈ G(S/R)_[u] ↔ (AlgEquiv.autCongr f s : S' ≃ₐ[R] S') ∈ G(S'/R)_[u] := by
+  simp only [lowerRamificationGroup, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk,
+    Set.mem_setOf_eq, AlgEquiv.autCongr_apply, AlgEquiv.trans_apply]
+  constructor <;>
+  intro h <;>
+  constructor <;>
+  intro a ha
+  · sorry -- need theorem/def of lift of f to integer is isom
+  · sorry
+  · sorry
+  · sorry
+
+end autCongr
 
 section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
@@ -273,6 +322,8 @@ end ScalarTower
 
 section ExhausiveSeperated
 
+section lower_eq_decomp
+
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
 [vS : Valued S ℤₘ₀] [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
 
@@ -294,6 +345,8 @@ G(S/R)_[u] = decompositionGroup R S := by
       show (0 : ℤ) ≤ - u - 1
       linarith
 
+end lower_eq_decomp
+
 section eq_top
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
@@ -313,10 +366,109 @@ end eq_top
 
 section eq_bot
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
+open ExtDVR IsValExtension Polynomial
+
+-- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
+variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
+
+-- section unique_ext_without_discrete
+
+-- theorem extension_valuation_equiv_extendedValuation [CompleteSpace K] :
+--   vL.v.IsEquiv (extendedValuation K L) := by
+
+--   sorry
+
+-- end unique_ext_without_discrete
+
+/-- The condition might be too strong.
+The proof is almost the SAME with `Valuation.mem_integer_of_mem_integral_closure`. -/
+instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] := by
+  rw [isIntegrallyClosed_iff K]
+  intro x ⟨p, hp⟩
+  by_cases xne0 : x = 0
+  · subst xne0; use 0; simp
+  by_cases vxgt1 : v x ≤ 1
+  · use ⟨x, vxgt1⟩; rfl
+  · exfalso
+    push_neg at vxgt1
+    letI : Invertible x := invertibleOfNonzero xne0
+    have : v (aeval x⁻¹ (p.reverse - 1)) < 1 := by
+      apply aeval_valuationSubring_lt_one_of_lt_one_self
+      · simp only [coeff_sub, coeff_zero_reverse, hp.1, Monic.leadingCoeff, coeff_one_zero, sub_self]
+      · apply (one_lt_val_iff v xne0).mp vxgt1
+    apply ne_of_lt this
+    have : aeval x⁻¹ (p.reverse - 1) = -1 := by
+      rw [← add_neg_eq_zero]
+      ring_nf
+      simp only [_root_.map_add, _root_.map_neg, _root_.map_one, add_neg_cancel_left]
+      rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, hp.2]
+    rw [this, Valuation.map_neg, Valuation.map_one]
+
+#check DiscreteValuation.Extension.integralClosure_eq_integer
+#check integralClosure.isIntegralClosure
+#check integralClosure_map_algEquiv
+attribute [local instance 1001] Algebra.toSMul
+
+#check extendedValuation
+#check Extension.integralClosure_eq_integer
+instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
+  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
+  intro ⟨x, hx⟩
+  rw [show 𝒪[L] = valuationSubring vL.v by rfl,
+    (Valuation.isEquiv_iff_valuationSubring _ _).mp
+      (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
+    ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
+  rcases hx with ⟨p, hp⟩
+  use p
+  refine ⟨hp.1, ?_⟩
+  ext
+  rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
+    show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
+  calc
+    _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
+    _ = _ := by
+      rw [Polynomial.hom_eval₂, subtype_comp_algebraMap_eq_algebraMap]
+      congr
+
+/-- Can't be inferred within 20000 heart beats. -/
+instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
+
+#check integralClosure_le_span_dualBasis
+instance instNoethertianToValuationSubringExtension [CompleteSpace K] [IsSeparable K L] : IsNoetherian 𝒪[K] 𝒪[L] :=
+  IsIntegralClosure.isNoetherian 𝒪[K] K L 𝒪[L]
+
+noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : PowerBasis 𝒪[K] 𝒪[L] :=
+  letI : Nontrivial vL.v := nontrivial_of_valExtension K L
+  PowerBasisExtDVR (integerAlgebra_injective K L)
+
+variable {K L}
+
+#check PowerBasis.exists_eq_aeval
+#check AlgEquiv.lowerIndex
+
+#check PowerBasis.algHom_ext
+-- Need the "restriction of Galois group to ring of integers".
+theorem aux0 (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
+  by_contra h
+  apply hs
+  rw [algEquiv_eq_iff_valuationSubring]
+
+
+  sorry
+
+theorem lowerIndex_ne_refl_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (h : s ≠ .refl) :
+  i_[L/K] s = (- Multiplicative.toAdd (WithZero.unzero (aux0 pb h))).toNat := by sorry
+
+open Classical in
+/-- Should I `open Classical`? -/
+theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
+  i_[L/K] s = if h : s = .refl then (⊤ : ℕ∞)
+    else (- Multiplicative.toAdd (WithZero.unzero (aux0 pb h))).toNat := by
+  sorry
+
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] [Algebra K L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
+theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
 
 end eq_bot
 
