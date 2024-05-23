@@ -296,7 +296,7 @@ theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v
     sorry -- `should use equiv of valuation on Top or L`
     -- exact h (⊤ : IntermediateField K L) -- Add theorems of isom
   · intro h F _ _
-    rw [← UpperRamificationGroup_aux.map_restrictNormalHom (L := L)]
+    rw [← herbrand' (L := L)]
     apply Subgroup.mem_map_of_mem
     exact h
 
@@ -304,35 +304,58 @@ theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s
       restrictNormalHom F s ∈ upperRamificationGroup_aux K F v := by
   rfl
 
-theorem upperRamificationGroup_eq_inf {v : ℚ} : G(L/K)^[v] = ⨅ (F : {F : IntermediateField K L // Normal K F ∧ FiniteDimensional K F}),
-    haveI := F.2.1
-    haveI := F.2.2
-    (upperRamificationGroup_aux K F.1 v).comap (restrictNormalHom (E := F.1)) := by
-  ext s
-  rw [mem_iff_mem_UpperRamificationGroup_aux, Subgroup.mem_iInf]
-  simp only [Subgroup.mem_comap, Subtype.forall]
-  constructor <;> intro h
-  · sorry
-  · sorry
+-- theorem upperRamificationGroup_eq_iInf {v : ℚ} : G(L/K)^[v] =
+--   iInf fun (⟨F,hF⟩ : {F : IntermediateField K L // Normal K F ∧ FiniteDimensional K F}) =>
+--     haveI := hF.1
+--     haveI := hF.2
+--     (upperRamificationGroup_aux K F v).comap (restrictNormalHom (E := F))
+--     := by
+--   ext s
+--   simp only
+--   rw [mem_iff_mem_UpperRamificationGroup_aux, Subgroup.mem_iInf]
+--   simp only [Subgroup.mem_comap, Subtype.forall]
+--   constructor <;> intro h F
+--   · intro hF
+--     exact @h F hF.1 hF.2
+--   · intro h1 h2
+--     exact h F ⟨h1,h2⟩
 
 
 -- theorem compatible with quotient, finite quotient
 @[simp]
 theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] [Normal K L] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
   ext s
-  -- simp [upperRamificationGroup]
-  constructor <;> intro h
-  · simp only [Subgroup.mem_map] at h
-    obtain ⟨t, ⟨ht, rfl⟩⟩ := h
-    rw [mem_iff_mem_UpperRamificationGroup_aux] at ht ⊢
-    intro F _ _
-    have : ∀ x : L, x ∈ (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) ↔ x ∈ F := sorry
-    haveI : Normal K (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) := sorry
-    haveI : FiniteDimensional K (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) := sorry
-    have := ht (F.map (IsScalarTower.toAlgHom K K' L) : IntermediateField K L)
-    simp only [toSubalgebra_map] at this
-    rw [IntermediateField.coe_map] at this
-
+  calc
+  _ ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
+      s ∈ ((upperRamificationGroup_aux K F v).comap (restrictNormalHom (K₁ := L) F)).map (restrictNormalHom K') := by
+    simp [mem_iff_mem_UpperRamificationGroup_aux]
+    sorry
+  _ ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
+      letI : FiniteDimensional K (F.comap (IsScalarTower.toAlgHom K K' L)) := sorry
+      letI : Normal K (F.comap (IsScalarTower.toAlgHom K K' L)) := sorry
+      s ∈ (upperRamificationGroup_aux K (F.comap (IsScalarTower.toAlgHom K K' L)) v).comap (restrictNormalHom (K₁ := K') (F.comap (IsScalarTower.toAlgHom K K' L))) := by
+        constructor <;> intro h F _ _
+        simp at h ⊢
+        sorry
+        sorry
+  _ ↔ ∀ (F : IntermediateField K K') [Normal K F] [FiniteDimensional K F],
+      s ∈ (upperRamificationGroup_aux K F v).comap (restrictNormalHom (K₁ := K') F) := sorry
+  _ ↔ _ := by exact mem_iff_mem_UpperRamificationGroup_aux
+  -- ext s
+  -- -- simp [upperRamificationGroup]
+  -- constructor <;> intro h
+  -- · simp only [Subgroup.mem_map] at h
+  --   obtain ⟨t, ⟨ht, rfl⟩⟩ := h
+  --   rw [mem_iff_mem_UpperRamificationGroup_aux] at ht ⊢
+  --   intro F _ _
+  --   have : ∀ x : K', (IsScalarTower.toAlgHom K K' L) x ∈ (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) ↔ x ∈ F := sorry
+  --   haveI : Normal K (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) := sorry
+  --   haveI : FiniteDimensional K (IntermediateField.map (IsScalarTower.toAlgHom K K' L) F) := sorry
+  --   have := ht (F.map (IsScalarTower.toAlgHom K K' L) : IntermediateField K L)
+  --   simp only [toSubalgebra_map] at this
+  --   sorry
+  --   -- rw [IntermediateField.coe_map] at this
+  -- ·
 
 theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
       s.restrictNormal F ∈ G(F/K)^[v] := by
