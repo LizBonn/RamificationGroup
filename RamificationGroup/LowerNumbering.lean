@@ -1,4 +1,4 @@
-import RamificationGroup.Valued.Hom.Discrete
+import RamificationGroup.Valued.Hom.Lift
 import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
@@ -20,66 +20,6 @@ rename theorems, many theorem should be named as LowerRamificationGroup.xxx, not
 -/
 
 open DiscreteValuation Valued Valuation
-
-section hom_eq_iff_integer
-
-variable {R K L : Type*} {ΓK ΓL : outParam Type*} [CommRing R] [Field K] [Field L]
-[LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL]
-[Algebra R K] [Algebra R L]
-
-
-namespace Valued
-
-/-- Should parameterized over `MulHomLike` or something similar.-/
-theorem algEquiv_eq_iff_valuationSubring (f g : K ≃ₐ[R] L) :
-  f = g ↔ ∀ x : 𝒪[K], f x = g x := by
-  constructor <;> intro heq
-  · simp [heq]
-  · ext x
-    rcases ValuationSubring.mem_or_inv_mem 𝒪[K] x with h | h
-    · exact heq ⟨x, h⟩
-    · calc
-        _ = (f x⁻¹)⁻¹ := by
-          simp
-        _ = (g x⁻¹)⁻¹ := by
-          rw [inv_inj]
-          exact heq ⟨x⁻¹, h⟩
-        _ = g x := by
-          simp
-
-
-end Valued
-
-end hom_eq_iff_integer
-
-section DecompositionGroup
-
-variable (R S : Type*) {ΓS : outParam Type*} [CommRing R] [Ring S]
-[LinearOrderedCommGroupWithZero ΓS] [vS : Valued S ΓS] [Algebra R S]
-
-variable {S} in
-theorem Valuation.IsEquiv_comap_symm {s : S ≃+* S} (h : vS.v.IsEquiv (vS.v.comap s)) : vS.v.IsEquiv (vS.v.comap s.symm) := by
-  intro x y
-  convert (h (s.symm x) (s.symm y)).symm using 2 <;>
-  simp
-
-namespace Valued
-
-def decompositionGroup : Subgroup (S ≃ₐ[R] S) where
-  carrier := {s | vS.v.IsEquiv <| vS.v.comap s}
-  mul_mem' {s} {s'} hs hs' x y := by
-    calc
-      _ ↔ (vS.v.comap s' x) ≤ (vS.v.comap s') y := hs' x y
-      _ ↔ _ := hs _ _
-  one_mem' := by
-    apply Valuation.IsEquiv.refl
-  inv_mem' {_} {h} := by
-    apply Valuation.IsEquiv_comap_symm
-    exact h
-
-end Valued
-
-end DecompositionGroup
 
 -- <-1 decomposition group
 -- >= -1 decompositiongroup and v (s x - x) ≤ 1
@@ -107,7 +47,8 @@ def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
     one_mem' := by
       constructor
       · exact one_mem _
-      · simp
+      · simp only [AlgEquiv.one_apply, sub_self, _root_.map_zero, ofAdd_sub, ofAdd_neg, zero_le',
+        Subtype.forall, implies_true, forall_const]
     inv_mem' {s} hs := by
       constructor
       · exact inv_mem hs.1
@@ -351,14 +292,6 @@ section eq_top
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
-@[simp]
-theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
-  rw [Subgroup.eq_top_iff']
-  intro f
-  unfold decompositionGroup
-  rw [Subgroup.mem_mk, Set.mem_setOf_eq]
-  apply algEquiv_preserve_val_of_complete
-
 theorem lowerRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
   rw [lowerRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
 
@@ -371,16 +304,7 @@ open ExtDVR IsValExtension Polynomial
 -- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
 variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
 
--- section unique_ext_without_discrete
-
--- theorem extension_valuation_equiv_extendedValuation [CompleteSpace K] :
---   vL.v.IsEquiv (extendedValuation K L) := by
-
---   sorry
-
--- end unique_ext_without_discrete
-
-/-- The condition might be too strong.
+/-- The conditions might be too strong.
 The proof is almost the SAME with `Valuation.mem_integer_of_mem_integral_closure`. -/
 instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] := by
   rw [isIntegrallyClosed_iff K]
@@ -404,12 +328,8 @@ instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] :
       rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, hp.2]
     rw [this, Valuation.map_neg, Valuation.map_one]
 
-#check DiscreteValuation.Extension.integralClosure_eq_integer
-#check integralClosure.isIntegralClosure
-#check integralClosure_map_algEquiv
 attribute [local instance 1001] Algebra.toSMul
 
-#check extendedValuation
 #check Extension.integralClosure_eq_integer
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
   apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
@@ -419,8 +339,7 @@ instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralC
       (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
     ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
   rcases hx with ⟨p, hp⟩
-  use p
-  refine ⟨hp.1, ?_⟩
+  refine ⟨p, hp.1, ?_⟩
   ext
   rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
     show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
@@ -430,10 +349,9 @@ instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralC
       rw [Polynomial.hom_eval₂, subtype_comp_algebraMap_eq_algebraMap]
       congr
 
-/-- Can't be inferred within 20000 heart beats. -/
+/-- Can't be inferred within 20000 heartbeats. -/
 instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
 
-#check integralClosure_le_span_dualBasis
 instance instNoethertianToValuationSubringExtension [CompleteSpace K] [IsSeparable K L] : IsNoetherian 𝒪[K] 𝒪[L] :=
   IsIntegralClosure.isNoetherian 𝒪[K] K L 𝒪[L]
 
@@ -442,30 +360,57 @@ noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [Is
   PowerBasisExtDVR (integerAlgebra_injective K L)
 
 variable {K L}
+variable [CompleteSpace K]
 
-#check PowerBasis.exists_eq_aeval
 #check AlgEquiv.lowerIndex
 
-#check PowerBasis.algHom_ext
--- Need the "restriction of Galois group to ring of integers".
 theorem aux0 (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
   by_contra h
+  rw [zero_iff, sub_eq_zero] at h
   apply hs
-  rw [algEquiv_eq_iff_valuationSubring]
+  rw [algEquiv_eq_iff_ValuationSubring]
+  apply PowerBasis.algHom_ext pb
+  ext; simp only [algEquivToValuationSubring_apply, h, AlgEquiv.coe_refl, id_eq]
 
-
+#check PowerBasis.exists_eq_aeval
+theorem aux1 (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) (x : 𝒪[L]) : vL.v (s x - x) ≤ vL.v (s pb.gen - pb.gen) := by
+  rcases PowerBasis.exists_eq_aeval' pb x with ⟨f, hf⟩
+  subst hf
+  /-
+  1. show `f (s a) = s (f a)`, where `a = pb.gen`
+  -/
+  /- 2. use Taylor to show `f (s a) - f a = (s a - a) * g a` with `g : 𝒪[L][X] or 𝒪[K][X]` -/
+  have : s pb.gen - pb.gen ∈ 𝒪[L] := by
+    apply sub_mem
+    · have : s ∈ decompositionGroup K L := by
+        simp only [decompositionGroup_eq_top, Subgroup.mem_top]
+      rw [mem_valuationSubring_iff, Valued.val_map_le_one_iff this pb.gen]
+      exact pb.gen.2
+    · exact pb.gen.2
+  rcases taylor_order_zero_apply_aeval f pb.gen ⟨(s pb.gen - pb.gen), this⟩ with ⟨b, hb⟩
   sorry
 
-theorem lowerIndex_ne_refl_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (h : s ≠ .refl) :
-  i_[L/K] s = (- Multiplicative.toAdd (WithZero.unzero (aux0 pb h))).toNat := by sorry
+theorem aux2 (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
+  ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
+  apply le_antisymm
+  · apply ciSup_le <| aux1 pb s
+  · apply le_ciSup (f := fun (x : 𝒪[L]) ↦ v (s x - x)) _ pb.gen
+    use v (s pb.gen - pb.gen)
+    intro y hy
+    simp only [Set.mem_range, Subtype.exists, exists_prop] at hy
+    rcases hy with ⟨a, ha⟩
+    rw [← ha.2, show s a - a = s (⟨a, ha.1⟩ : 𝒪[L]) - (⟨a, ha.1⟩ : 𝒪[L]) by rfl]
+    apply aux1
 
 open Classical in
 /-- Should I `open Classical`? -/
 theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   i_[L/K] s = if h : s = .refl then (⊤ : ℕ∞)
     else (- Multiplicative.toAdd (WithZero.unzero (aux0 pb h))).toNat := by
-  sorry
-
+  by_cases h : s = .refl
+  · simp only [h, lowerIndex_refl, ↓reduceDite]
+  · unfold AlgEquiv.lowerIndex
+    simp only [h, aux2 pb, aux0 pb h, ↓reduceDite]
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry

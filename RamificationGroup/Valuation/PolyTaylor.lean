@@ -43,4 +43,17 @@ theorem taylor_order_one_apply₂ (x h : B) :
   use gx
   simp only [exp, derivative_map]
 
+theorem taylor_order_one_apply_aeval [Algebra A B] (x h : B) :
+  ∃gx : B, aeval (x + h) f =
+    aeval x f + h * aeval x (derivative f) + h ^ 2 * gx := by
+  simp only [aeval_def, taylor_order_one_apply₂]
+
+theorem taylor_order_zero_apply_aeval [Algebra A B] (x h : B) :
+  ∃gx : B, aeval (x + h) f =
+    aeval x f + h * gx := by
+  rcases taylor_order_one_apply_aeval f x h with ⟨a, ha⟩
+  use aeval x (derivative f) + h * a
+  rw [ha]
+  ring_nf
+
 end taylor

@@ -20,7 +20,8 @@ namespace Valued
 
 variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓS]
-  [vR : Valued R ΓR] [vS : Valued S ΓS] {f : R →+* S} (hf : vR.v.IsEquiv <| vS.v.comap f)
+  [vR : Valued R ΓR] [vS : Valued S ΓS]
+variable {F : Type*} [FunLike F R S] [RingHomClass F R S] {f : F} (hf : vR.v.IsEquiv <| vS.v.comap f)
 
 @[simp]
 theorem val_map_le_iff (x y : R) : v (f x) ≤ v (f y) ↔ v x ≤ v y :=
@@ -77,27 +78,27 @@ variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
 
 @[simp, norm_cast]
 theorem val_map_le_iff (x y : R) : v (algebraMap R A x) ≤ v (algebraMap R A y) ↔ v x ≤ v y :=
-  Valued.val_map_le_iff val_isEquiv_comap x y
+  Valued.val_map_le_iff (f := algebraMap R A) val_isEquiv_comap  x y
 
 @[simp, norm_cast]
 theorem val_map_lt_iff (x y : R) : v (algebraMap R A x) < v (algebraMap R A y) ↔ v x < v y :=
-  Valued.val_map_lt_iff val_isEquiv_comap x y
+  Valued.val_map_lt_iff (f := algebraMap R A) val_isEquiv_comap x y
 
 @[simp, norm_cast]
 theorem val_map_eq_iff (x y : R) : v (algebraMap R A x) = v (algebraMap R A y) ↔ v x = v y :=
-  Valued.val_map_eq_iff val_isEquiv_comap x y
+  Valued.val_map_eq_iff (f := algebraMap R A) val_isEquiv_comap x y
 
 @[simp, norm_cast]
 theorem val_map_le_one_iff (x : R) : v (algebraMap R A x) ≤ 1 ↔ v x ≤ 1 :=
-  Valued.val_map_le_one_iff val_isEquiv_comap x
+  Valued.val_map_le_one_iff (f := algebraMap R A) val_isEquiv_comap x
 
 @[simp, norm_cast]
 theorem val_map_lt_one_iff (x : R) : v (algebraMap R A x) < 1 ↔ v x < 1 :=
-  Valued.val_map_lt_one_iff val_isEquiv_comap x
+  Valued.val_map_lt_one_iff (f := algebraMap R A) val_isEquiv_comap x
 
 @[simp, norm_cast]
 theorem val_map_eq_one_iff (x : R) : v (algebraMap R A x) = 1 ↔ v x = 1 :=
-  Valued.val_map_eq_one_iff val_isEquiv_comap x
+  Valued.val_map_eq_one_iff (f := algebraMap R A) val_isEquiv_comap x
 
 instance id : IsValExtension R R where
   val_isEquiv_comap := by
