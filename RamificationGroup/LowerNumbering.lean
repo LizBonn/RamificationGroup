@@ -21,6 +21,37 @@ rename theorems, many theorem should be named as LowerRamificationGroup.xxx, not
 
 open DiscreteValuation Valued Valuation
 
+section hom_eq_iff_integer
+
+variable {R K L : Type*} {ΓK ΓL : outParam Type*} [CommRing R] [Field K] [Field L]
+[LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL] [vK : Valued K ΓK] [vL : Valued L ΓL]
+[Algebra R K] [Algebra R L]
+
+
+namespace Valued
+
+/-- Should parameterized over `MulHomLike` or something similar.-/
+theorem algEquiv_eq_iff_valuationSubring (f g : K ≃ₐ[R] L) :
+  f = g ↔ ∀ x : 𝒪[K], f x = g x := by
+  constructor <;> intro heq
+  · simp [heq]
+  · ext x
+    rcases ValuationSubring.mem_or_inv_mem 𝒪[K] x with h | h
+    · exact heq ⟨x, h⟩
+    · calc
+        _ = (f x⁻¹)⁻¹ := by
+          simp
+        _ = (g x⁻¹)⁻¹ := by
+          rw [inv_inj]
+          exact heq ⟨x⁻¹, h⟩
+        _ = g x := by
+          simp
+
+
+end Valued
+
+end hom_eq_iff_integer
+
 section DecompositionGroup
 
 variable (R S : Type*) {ΓS : outParam Type*} [CommRing R] [Ring S]
@@ -415,8 +446,15 @@ variable {K L}
 #check PowerBasis.exists_eq_aeval
 #check AlgEquiv.lowerIndex
 
+#check PowerBasis.algHom_ext
+-- Need the "restriction of Galois group to ring of integers".
+theorem aux0 (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
+  by_contra h
+  apply hs
+  rw [algEquiv_eq_iff_valuationSubring]
 
-theorem aux0 (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by sorry
+
+  sorry
 
 theorem lowerIndex_ne_refl_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (h : s ≠ .refl) :
   i_[L/K] s = (- Multiplicative.toAdd (WithZero.unzero (aux0 pb h))).toNat := by sorry
