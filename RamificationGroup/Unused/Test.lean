@@ -74,3 +74,20 @@ noncomputable def exp_ord {K : Type _} [Field K] [NumberField K]
 
 
 -- DiscreteValuation.termℤₘ₀ (open discretevaluation)
+
+
+namespace DiscreteValuation
+
+variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] {K' : IntermediateField K L} [FiniteDimensional K K']
+
+instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
+
+/- -- success
+#synth IsDiscrete (valuedIntermediateField.v : Valuation K' _)
+-/
+
+-- this is needed, or #synth CompleteSpace K' fails
+-- `when is this needed?`
+instance (priority := 100) : CompleteSpace K' := DiscreteValuation.Extension.completeSpace K K'
+
+end DiscreteValuation

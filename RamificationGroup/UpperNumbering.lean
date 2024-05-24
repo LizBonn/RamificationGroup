@@ -236,21 +236,6 @@ section upperRamificationGroup
 
 -- Is this instance ok? it is possible to avoid instance and always use def, but I do think a scoped instance make statements much easier.
 
-namespace DiscreteValuation
-
-variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] {K' : IntermediateField K L} [FiniteDimensional K K']
-
-instance valuedIntermediateField : Valued K' ℤₘ₀ := DiscreteValuation.Extension.valued K K'
-
-/- -- success
-#synth IsDiscrete (valuedIntermediateField.v : Valuation K' _)
--/
-
--- this is needed, or #synth CompleteSpace K' fails
--- `when is this needed?`
-instance (priority := 100) : CompleteSpace K' := DiscreteValuation.Extension.completeSpace K K'
-
-end DiscreteValuation
 
 /-
 noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
@@ -261,19 +246,44 @@ noncomputable def upperRamificationGroup (v : ℚ) : Subgroup (L ≃ₐ[K] L) :=
 
 #check upperRamificationGroup
 -/
+#check Valued.toUniformSpace
+theorem Valued.toUniformSpace_eq_of_v_eq {K Γ : Type*} [Ring K] [LinearOrderedCommGroupWithZero Γ] {v₁ v₂ : Valued K Γ} (h : v₁.v = v₂.v) : v₁.toUniformSpace = v₂.toUniformSpace := by
+  apply UniformAddGroup.ext v₁.toUniformAddGroup v₂.toUniformAddGroup
+  ext s
+  rw [v₁.is_topological_valuation, v₂.is_topological_valuation, h]
+
+def completeSpaceIsValExtension (K F : Type*) [Field K] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [Field F] [vF : Valued F ℤₘ₀] [IsDiscrete vF.v] [Algebra K F] (h : vK.v.IsEquiv <| vF.v.comap (algebraMap K F)) [FiniteDimensional K F]: CompleteSpace F := by
+  have veq : vF.v = extendedValuation K F := by
+    rw [← isEquiv_iff_eq]
+    exact extension_valuation_equiv_extendedValuation_of_discrete h
+  have ueq: vF.toUniformSpace = (DiscreteValuation.Extension.valued K F).toUniformSpace := Valued.toUniformSpace_eq_of_v_eq veq
+  erw [ueq]
+  exact DiscreteValuation.Extension.completeSpace K F
 
 open AlgEquiv
+
+#check extension_valuation_equiv_extendedValuation_of_discrete
+#check isEquiv_iff_eq
+#check IntermediateField
+#check DiscreteValuation.Extension.completeSpace
 -- this is easier to use
-def upperRamificationGroup (K L : Type*) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
-  carrier := {s | ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
+
+universe u v
+
+-- universe problem, what should be F's universe? max u v requires ULift
+def upperRamificationGroup (K : Type u) (L : Type v) [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K] (v : ℚ) : Subgroup (L ≃ₐ[K] L) where
+  carrier := {s | ∀ (F : Type v) [Field F] [vF : Valued F ℤₘ₀] [IsDiscrete vF.v] [Algebra K F] [IsValExtension K F] [Algebra F L] [IsScalarTower K F L] [Normal K F] [FiniteDimensional K F],
     restrictNormalHom F s ∈ upperRamificationGroup_aux K F v}
-  mul_mem' {s} {s'} hs hs' F _ _ := by
+  mul_mem' {s} {s'} hs hs' F:= by
+    intros
     rw [(restrictNormalHom F).map_mul s s']
     exact Subgroup.mul_mem (upperRamificationGroup_aux K F v) (hs F) (hs' F)
-  one_mem' F _ _ := by
+  one_mem' F := by
+    intros
     rw [(restrictNormalHom F).map_one]
     exact Subgroup.one_mem (upperRamificationGroup_aux K F v)
-  inv_mem' {s} hs F _ _ := by
+  inv_mem' {s} hs F:= by
+    intros
     rw [(restrictNormalHom F).map_inv s]
     exact Subgroup.inv_mem (upperRamificationGroup_aux K F v) (hs F)
 
@@ -285,23 +295,38 @@ namespace UpperRamificationGroup
 
 variable {K L : Type*} [Field K] [vK : Valued K ℤₘ₀] [Field L] [Algebra K L] [IsDiscrete vK.v] [CompleteSpace K]
 
+@[simp]
+theorem restrictNormal_eq_self {F E : Type*}  [Field F] [Field E] [Algebra F E] [Algebra F E] (s : E ≃ₐ[F] E) [Normal F E] : s.restrictNormal E = s := by
+  ext x
+  calc
+  _ = (algebraMap E E) ((s.restrictNormal E) x) := by simp
+  _ = _ := by
+    rw [AlgEquiv.restrictNormal_commutes]
+    simp
+
+theorem restrictNormal_restrictNormal {F K₁ K₂ : Type*} [Field F] [Field K₁] [Field K₂] [Algebra F K₁] [Algebra F K₂]  (s : K₁ ≃ₐ[F] K₂) (E M: Type*) [Field E] [Field M] [Algebra F M] [Algebra F E] [Algebra M E] [Algebra M K₁] [Algebra M K₂] [Algebra E K₁] [Algebra E K₂] [IsScalarTower F M K₁] [IsScalarTower F M K₂] [IsScalarTower F E K₁] [IsScalarTower F E K₂]  [Normal F E] [Normal F M] [IsScalarTower F M E] : (s.restrictNormal E).restrictNormal M = s.restrictNormal M := by sorry
+
 -- theorem relation with aux
 theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
   ext s
   simp only [upperRamificationGroup, Subgroup.mem_mk, Set.mem_setOf_eq]
   constructor
   · intro h
-    haveI := Normal.of_algEquiv (F := K) (E := L) (IntermediateField.topEquiv.symm)
-    have htop := h ⊤
-    sorry -- `should use equiv of valuation on Top or L`
-    -- exact h (⊤ : IntermediateField K L) -- Add theorems of isom
-  · intro h F _ _
+    have hL := h L
+    suffices restrictNormalHom (F := K) L = MonoidHom.id _ by
+      simp [this] at hL
+      assumption
+    ext s a
+    simp [restrictNormalHom]
+  · intro h F
+    intros
     rw [← herbrand' (L := L)]
     apply Subgroup.mem_map_of_mem
     exact h
 
-theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
-      restrictNormalHom F s ∈ upperRamificationGroup_aux K F v := by
+-- universe problem here. `∀ (F : Type u_2)`
+theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : Type u_2) [Field F] [vF : Valued F ℤₘ₀] [IsDiscrete vF.v] [Algebra K F] [IsValExtension K F] [Algebra F L] [IsScalarTower K F L] [Normal K F] [FiniteDimensional K F],
+    restrictNormalHom F s ∈ upperRamificationGroup_aux K F v := by
   rfl
 
 -- theorem upperRamificationGroup_eq_iInf {v : ℚ} : G(L/K)^[v] =
