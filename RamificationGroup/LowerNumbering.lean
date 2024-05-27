@@ -373,22 +373,21 @@ theorem aux0 (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .
   ext; simp only [algEquivToValuationSubring_apply, h, AlgEquiv.coe_refl, id_eq]
 
 #check PowerBasis.exists_eq_aeval
+open Polynomial in
 theorem aux1 (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) (x : 𝒪[L]) : vL.v (s x - x) ≤ vL.v (s pb.gen - pb.gen) := by
+  by_cases hs : s = .refl
+  · subst hs
+    simp only [AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, le_refl]
   rcases PowerBasis.exists_eq_aeval' pb x with ⟨f, hf⟩
   subst hf
-  /-
-  1. show `f (s a) = s (f a)`, where `a = pb.gen`
-  -/
-  /- 2. use Taylor to show `f (s a) - f a = (s a - a) * g a` with `g : 𝒪[L][X] or 𝒪[K][X]` -/
-  have : s pb.gen - pb.gen ∈ 𝒪[L] := by
-    apply sub_mem
-    · have : s ∈ decompositionGroup K L := by
-        simp only [decompositionGroup_eq_top, Subgroup.mem_top]
-      rw [mem_valuationSubring_iff, Valued.val_map_le_one_iff this pb.gen]
-      exact pb.gen.2
-    · exact pb.gen.2
-  rcases taylor_order_zero_apply_aeval f pb.gen ⟨(s pb.gen - pb.gen), this⟩ with ⟨b, hb⟩
-  sorry
+  rcases taylor_order_zero_apply_aeval f pb.gen ((algEquivToValuationSubring s) pb.gen - pb.gen) with ⟨b, hb⟩
+  rw [add_sub_cancel'_right, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
+  simp only [AddSubgroupClass.coe_sub, algEquivToValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
+  rw [hb, Valuation.map_mul]
+  nth_rw 2 [← mul_one (v (s ↑pb.gen - ↑pb.gen))]
+  rw [mul_le_mul_left₀]
+  · exact b.2
+  · apply aux0 pb hs
 
 theorem aux2 (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
