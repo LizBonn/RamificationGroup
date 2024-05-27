@@ -3,6 +3,7 @@ import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 import LocalClassFieldTheory.LocalField
+import RamificationGroup.ForMathlib.Algebra.Algebra.PowerBasis
 
 /-
 # Lower Numbering Ramification Group
@@ -163,11 +164,12 @@ variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing 
 
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
-  simp [AlgEquiv.lowerIndex]
+  simp only [AlgEquiv.lowerIndex, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ciSup_const,
+    ↓reduceDite]
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
-  simp [AlgEquiv.truncatedLowerIndex]
+  simp only [AlgEquiv.truncatedLowerIndex, lowerIndex_refl, ↓reduceDite]
 
 section lowerIndex_inequality
 
@@ -330,7 +332,6 @@ instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] :
 
 attribute [local instance 1001] Algebra.toSMul
 
-#check Extension.integralClosure_eq_integer
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
   apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
   intro ⟨x, hx⟩
@@ -362,54 +363,57 @@ noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [Is
 variable {K L}
 variable [CompleteSpace K]
 
-#check AlgEquiv.lowerIndex
-
-theorem aux0 (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
+theorem AlgEquiv.val_map_powerBasis_sub_ne_zero (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
   by_contra h
   rw [zero_iff, sub_eq_zero] at h
   apply hs
-  rw [algEquiv_eq_iff_ValuationSubring]
-  apply PowerBasis.algHom_ext pb
-  ext; simp only [algEquivToValuationSubring_apply, h, AlgEquiv.coe_refl, id_eq]
+  rw [AlgEquiv.eq_iff_ValuationSubring]
+  apply PowerBasis.algEquiv_ext pb
+  ext; simp only [AlgEquiv.restrictValuationSubring_apply, h, AlgEquiv.coe_refl, id_eq]
 
-#check PowerBasis.exists_eq_aeval
 open Polynomial in
-theorem aux1 (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) (x : 𝒪[L]) : vL.v (s x - x) ≤ vL.v (s pb.gen - pb.gen) := by
+theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) (x : 𝒪[L]) : vL.v (s x - x) ≤ vL.v (s pb.gen - pb.gen) := by
   by_cases hs : s = .refl
   · subst hs
     simp only [AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, le_refl]
   rcases PowerBasis.exists_eq_aeval' pb x with ⟨f, hf⟩
   subst hf
-  rcases taylor_order_zero_apply_aeval f pb.gen ((algEquivToValuationSubring s) pb.gen - pb.gen) with ⟨b, hb⟩
+  rcases taylor_order_zero_apply_aeval f pb.gen ((AlgEquiv.restrictValuationSubring s) pb.gen - pb.gen) with ⟨b, hb⟩
   rw [add_sub_cancel'_right, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
-  simp only [AddSubgroupClass.coe_sub, algEquivToValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
+  simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
   rw [hb, Valuation.map_mul]
   nth_rw 2 [← mul_one (v (s ↑pb.gen - ↑pb.gen))]
   rw [mul_le_mul_left₀]
   · exact b.2
-  · apply aux0 pb hs
+  · apply AlgEquiv.val_map_powerBasis_sub_ne_zero pb hs
 
-theorem aux2 (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
+theorem AlgEquiv.iSup_val_map_sub_eq_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
   apply le_antisymm
-  · apply ciSup_le <| aux1 pb s
+  · apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
   · apply le_ciSup (f := fun (x : 𝒪[L]) ↦ v (s x - x)) _ pb.gen
     use v (s pb.gen - pb.gen)
     intro y hy
     simp only [Set.mem_range, Subtype.exists, exists_prop] at hy
     rcases hy with ⟨a, ha⟩
     rw [← ha.2, show s a - a = s (⟨a, ha.1⟩ : 𝒪[L]) - (⟨a, ha.1⟩ : 𝒪[L]) by rfl]
-    apply aux1
+    apply AlgEquiv.val_map_sub_le_powerBasis
 
 open Classical in
 /-- Should I `open Classical`? -/
 theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   i_[L/K] s = if h : s = .refl then (⊤ : ℕ∞)
-    else (- Multiplicative.toAdd (WithZero.unzero (aux0 pb h))).toNat := by
+    else (- Multiplicative.toAdd (WithZero.unzero (AlgEquiv.val_map_powerBasis_sub_ne_zero pb h))).toNat := by
   by_cases h : s = .refl
   · simp only [h, lowerIndex_refl, ↓reduceDite]
   · unfold AlgEquiv.lowerIndex
-    simp only [h, aux2 pb, aux0 pb h, ↓reduceDite]
+    simp only [h, AlgEquiv.iSup_val_map_sub_eq_powerBasis pb, AlgEquiv.val_map_powerBasis_sub_ne_zero pb h, ↓reduceDite]
+
+#check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
+theorem lowerRamificationGroup_eq_bot_of_ge_val {pb : PowerBasis 𝒪[K] 𝒪[L]} {s : L ≃ₐ[K] L} {u : ℤ} (hu : sorry) : s ∉ G(L/K)_[u] := by
+  intro hs
+  sorry
+
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry

@@ -3,7 +3,6 @@ GOAL:
 1. one order taylor expansion
 -/
 import Mathlib.Data.Polynomial.Taylor
-import Mathlib.Tactic
 
 namespace Polynomial
 
