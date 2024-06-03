@@ -1,16 +1,6 @@
-import LocalClassFieldTheory.DiscreteValuationRing.Basic
+import Mathlib.Topology.Algebra.Valuation
 
 open Valuation DiscreteValuation
-
-section check
-variable {K} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [vK : Valued K ℤₘ₀]
-
-#check [IsDiscrete vK.v] -- use this for discrete valuation
-
-#check Valuation.valuationSubring -- use this for `𝒪[K]`
-#check Valuation.integer -- only subring, do not need K to be a field
-
-end check
 
 namespace Valued
 
@@ -45,7 +35,7 @@ end Preorder
 @[reducible]
 def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : ValuationSubring K := (Valued.v).valuationSubring
 
-scoped notation:max "𝒪[" K:max "]" => Valued.valuationSubring K
+scoped notation "𝒪[" K "]" => Valued.valuationSubring K
 
 /-
 
@@ -95,7 +85,7 @@ end IntegerValued
 @[reducible]
 def maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
 
-scoped notation:max "𝓂[" K:max "]" => maximalIdeal K
+scoped notation "𝓂[" K "]" => maximalIdeal K
 
 /-
 theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : 𝓂[K] = (Valued.v).ltIdeal 1 := sorry

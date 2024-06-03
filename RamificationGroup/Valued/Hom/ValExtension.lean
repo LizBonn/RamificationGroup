@@ -1,5 +1,5 @@
 import RamificationGroup.Valued.Defs
-import RamificationGroup.Valuation.Discrete
+
 
 /-!
 # Extension of Valuation
@@ -23,6 +23,7 @@ variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
   [vR : Valued R ΓR] [vS : Valued S ΓS]
 variable {F : Type*} [FunLike F R S] [RingHomClass F R S] {f : F} (hf : vR.v.IsEquiv <| vS.v.comap f)
 
+/- not a simp lemma any more since you need hf as input -/
 @[simp]
 theorem val_map_le_iff (x y : R) : v (f x) ≤ v (f y) ↔ v x ≤ v y :=
   (hf x y).symm
@@ -232,22 +233,5 @@ end scalar_tower
 end ValuationSubring
 
 end lift
-
-section nontrivial
-
-variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-  [Algebra R A] [vR : Valued R ΓR] [Nontrivial vR.v] [vA : Valued A ΓA] [IsValExtension R A]
-
-variable (R A) in
-theorem nontrivial_of_valExtension : Nontrivial vA.v where
-  nontrivial := by
-    rcases vR.v.nontrivial_def with ⟨r, h0, h1⟩
-    use (algebraMap R A) r
-    simp [h1]
-    rw [show (0 : ΓA) = vA.v (0) by simp, show (0 : A) = (algebraMap R A) 0 by simp, val_map_eq_iff]
-    simp [h0]
-
-end nontrivial
 
 end IsValExtension

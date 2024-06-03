@@ -2,7 +2,7 @@ import RamificationGroup.LowerNumbering
 import Mathlib.RingTheory.Valuation.Basic
 import Mathlib.FieldTheory.KrullTopology
 import RamificationGroup.HerbrandFunction
-import RamificationGroup.Valued.Hom.Discrete'
+-- import RamificationGroup.Valued.Hom.Discrete'
 
 /-!
 
@@ -349,6 +349,8 @@ theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s
 -- theorem compatible with quotient, finite quotient
 @[simp]
 theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [Normal K K'] [Normal K L] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+  sorry
+  /-
   ext s
   calc
   _ ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
@@ -366,6 +368,7 @@ theorem map_restrictNormalHom {K'} [Field K'] [Algebra K K'] [Algebra K' L] [IsS
   _ ↔ ∀ (F : IntermediateField K K') [Normal K F] [FiniteDimensional K F],
       s ∈ (upperRamificationGroup_aux K F v).comap (restrictNormalHom (K₁ := K') F) := sorry
   _ ↔ _ := by exact mem_iff_mem_UpperRamificationGroup_aux
+  -/
   -- ext s
   -- -- simp [upperRamificationGroup]
   -- constructor <;> intro h
