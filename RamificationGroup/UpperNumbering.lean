@@ -391,7 +391,8 @@ theorem mem_iff {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : In
     rhs
     intro F i i'
     rhs
-    rw [(eq_UpperRamificationGroup_aux (K := K) (L := F))]
+    -- rw [eq_UpperRamificationGroup_aux (K := K) (L := F)]
+  sorry
 
 section autCongr
 
