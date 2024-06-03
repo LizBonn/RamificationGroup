@@ -1,0 +1,46 @@
+import RamificationGroup.Valued.Hom.Discrete
+
+open DiscreteValuation Valuation Valued
+
+section DecompositionGroup
+
+variable (R S : Type*) {ΓS : outParam Type*} [CommRing R] [Ring S]
+[LinearOrderedCommGroupWithZero ΓS] [vS : Valued S ΓS] [Algebra R S]
+
+variable {S} in
+theorem Valuation.IsEquiv_comap_symm {s : S ≃+* S} (h : vS.v.IsEquiv (vS.v.comap s)) : vS.v.IsEquiv (vS.v.comap s.symm) := by
+  intro x y
+  convert (h (s.symm x) (s.symm y)).symm using 2 <;>
+  simp
+
+namespace Valued
+
+def decompositionGroup : Subgroup (S ≃ₐ[R] S) where
+  carrier := {s | vS.v.IsEquiv <| vS.v.comap s}
+  mul_mem' {s} {s'} hs hs' x y := by
+    calc
+      _ ↔ (vS.v.comap s' x) ≤ (vS.v.comap s') y := hs' x y
+      _ ↔ _ := hs _ _
+  one_mem' := by
+    apply Valuation.IsEquiv.refl
+  inv_mem' {_} {h} := by
+    apply Valuation.IsEquiv_comap_symm
+    exact h
+
+section eq_top
+
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
+
+@[simp]
+theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
+  rw [Subgroup.eq_top_iff']
+  intro f
+  unfold decompositionGroup
+  rw [Subgroup.mem_mk, Set.mem_setOf_eq]
+  apply algEquiv_preserve_val_of_complete
+
+end eq_top
+
+end Valued
+
+end DecompositionGroup
