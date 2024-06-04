@@ -48,7 +48,7 @@ instance integer.valued: Valued vR.v.integer Γ := Valued.mk' (vR.v.comap vR.v.i
 
 
 -- need to add this, lean cannot infer this
--- `This will be auto infered once Valuation.valuationSubring is with @[reducible] tag`, for now, every instance need to be written again for `𝒪[K]`, in this file and Hom.lift file and more. This is also the reason that valuationSubring should with tag @[reducible]. Add this tag to `Valuation.valuationSubring` when impoet to mathlib!
+-- `This will be auto infered once Valuation.valuationSubring is with @[reducible] tag or at least @[instance]`, for now, every instance need to be written again for `𝒪[K]`, in this file and Hom.lift file and more. This is also the reason that valuationSubring should with tag @[reducible]. Add this tag to `Valuation.valuationSubring` when impoet to mathlib!
 instance valuationSubring.valued: Valued 𝒪[K] Γ := inferInstanceAs (Valued vK.v.integer Γ)
 
 #synth Valued 𝒪[K] Γ

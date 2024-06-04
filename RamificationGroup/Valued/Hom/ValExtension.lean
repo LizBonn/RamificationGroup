@@ -59,9 +59,8 @@ theorem val_map_eq_one_iff (x : R) : v (f x) = 1 ↔ v x = 1 := by
 
 end Valued
 
--- is injectivity needed here?
 /--
-An instance of `IsValExtension R A` states that the valuation of `A` is an extension of the valuation on `R`.
+The class `IsValExtension R A` states that the valuation of `A` is an extension of the valuation on `R`. More precisely, the valuation on `R` is equivlent to the comap of the valuation on `A`.
 -/
 class IsValExtension (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
@@ -217,8 +216,6 @@ theorem integerAlgebra_injective : Function.Injective (algebraMap 𝒪[R] 𝒪[A
   apply RingHom.injective (algebraMap R A) h
 
 section scalar_tower
-
-attribute [local instance 1001] Algebra.toSMul
 
 instance instIsScalarTowerToValuationSubringToField : IsScalarTower 𝒪[R] 𝒪[A] A where
   smul_assoc x y z := by
