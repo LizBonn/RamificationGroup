@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2024 Patrick Massot. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Jiedong Jiang, Bichang Lei
+-/
 import RamificationGroup.Valued.Defs
 
 
@@ -109,7 +114,7 @@ end CoeLemma
 
 section mk'
 
-def of_integer_comap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
+def ofIntegerComap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
   [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] (h : vA.v.integer.comap (algebraMap R A) = vR.v.integer) : IsValExtension R A where
   val_isEquiv_comap := by
@@ -119,10 +124,10 @@ def of_integer_comap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
     rw [← h]
     rfl
 
-def of_valuationSubring_comap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
+def ofValuationSubringComap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
   [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A] (h : 𝒪[A].comap (algebraMap R A) = 𝒪[R]) : IsValExtension R A := by
-    apply of_integer_comap
+    apply ofIntegerComap
     rw [show vR.v.integer = 𝒪[R].toSubring by rfl, ← h]
     rfl
 

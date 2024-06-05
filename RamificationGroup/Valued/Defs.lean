@@ -1,41 +1,29 @@
 import Mathlib.Topology.Algebra.Valuation
 
-open Valuation DiscreteValuation
-
 namespace Valued
 
-
-/-
-
-section Preorder
-
-variable {R : Type*} {Γ : outParam Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ] [Valued R Γ]
-
--- the preoder lift from valuation is different from the proorder of divisibility -- there is a preorder on the valuations, called specialization?
-instance preorder : Preorder R := Valuation.toPreorder Valued.v
-
-theorem le_iff_val_le (x y : R) : x ≤ y ↔ v x ≤ v y := sorry
-
-theorem lt_iff_val_lt (x y : R) : x < y ↔ v x < v y := sorry
-
-theorem le_one_iff_val_le_one (x y : R) : x ≤ 1 ↔ v x ≤ 1 := sorry
-
-theorem lt_one_iff_val_lt_one (x y : R) : x < 1 ↔ v x < 1 := sorry
-
-theorem zero_le (x y : R) : 0 ≤ x := sorry
-
--- lower TODO : `theorems that x + y ≤ x, x + y < x,...`
-
-end Preorder
-
--/
-
-
-/-- An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]` -/
+/-- A `Valued` version of `Valuation.valuationSubring`, enabling the notation `𝒪[K]` for valued field `K` -/
 @[reducible]
 def valuationSubring (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : ValuationSubring K := (Valued.v).valuationSubring
 
+@[inherit_doc]
 scoped notation "𝒪[" K "]" => Valued.valuationSubring K
+
+/-- An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a valued field `K`, enabling the notation `𝓂[K]` -/
+@[reducible]
+def maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
+
+@[inherit_doc]
+scoped notation "𝓂[" K "]" => maximalIdeal K
+
+/-- An abbrevation for `LocalRing.ResidueField 𝒪[K]` of a `Valued` instance, enabling the notation `𝓀[K]` -/
+@[reducible]
+def ResidueField (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] := LocalRing.ResidueField (𝒪[K])
+
+@[inherit_doc]
+scoped notation:max "𝓀[" K:max "]" => ResidueField K
+
+end Valued
 
 /-
 
@@ -79,30 +67,11 @@ end IntegerValued
 
 -/
 
--- `theorems about the relation between order and valuation?`
-
-/-- An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a `Valued` instance, it serves for notation `𝓂[K]` -/
-@[reducible]
-def maximalIdeal (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : Ideal 𝒪[K] := LocalRing.maximalIdeal 𝒪[K]
-
-scoped notation "𝓂[" K "]" => maximalIdeal K
-
 /-
 theorem maximalIdeal_eq {K : Type*} [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] : 𝓂[K] = (Valued.v).ltIdeal 1 := sorry
 -/
 
-/-- An abbrevation for `LocalRing.ResidueField 𝒪[K]` of a `Valued` instance, it serves for notation `𝓀[K]` -/
-@[reducible]
-def ResidueField (K : Type*) [Field K] {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Valued K Γ] := LocalRing.ResidueField (𝒪[K])
 
-scoped notation:max "𝓀[" K:max "]" => ResidueField K
-
-/- -- is this needed?
-instance valuationSubring.coeResidueField {K : Type*} {Γ : outParam Type*} [LinearOrderedCommGroupWithZero Γ] [Field K] [Valued K Γ] : Coe 𝒪[K] 𝓀[K] where
-  coe := LocalRing.residue 𝒪[K]
--/
 
 -- TODO? : Should residue field be equipped with trivial valuation?
 -- A generalization of this could be : after a valued ring quotient a "upper-closed" value ideal, it is equipped with a quotient valuation
-
-end Valued

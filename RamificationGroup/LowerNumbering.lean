@@ -348,7 +348,8 @@ instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralC
   calc
     _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
     _ = _ := by
-      rw [Polynomial.hom_eval₂, subtype_comp_algebraMap_eq_algebraMap]
+      rw [Polynomial.hom_eval₂]
+      simp only [ValuationSubring.algebraMap_def]
       congr
 
 /-- Can't be inferred within 20000 heartbeats. -/
