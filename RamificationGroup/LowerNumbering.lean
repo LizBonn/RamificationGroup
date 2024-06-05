@@ -333,8 +333,11 @@ instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] :
 
 attribute [local instance 1001] Algebra.toSMul
 
+instance: IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
+
+#check IsIntegralClosure.of_isIntegrallyClosed
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
+  apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
   intro ⟨x, hx⟩
   rw [show 𝒪[L] = valuationSubring vL.v by rfl,
     (Valuation.isEquiv_iff_valuationSubring _ _).mp
