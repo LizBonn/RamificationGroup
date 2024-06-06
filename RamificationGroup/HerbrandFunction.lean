@@ -273,13 +273,16 @@ theorem Ramification_Group_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(F
   simp at hs
   apply Ramification_Group_Disjoint K L hs.1 hs.2 hij
 
-
 --i don't know how to name them
-theorem x_in_G_n {x : (L ≃ₐ[K] L)} (hx : x ≠ .refl): ∃ (n : ℤ) , -1 ≤ n ∧ x ∈ G(L/K)_[n] ∧ x ∉ G(L/K)_[(n + 1)] := by
+theorem x_not_in_aux {x : (L ≃ₐ[K] L)} (hx : x ≠ .refl) : ∃ (n : ℤ) , x ∉ G(L/K)_[n] := by sorry
+
+
+theorem x_in_G_n {x : (L ≃ₐ[K] L)} (hx : x ≠ .refl) : ∃ (n : ℤ) , -1 ≤ n ∧ x ∈ G(L/K)_[n] ∧ x ∉ G(L/K)_[(n + 1)] := by
   by_contra hc
   push_neg at *
+  obtain ⟨n, hn⟩ := x_not_in_aux K L hx
+  apply hn
   sorry
-
 
 theorem mem_all_lowerRamificationGroup_iff {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by
   constructor
@@ -361,7 +364,11 @@ theorem phi_eq_sum_card {u : ℚ} : phi K L u = (1 / Nat.card G(L/K)_[0]) * ((�
       ext x
       rw [relindex_aux, div_mul_eq_mul_div, one_mul, Nat.cast_div, one_div_div]
       simp
-      sorry; sorry
+      · simp
+        apply Subgroup.card_dvd_of_le
+        apply lowerRamificationGroup.antitone
+        sorry
+      · sorry
     _ = ((1 : ℚ) / Nat.card G(L/K)_[0]) * (∑ x in Finset.Icc 1 (⌈u⌉ - 1), Nat.card G(L/K)_[x]) + (u - (max 0 (⌈u⌉ - 1))) * (1 / ↑(relindex G(L/K)_[⌈u⌉] G(L/K)_[0])) := by
       rw [(Finset.mul_sum (Finset.Icc 1 (⌈u⌉ - 1)) (fun i => (Nat.card (lowerRamificationGroup K L i) : ℚ)) ((1 : ℚ) / Nat.card G(L/K)_[0])).symm]
       simp
