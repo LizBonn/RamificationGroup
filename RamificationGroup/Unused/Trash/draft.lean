@@ -34,4 +34,5 @@ variable {a : A}
 theorem Prop18 {x : B} (h0 : Irreducible x) (h1 : ∀ a : A, (addVal A a) * (finrank K L) = addVal B (algebraMap A B a)) :
 (ker (aeval x)) = (Ideal.span {LinearMap.charpoly (lsmul A K L x)}) := by sorry
 
-end
+
+def aaa (f : ℕ → ℕ) := ∀ x y, f (x + y) = f x + f y ∧ ∀ x c, f (c * x) = c * f x
