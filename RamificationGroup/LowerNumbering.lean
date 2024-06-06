@@ -78,8 +78,7 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
   constructor
   · exact hs1
   · intro y hy
-    apply le_trans
-    apply hs2 y hy
+    apply le_trans (hs2 y hy)
     simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel', inv_le_inv_iff,
       Multiplicative.ofAdd_le]
     exact hab
@@ -152,8 +151,6 @@ noncomputable def AlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐ[R] S)) :
   else min u ((i_[S/R] s).untop h)
 
 scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => AlgEquiv.truncatedLowerIndex K L
-
-#check AlgEquiv.truncatedLowerIndex
 
 end lowerIndex
 
@@ -229,8 +226,7 @@ theorem lowerIndex_ne_one {s : decompositionGroup K L} (hs : s ≠ 1) : i_[L/K] 
 
 @[simp]
 theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s = ⊤ ↔ s = 1 := by
-  constructor <;>
-  intro h
+  constructor <;> intro h
   · contrapose! h
     apply lowerIndex_ne_one h
   · simp only [AlgEquiv.lowerIndex, h, OneMemClass.coe_one, AlgEquiv.one_apply, sub_self,
@@ -380,8 +376,7 @@ instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralC
   rcases hx with ⟨p, hp⟩
   refine ⟨p, hp.1, ?_⟩
   ext
-  rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
-    show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
+  rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
   calc
     _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
     _ = _ := by
