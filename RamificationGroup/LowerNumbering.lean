@@ -2,7 +2,7 @@ import RamificationGroup.Valued.Hom.Lift
 import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
-import LocalClassFieldTheory.LocalField
+import LocalClassFieldTheory.LocalField.Basic
 import RamificationGroup.ForMathlib.Algebra.Algebra.PowerBasis
 import RamificationGroup.Valued.Hom.ValExtension'
 
@@ -80,7 +80,7 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
   · intro y hy
     apply le_trans
     apply hs2 y hy
-    simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel', inv_le_inv_iff,
+    simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel, inv_le_inv_iff,
       Multiplicative.ofAdd_le]
     exact hab
 
@@ -162,6 +162,14 @@ section ScalarTower
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
+
+/-- `This should be add to correct place` -/
+instance {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := by
+  use (0 : R)
+  change v 0 ≤ 1
+  simp only [_root_.map_zero, zero_le']
+
+instance {K Γ₀: Type*} [Field K] [LinearOrderedCommGroupWithZero Γ₀] [vK : Valued K Γ₀]: Nonempty 𝒪[K] := inferInstanceAs (Nonempty vK.v.integer)
 
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
@@ -336,24 +344,29 @@ attribute [local instance 1001] Algebra.toSMul
 instance: IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
 #check IsIntegralClosure.of_isIntegrallyClosed
+
+instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
+  isIntegral := by
+    intro ⟨x, hx⟩
+    rw [show 𝒪[L] = valuationSubring vL.v by rfl,
+      (Valuation.isEquiv_iff_valuationSubring _ _).mp
+        (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
+      ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
+    rcases hx with ⟨p, hp⟩
+    refine ⟨p, hp.1, ?_⟩
+    ext
+    rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
+      show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
+    calc
+      _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
+      _ = _ := by
+        rw [Polynomial.hom_eval₂]
+        simp only [ValuationSubring.algebraMap_def]
+        congr
+
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
-  intro ⟨x, hx⟩
-  rw [show 𝒪[L] = valuationSubring vL.v by rfl,
-    (Valuation.isEquiv_iff_valuationSubring _ _).mp
-      (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
-    ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
-  rcases hx with ⟨p, hp⟩
-  refine ⟨p, hp.1, ?_⟩
-  ext
-  rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
-    show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
-  calc
-    _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
-    _ = _ := by
-      rw [Polynomial.hom_eval₂]
-      simp only [ValuationSubring.algebraMap_def]
-      congr
+  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
+
 
 /-- Can't be inferred within 20000 heartbeats. -/
 instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
@@ -384,7 +397,7 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
   rcases PowerBasis.exists_eq_aeval' pb x with ⟨f, hf⟩
   subst hf
   rcases taylor_order_zero_apply_aeval f pb.gen ((AlgEquiv.restrictValuationSubring s) pb.gen - pb.gen) with ⟨b, hb⟩
-  rw [add_sub_cancel'_right, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
+  rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
   simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
   rw [hb, Valuation.map_mul]
   nth_rw 2 [← mul_one (v (s ↑pb.gen - ↑pb.gen))]

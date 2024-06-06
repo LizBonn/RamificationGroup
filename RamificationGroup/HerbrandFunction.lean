@@ -3,7 +3,6 @@ import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.GroupTheory.Index
 import Mathlib.Logic.Function.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
-import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.Group.Basic
 
 open DiscreteValuation Subgroup Set Function Finset BigOperators Int Valued
