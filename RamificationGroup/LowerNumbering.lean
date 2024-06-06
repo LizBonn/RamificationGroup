@@ -278,10 +278,7 @@ G(S/R)_[u] = decompositionGroup R S := by
   intro hs a ha
   calc
     _ ≤ max (v (s a)) (v a) := Valuation.map_sub _ _ _
-    _ ≤ 1 := by
-      apply max_le
-      · exact (val_map_le_one_iff hs a).mpr ha
-      · exact ha
+    _ ≤ 1 := max_le ((val_map_le_one_iff hs a).mpr ha) ha
     _ ≤ _ := by
       show (.coe (0 : ℤ) : ℤₘ₀) ≤ .coe ((- u - 1) : ℤ)
       norm_cast
@@ -312,7 +309,7 @@ instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] :
   rw [isIntegrallyClosed_iff K]
   intro x ⟨p, hp⟩
   by_cases xne0 : x = 0
-  · subst xne0; use 0; simp
+  · subst xne0; use 0; simp only [ValuationSubring.algebraMap_def, _root_.map_zero]
   by_cases vxgt1 : v x ≤ 1
   · use ⟨x, vxgt1⟩; rfl
   · exfalso
