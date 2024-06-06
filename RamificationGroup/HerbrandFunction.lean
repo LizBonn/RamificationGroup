@@ -5,6 +5,7 @@ import Mathlib.Logic.Function.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.Group.Basic
+import Mathlib.Data.Int.Cast.Basic
 
 open DiscreteValuation Subgroup Set Function Finset BigOperators Int Valued
 
@@ -54,8 +55,18 @@ theorem phiDeriv_eq_ceil {u : ℚ} : phiDeriv R S u = phiDeriv R S ⌈u⌉ := by
 theorem phi_pos_of_pos {u : ℚ} (hu : 0 < u) : 0 < phi R S u := by
   unfold phi
   have h : 0 ≤ ∑ x in Finset.Icc 1 (⌈u⌉ - 1), phiDeriv R S x := by
-    --apply sum_pos
-    sorry
+    by_cases h : ⌈u⌉ - 1 = 0
+    · simp [h]
+    · apply le_of_lt
+      apply sum_pos (s := Finset.Icc 1 (⌈u⌉ - 1))
+      · intro i _
+        apply phiDeriv_pos
+      · simp
+        apply Int.le_of_sub_one_lt
+        simp [one_le_ceil_iff.2]
+        apply lt_of_le_of_ne
+        apply one_le_ceil_iff.2 hu
+        omega
   have h' : 0 < (u - (max 0 (⌈u⌉ - 1))) * phiDeriv R S u := by
     apply mul_pos
     simp [hu]
@@ -98,7 +109,7 @@ theorem phi_strictMono_of_gt_one {a b : ℚ} (hb : 1 < b) (hab : a < b) : phi R 
           simp
           right; apply le_ceil
         linarith [this]
-        have h : ∑ x in Finset.Icc 1 (⌈a⌉ - 1), phiDeriv R S ↑x + 1 * phiDeriv R S ↑⌈a⌉ = ∑ x in Finset.Icc 1 ⌈a⌉, phiDeriv R S ↑x := by sorry
+        have h : ∑ x in Finset.Icc 1 (⌈a⌉ - 1), phiDeriv R S ↑x + 1 * phiDeriv R S ↑⌈a⌉ = ∑ x in Finset.Icc 1 ⌈a⌉, phiDeriv R S ↑x := by sorry -- i have done this later
         apply le_of_eq h
       _ ≤ ∑ x in Finset.Icc 1 (⌈b⌉ - 1), phiDeriv R S x := by
         have h : ⌈a⌉ ≤ ⌈b⌉ - 1 := by
@@ -111,7 +122,7 @@ theorem phi_strictMono_of_gt_one {a b : ℚ} (hb : 1 < b) (hab : a < b) : phi R 
           apply le_sub_one_of_lt hc
         have h' : Finset.Icc 1 (⌈a⌉) ⊆ Finset.Icc 1 (⌈b⌉ - 1) := by apply Finset.Icc_subset_Icc (by linarith) h
         sorry
-        --apply sum_le_sum_of_subset h' (f := phiDeriv R S)
+        --apply sum_le_sum_of_subset h' --(f := phiDeriv R S)
       _ < phi R S b := by
         unfold phi
         simp
@@ -153,9 +164,17 @@ theorem phi_strictMono : StrictMono (phi R S) := by
     apply phi_strictMono_of_gt_one R S (by linarith) h
 
 
---i don't know
-theorem exist_aux (y : ℚ) : ∃ n , phi R S (n - 1) ≤ y ∧ y < phi R S n := by sorry
+theorem phi_inf (y : ℚ) : ∃ (n : ℕ) , ¬ phi R S n ≤ y := by sorry
 
+--i don't know
+--the proof is not good
+theorem exist_aux (y : ℚ) : ∃ (n : ℕ) , phi R S (n - 1) ≤ y ∧ y < phi R S n := by
+  by_contra h
+  push_neg at h
+  obtain ⟨n, hn⟩ := phi_inf R S y
+  apply hn
+  apply h
+  sorry
 
 theorem phi_Bijective : Function.Bijective (phi R S) := by
   constructor
@@ -167,7 +186,7 @@ theorem phi_Bijective : Function.Bijective (phi R S) := by
       apply ne_of_lt (phi_strictMono R S (lt_of_le_of_ne h1 h))
   · rintro y
     obtain ⟨n, ⟨hn, hn'⟩⟩  := exist_aux R S y
-    use (y - phi R S (n - 1)) * (relindex G(S/R)_[⌈n⌉] G(S/R)_[0]) + n - 1
+    use (y - phi R S (n - 1)) * (relindex G(S/R)_[n] G(S/R)_[0]) + n - 1
     unfold phi
     sorry
 
@@ -286,7 +305,8 @@ theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x 
   have h : G(L/K)_[m] ≤  G(L/K)_[n] := by
     convert lowerRamificationGroup.antitone K L hc
     simp
-  sorry
+  apply hn
+  apply Set.mem_of_subset_of_mem h hm
 
 theorem G_n_or_G_lt_n {n : ℤ} {x : (L ≃ₐ[K] L)} (h : x ∉ G(L/K)_[n]) : ∃ a, (-1 ≤ a ∧ a ≤ n - 1) ∧ x ∈ G_diff K L a := by
   have hx : x ≠ .refl := by
@@ -347,10 +367,11 @@ theorem phi_eq_sum_card {u : ℚ} : phi K L u = (1 / Nat.card G(L/K)_[0]) * ((�
       simp
     _ = (1 / Nat.card G(L/K)_[0]) * ((∑ x in Finset.Icc 1 (⌈u⌉ - 1), Nat.card G(L/K)_[x]) + (u - (max 0 (⌈u⌉ - 1))) * (Nat.card G(L/K)_[⌈u⌉])) := by
       simp [relindex_aux, mul_add]
-      sorry
+      rw [Nat.cast_div, inv_div, div_eq_mul_inv]
+      ring
+      sorry; sorry
 
-
-theorem insert_Icc (a b : ℤ) (ha : a ≤ b): Finset.Icc a b = insert a (Finset.Icc (a + 1) b) := by
+theorem insert_Icc_left (a b : ℤ) (ha : a ≤ b): Finset.Icc a b = insert a (Finset.Icc (a + 1) b) := by
   ext x
   constructor
   · intro h
@@ -377,25 +398,51 @@ theorem insert_Icc (a b : ℤ) (ha : a ≤ b): Finset.Icc a b = insert a (Finset
       · linarith [h1]
       · exact h2
 
+theorem insert_Icc_right (a b : ℤ) (h : a ≤ b) : Finset.Icc a b = insert b (Finset.Icc a (b - 1)) := by
+  apply Finset.Subset.antisymm
+  · intro x hx
+    rw [Finset.insert_eq b (Finset.Icc a (b - 1))]
+    apply Finset.mem_union.2
+    by_cases h : x = b
+    · left
+      simp [h]
+    · right
+      simp at hx
+      simp
+      constructor
+      · exact hx.1
+      · apply Int.le_of_sub_one_lt
+        apply lt_of_le_of_ne
+        linarith
+        push_neg at h
+        simp [h]
+  · rw [Finset.insert_eq b (Finset.Icc a (b - 1))]
+    apply Finset.union_subset
+    simp [h]
+    apply Finset.Icc_subset_Icc
+    rfl; linarith
 
 theorem sum_insert_left_aux (a b : ℤ) (ha : a ≤ b) (f : ℤ → ℕ) : (∑ x in Finset.Icc a b, f x) - f a = (∑ x in Finset.Icc (a + 1) b, f x):= by
   calc
     _ = ∑ x in insert a (Finset.Icc (a + 1) b), f x - f a := by
-      rw [insert_Icc _ _ ha]
+      rw [insert_Icc_left _ _ ha]
     _ = (∑ x in Finset.Icc (a + 1) b, f x) := by simp
 
 theorem sum_insert_left_aux' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℤ) : (∑ x in Finset.Icc a b, f x) - f a = (∑ x in Finset.Icc (a + 1) b, f x) := by
   calc
     _ = ∑ x in insert a (Finset.Icc (a + 1) b), f x - f a := by
-      rw [insert_Icc _ _ h]
+      rw [insert_Icc_left _ _ h]
     _ = (∑ x in Finset.Icc (a + 1) b, f x) := by simp
 
-theorem sum_insert_right_aux' (a b : ℤ) (f : ℤ → ℤ) : (∑ x in Finset.Icc a b, f x) = (∑ x in Finset.Icc a (b - 1), f x) + f b := by sorry
-
+theorem sum_insert_right_aux' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℤ) : (∑ x in Finset.Icc a b, f x) = (∑ x in Finset.Icc a (b - 1), f x) + f b := by
+  calc
+    _ = ∑ x in insert b (Finset.Icc a (b - 1)), f x := by
+      rw [insert_Icc_right _ _ h]
+    _ = (∑ x in Finset.Icc a (b - 1), f x) + f b := by simp [add_comm]
 
 #check sum_sub_distrib
 
-theorem sum_sub_aux {u : ℚ} : (∑ i in Finset.Icc (-1) (⌈u⌉ - 1), (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)])) = ∑ i in Finset.Icc 0 (⌈u⌉ - 1), Nat.card G(L/K)_[i] - ⌈u⌉ * (Nat.card G(L/K)_[⌈u⌉]) := by
+theorem sum_sub_aux {u : ℚ} (hu : 0 ≤ ⌈u⌉ - 1): (∑ i in Finset.Icc (-1) (⌈u⌉ - 1), (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)])) = ∑ i in Finset.Icc 0 (⌈u⌉ - 1), Nat.card G(L/K)_[i] - ⌈u⌉ * (Nat.card G(L/K)_[⌈u⌉]) := by
   calc
     _ = ∑ i in Finset.Icc (-1) (⌈u⌉ - 1), ((i + 1) * Nat.card G(L/K)_[i] - (i + 1) * Nat.card G(L/K)_[(i + 1)]) := by
       apply (Finset.sum_eq_sum_iff_of_le _).2
@@ -427,26 +474,35 @@ theorem sum_sub_aux {u : ℚ} : (∑ i in Finset.Icc (-1) (⌈u⌉ - 1), (i + 1)
         simp [e]
         constructor
         · linarith [hi1]
-        · sorry
+        · apply add_one_le_ceil_iff.1 (by linarith [hi2])
       · simp
         intro hi
-        sorry
+        simp [e] at *
+        intro hi'
+        constructor
+        · linarith [hi]
+        · linarith [add_one_le_ceil_iff.2 hi']
       rintro i hi
       simp [e]
     _ = ((-1) + 1) * Nat.card G(L/K)_[(-1)] + ∑ i in Finset.Icc 0 (⌈u⌉ - 1), (i + 1) * Nat.card G(L/K)_[i] - ∑ i in Finset.Icc 0 (⌈u⌉ - 1), i * Nat.card G(L/K)_[i] - ⌈u⌉ * Nat.card G(L/K)_[⌈u⌉] := by
-      have h : (-1) ≤ ⌈u⌉ - 1 := by sorry
-      erw [← sum_insert_left_aux' (-1) (⌈u⌉ - 1) h (fun i => (i + 1) * Nat.card (lowerRamificationGroup K L i)), sub_sub, ← sum_insert_right_aux' 0 ⌈u⌉ (fun i => i * Nat.card (lowerRamificationGroup K L i))]
+      have h : (-1) ≤ ⌈u⌉ - 1 := by linarith [hu]
+      erw [← sum_insert_left_aux' (-1) (⌈u⌉ - 1) h (fun i => (i + 1) * Nat.card (lowerRamificationGroup K L i)), sub_sub, ← sum_insert_right_aux' 0 ⌈u⌉ (by linarith [h]) (fun i => i * Nat.card (lowerRamificationGroup K L i))]
       simp
     _ = ∑ i in Finset.Icc 0 (⌈u⌉ - 1), Nat.card G(L/K)_[i] - ⌈u⌉ * (Nat.card G(L/K)_[⌈u⌉]) := by
-      rw [neg_add_self, zero_mul, zero_add]
-      congr
-      rw [← sum_sub_distrib]
-      ring_nf
-      simp
+      sorry
+      -- rw [neg_add_self, zero_mul, zero_add]
+      -- congr
+      -- rw [← sum_sub_distrib]
+      -- ring_nf
+      -- simp
 
-theorem truncatedLowerindex_eq_if {i : ℤ} {u : ℚ} {s : (L ≃ₐ[K] L)} (hu : i ≤ (⌈u⌉ - 1)) (hs : s ∈ Ramification_Group_diff K L i) : i_[L/K]ₜ (u + 1) s = i + 1 := by sorry
+theorem truncatedLowerindex_eq_if {i : ℤ} {u : ℚ} {s : (L ≃ₐ[K] L)} (hu : i ≤ (⌈u⌉ - 1)) (hs : s ∈ Ramification_Group_diff K L i) : i_[L/K]ₜ (u + 1) s = i + 1 := by
+  unfold Ramification_Group_diff at hs
+  simp at hs
+  rcases hs with ⟨hs1, hs2⟩
+  sorry
 
-theorem sum_of_diff_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc 0 (⌈u⌉ - 1)) : ∑ s in Ramification_Group_diff K L i, (AlgEquiv.truncatedLowerIndex K L (u + 1) s) = (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)]) := by
+theorem sum_of_diff_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc (-1) (⌈u⌉ - 1)) : ∑ s in Ramification_Group_diff K L i, (AlgEquiv.truncatedLowerIndex K L (u + 1) s) = (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)]) := by
   calc
      ∑ s in Ramification_Group_diff K L i, (AlgEquiv.truncatedLowerIndex K L (u + 1) s) = ∑ s in Ramification_Group_diff K L i, ((i : ℚ) + 1) := by
       apply sum_equiv (by rfl : (L ≃ₐ[K] L) ≃ (L ≃ₐ[K] L)) (by simp)
@@ -458,10 +514,15 @@ theorem sum_of_diff_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc 0 (⌈u⌉ - 1
      _ = (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)]) := by
       simp [← mul_sum (Ramification_Group_diff K L i) (fun x => 1) (i + 1), add_mul, mul_comm]
       unfold Ramification_Group_diff
+      have hsub : (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L)) ⊆ (G(L/K)_[i] : Set (L ≃ₐ[K] L)) := by
+        apply lowerRamificationGroup.antitone
+        linarith
       have h : (((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset).card = ((Fintype.card G(L/K)_[i] ) - (Fintype.card G(L/K)_[(i + 1)])) := by
-        sorry
+        rw [toFinset_diff, card_sdiff (by apply Set.toFinset_mono hsub)]
+        simp
       rw [h, Nat.cast_sub]
       sorry
+
 
 --for lower numbering
 --the type of lowerindex and the reletive theorems
@@ -502,98 +563,60 @@ theorem sum_fiberwise_aux {u : ℚ} : ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)
     linarith [hn2]
   apply hs h'
 
+
 #check Finset.sum_disjiUnion
 #check Set.union_diff_cancel
 #check Finset.sum_fiberwise
 #check (mul_one_div ((Nat.card G(L/K)_[0]) : ℚ) ((Nat.card G(L/K)_[0]) : ℚ))
 
+theorem cast_natCast (n : ℕ) : ((n : ℤ) : R) = n := by sorry
+
 theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
   by_cases hu : u ≤ 0
   · have hu' : ⌈u⌉ - 1 < 0 := by
       apply lt_of_lt_of_le
-      linarith [(Int.ceil_lt_add_one u)]
+      linarith [ceil_lt_add_one u]
+      apply ceil_le.2 hu
     rw [phi_eq_self_of_le_zero K L hu, sum_fiberwise_aux K L]
     symm
     by_cases huc : ⌈u⌉ < 0
     · have huc' : ⌈u⌉ - 1 < (-1) := by linarith [huc]
       simp [huc', mul_comm, mul_assoc, mul_inv_self]
       sorry
-    · have huc' : ⌈u⌉ = 0 := by sorry
+    · have huc' : ⌈u⌉ = 0 := by omega
       have huc'' : ⌈u⌉ - 1 = (-1) := by linarith [huc']
       have hsum : ∑ s in Ramification_Group_diff K L (-1), i_[L/K]ₜ (u + 1) s = 0 := by
         apply Finset.sum_eq_zero
         intro x hx
         simp [truncatedLowerindex_eq_if K L (by linarith [huc'']) hx]
       simp [huc', huc'', hsum, mul_comm, mul_assoc, mul_inv_self]
-  · have hu' : 0 ≤ ⌈u⌉ - 1 := by sorry
+  · have hu' : 0 ≤ ⌈u⌉ - 1 := by
+      push_neg at hu
+      simp [add_one_le_ceil_iff.2 hu, hu]
     calc
       _ = (1 / Nat.card G(L/K)_[0]) * ((∑ i in Finset.Icc 1 (⌈u⌉ - 1), Nat.card G(L/K)_[i]) + (u - (max 0 (⌈u⌉ - 1))) * (Nat.card G(L/K)_[⌈u⌉])) := by
         apply phi_eq_sum_card K L
       _ = (1 / Nat.card G(L/K)_[0]) * ((∑ i in Finset.Icc 0 (⌈u⌉ - 1), Nat.card G(L/K)_[i]) + (u - (max 0 (⌈u⌉ - 1))) * (Nat.card G(L/K)_[⌈u⌉])) - (1 : ℕ) := by
         have h : 0 < Nat.card G(L/K)_[0] := by sorry
-        have h1 : 0 ≤ ⌈u⌉ - 1 := by sorry
-        erw [← sum_insert_left_aux 0 (⌈u⌉ - 1) h1 (fun x => Nat.card (lowerRamificationGroup K L x)), ← (Nat.div_self h), Nat.cast_div (by simp) (by simp [h]), ← (mul_one_div ((Nat.card G(L/K)_[0]) : ℚ) ((Nat.card G(L/K)_[0]) : ℚ)), (mul_comm ((Nat.card ↥ G(L/K)_[0]) : ℚ) (1 / ↑(Nat.card ↥ G(L/K)_[0] ))), ← mul_sub, Nat.cast_sub]
-        simp [add_comm, add_sub, add_comm]
+        erw [← sum_insert_left_aux 0 (⌈u⌉ - 1) hu' (fun x => Nat.card (lowerRamificationGroup K L x)), ← (Nat.div_self h), Nat.cast_div (by simp) (by simp [h]), ← (mul_one_div ((Nat.card G(L/K)_[0]) : ℚ) ((Nat.card G(L/K)_[0]) : ℚ)), (mul_comm ((Nat.card ↥ G(L/K)_[0]) : ℚ) (1 / ↑(Nat.card ↥ G(L/K)_[0] ))), ← mul_sub, Nat.cast_sub]
+        --simp [add_comm, add_sub, add_comm]
+        sorry
         sorry
       _ = (1 / Nat.card G(L/K)_[0]) * ((∑ i in Finset.Icc (-1) (⌈u⌉ - 1), (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)])) + (u + 1) * (Nat.card G(L/K)_[⌈u⌉])) - 1 := by
-        rw [sum_sub_aux, cast_sub]
+        rw [sum_sub_aux K L hu', cast_sub]
         congr 2
         have h : (u - max 0 (⌈u⌉ - 1)) * (Nat.card G(L/K)_[⌈u⌉]) = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) - ⌈u⌉ * (Nat.card G(L/K)_[⌈u⌉]) := by
-          have hu' : 0 ≤ ⌈u⌉ - 1 := by sorry
           simp [hu', ← sub_add]
           ring
-        rw [h, add_sub]
-        sorry
+        rw [h, add_sub, cast_mul, cast_natCast, add_comm_sub, add_sub]
+        congr
       _ = (1 / Nat.card G(L/K)_[0]) * ((∑ i in Finset.Icc (-1) (⌈u⌉ - 1), ∑ s in Ramification_Group_diff K L i, (AlgEquiv.truncatedLowerIndex K L (u + 1) s)) + (u + 1) * (Nat.card G(L/K)_[⌈u⌉])) - 1 := by
         congr 3
         have h : Finset.Icc (-1) (⌈u⌉ - 1) = Finset.Icc (-1) (⌈u⌉ - 1) := by rfl
-        sorry
-        --apply sum_congr h (sum_of_diff_aux K L)
+        rw [Int.cast_sum]
+        apply sum_congr h
+        intro x hx
+        simp [(sum_of_diff_aux K L hx)]
       _ = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
         congr 2
         apply (sum_fiberwise_aux K L (u := u)).symm
-
-
-  -- by_cases h : u ≥ 1
-  -- · simp [h]
-  --   have hsplit : (Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·)) = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
-  --     calc
-  --     _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) ∪ (G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
-  --       congr
-  --       apply G_split
-  --     _ = (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) + (Finset.sum (((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset)) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) := by
-  --       have : Disjoint (disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)) (toFinset ↑ G(L/K)_[⌈u⌉]) := by sorry
-  --       apply sum_union
-  --       apply this
-  --   have hsplit' : (Finset.sum (((disjiUnion (Finset.Icc (-1) (⌈u⌉ - 1)) (G_diff K L) (G_pairwiseDisjoint K L _)))) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = Finset.sum _ fun (i : ℤ) => Finset.sum _ fun (x : _) => (AlgEquiv.truncatedLowerIndex K L (u + 1) x) := by
-  --     apply sum_disjiUnion
-  --   simp at hsplit hsplit'
-  --   rw [hsplit, hsplit']
-  --   have hu : (Finset.sum ((G(L/K)_[(⌈u⌉)] : Set (L ≃ₐ[K] L)).toFinset) ((AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
-  --     convert Sum_Trunc_lower_Index_of_G_n K L ⌈u⌉ u (by apply le_ceil)
-  --   rw [hu]
-  --   have hd : Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) (fun (i : ℤ) => Finset.sum (G_diff K L i) (fun (x : _) => (AlgEquiv.truncatedLowerIndex K L (u + 1) x))) = Finset.sum (Finset.Icc (-1) (⌈u⌉ - 1)) fun (i : ℤ) => (i + 1) * (Nat.card ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))):= by
-  --     norm_num
-  --     apply sum_equiv (.refl ℤ)
-  --     simp
-  --     simp
-  --     rintro i hge hle
-  --     have hle' : i ≤ u := by
-  --       sorry
-  --     convert Sum_Trunc_lower_Index_of_diff_G K L i u hle'
-  --     unfold G_diff
-  --     simp
-  --     sorry
-  --   rw [hd]
-  --   sorry
-  -- unfold phi
-  -- simp [h]
-  -- sorry
-
-
-variable (S' : Type*) [Ring S'] [vS' : Valued S' ℤₘ₀] [Algebra R S']
-theorem phi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phi R S u = phi R S' u := sorry
-
-theorem psi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : psi R S u = psi R S' u := sorry
-
-end HerbrandFunction
