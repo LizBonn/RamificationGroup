@@ -4,6 +4,7 @@ import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 import LocalClassFieldTheory.LocalField
 import RamificationGroup.ForMathlib.Algebra.Algebra.PowerBasis
+import RamificationGroup.Valued.Hom.ValExtension'
 
 /-
 # Lower Numbering Ramification Group
@@ -329,8 +330,11 @@ instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] :
 
 attribute [local instance 1001] Algebra.toSMul
 
+instance: IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
+
+#check IsIntegralClosure.of_isIntegrallyClosed
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
+  apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
   intro ⟨x, hx⟩
   rw [show 𝒪[L] = valuationSubring vL.v by rfl,
     (Valuation.isEquiv_iff_valuationSubring _ _).mp
@@ -344,7 +348,8 @@ instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralC
   calc
     _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
     _ = _ := by
-      rw [Polynomial.hom_eval₂, subtype_comp_algebraMap_eq_algebraMap]
+      rw [Polynomial.hom_eval₂]
+      simp only [ValuationSubring.algebraMap_def]
       congr
 
 /-- Can't be inferred within 20000 heartbeats. -/
