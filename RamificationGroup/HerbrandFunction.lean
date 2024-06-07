@@ -290,16 +290,18 @@ theorem mem_all_lowerRamificationGroup_iff {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, 
     by_contra hc
     simp at hc
     push_neg at *
-    obtain ⟨m, hx, hx', hx''⟩ := x_in_G_n K L hc
+    obtain ⟨m, hx, hx', hx''⟩ := x_in_G_n K L sorry -- hc
     apply hx''
     apply h
-  apply lowerIndex_eq_top_iff_eq_refl.1 htop
-  rintro n
-  have : x ∈ G(L/K)_[n.toNat] := by
-    apply (mem_lowerRamificationGroup_iff n.toNat).2
-    rw [h, (lowerIndex_refl (R := K) (S := L))]
-    simp
   sorry
+  sorry
+  -- apply lowerIndex_eq_top_iff_eq_refl.1 htop
+  -- rintro n
+  -- have : x ∈ G(L/K)_[n.toNat] := by
+  --   apply (mem_lowerRamificationGroup_iff n.toNat).2
+  --   rw [h, (lowerIndex_refl (R := K) (S := L))]
+  --   simp
+  -- sorry
 
 theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x ∈ G(L/K)_[m]) (hn : x ∉ G(L/K)_[n]) : m ≤ n - 1 := by
   by_contra hc
