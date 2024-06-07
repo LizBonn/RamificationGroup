@@ -153,8 +153,6 @@ noncomputable def AlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐ[R] S)) :
 
 scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => AlgEquiv.truncatedLowerIndex K L
 
-#check AlgEquiv.truncatedLowerIndex
-
 end lowerIndex
 
 section ScalarTower
@@ -186,28 +184,62 @@ variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [CommRing K] [Field K'] [F
 [LinearOrderedCommGroupWithZero ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L]
 [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L]
 
+/-- `h` should be `𝒪[L] is finite over 𝒪[K]`-/
+theorem lowerIndex_ne_refl_of_FG (h : sorry) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
+  intro heq
+  simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
+    dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at heq
+  have : ∀ x : vL.v.integer, v (s x - x) = 0 := by
+    intro x
+    apply le_of_eq at heq
+    rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
+    refine (ciSup_le_iff' ?_).mp heq x -- this sorry is should be filled with bounded by one
+    use 1
+    intro a ha
+    rcases ha with ⟨y, hy⟩
+    rw [← hy, ← Valuation.mem_integer_iff]
+    apply Subring.sub_mem
+    sorry; sorry
+  apply hs
+  ext x
+  rw [AlgEquiv.coe_refl, id_eq, ← sub_eq_zero, ← Valuation.zero_iff vL.v]
+  rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
+  · sorry
+  · sorry
+
+theorem lowerIndex_ne_one {s : decompositionGroup K L} (hs : s ≠ 1) : i_[L/K] s ≠ ⊤ := by
+  intro heq
+  simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
+    dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at heq
+  have hL : ∀ x : vL.v.integer, s.1 x = x := by
+    intro x
+    apply le_of_eq at heq
+    rw [← sub_eq_zero, ← Valuation.zero_iff vL.v, show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
+    refine (ciSup_le_iff' ?_).mp heq x
+    use 1
+    intro a ha
+    rcases ha with ⟨y, hy⟩
+    rw [← hy, ← Valuation.mem_integer_iff]
+    apply Subring.sub_mem
+    · rw [mem_integer_iff, val_map_le_one_iff s.2]
+      exact y.2
+    · exact y.2 -- should have be proved somewhere else?
+  apply hs
+  ext x
+  rw [decompositionGroup_one, AlgEquiv.coe_refl, id_eq]
+  rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
+  · exact hL ⟨x, h⟩
+  · calc
+    _ = (s.1 x⁻¹)⁻¹ := by simp only [inv_inv, map_inv₀]
+    _ = _ := by rw [hL ⟨x⁻¹, h⟩, inv_inv]
+
 @[simp]
-theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} : i_[L/K] s = ⊤ ↔ s = .refl := by
-  constructor <;>
-  intro h
-  · ext l
-    simp only [AlgEquiv.coe_refl, id_eq]
-    obtain ⟨x, ⟨y, ⟨_, rfl⟩⟩⟩ := IsFractionRing.div_surjective l (A := 𝒪[L])
-    simp
-    by_cases hs : iSup (fun x : vL.v.integer => (v (s x - x))) = 0
-    · simp only [AddSubgroupClass.coe_sub] at hs
-      have : ∀ x : vL.v.integer, v (s x - x) = 0 := by
-        intro x
-        apply le_of_eq at hs
-        rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
-        exact (ciSup_le_iff' sorry).mp hs x -- this sorry is should be filled with bounded by one
-      sorry
-    · simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
-      dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at h
-      have h : ∀ x : 𝒪[L], v (s ↑x - ↑x) = 0 := sorry
-      --exact h l
-      sorry
-  · simp [AlgEquiv.lowerIndex, h]
+theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s = ⊤ ↔ s = 1 := by
+  constructor <;> intro h
+  · contrapose! h
+    apply lowerIndex_ne_one h
+  · simp only [AlgEquiv.lowerIndex, h, OneMemClass.coe_one, AlgEquiv.one_apply, sub_self,
+    _root_.map_zero, ciSup_const, ↓reduceDite]
 
 --the type of `n` should be changed
 -- instead, change when use this theorem
@@ -287,10 +319,7 @@ G(S/R)_[u] = decompositionGroup R S := by
   intro hs a ha
   calc
     _ ≤ max (v (s a)) (v a) := Valuation.map_sub _ _ _
-    _ ≤ 1 := by
-      apply max_le
-      · exact (val_map_le_one_iff hs a).mpr ha
-      · exact ha
+    _ ≤ 1 := max_le ((val_map_le_one_iff hs a).mpr ha) ha
     _ ≤ _ := by
       show (.coe (0 : ℤ) : ℤₘ₀) ≤ .coe ((- u - 1) : ℤ)
       norm_cast
@@ -315,13 +344,15 @@ open ExtDVR IsValExtension Polynomial
 -- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
 variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
 
+section algebra_instances
+
 /-- The conditions might be too strong.
 The proof is almost the SAME with `Valuation.mem_integer_of_mem_integral_closure`. -/
 instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] := by
   rw [isIntegrallyClosed_iff K]
   intro x ⟨p, hp⟩
   by_cases xne0 : x = 0
-  · subst xne0; use 0; simp
+  · subst xne0; use 0; simp only [ValuationSubring.algebraMap_def, _root_.map_zero]
   by_cases vxgt1 : v x ≤ 1
   · use ⟨x, vxgt1⟩; rfl
   · exfalso
@@ -341,7 +372,7 @@ instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] :
 
 attribute [local instance 1001] Algebra.toSMul
 
-instance: IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
+instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
 #check IsIntegralClosure.of_isIntegrallyClosed
 
@@ -377,6 +408,8 @@ instance instNoethertianToValuationSubringExtension [CompleteSpace K] [IsSeparab
 noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : PowerBasis 𝒪[K] 𝒪[L] :=
   letI : Nontrivial vL.v := nontrivial_of_valExtension K L
   PowerBasisExtDVR (integerAlgebra_injective K L)
+
+end algebra_instances
 
 variable {K L}
 variable [CompleteSpace K]
@@ -427,14 +460,34 @@ theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ
   · unfold AlgEquiv.lowerIndex
     simp only [h, AlgEquiv.iSup_val_map_sub_eq_powerBasis pb, AlgEquiv.val_map_powerBasis_sub_ne_zero pb h, ↓reduceDite]
 
+#synth Fintype (L ≃ₐ[K] L)
+
+theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
+  have : s ∈ decompositionGroup K L := by
+    rw [decompositionGroup_eq_top]
+    exact Subgroup.mem_top s
+  rw [show s = (⟨s, this⟩ : decompositionGroup K L).1 by rfl]
+  apply lowerIndex_ne_one
+  intro h
+  rw [Subtype.ext_iff, decompositionGroup_one] at h
+  exact hs h
+
+variable (K L) in
+theorem aux1 : ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
+  rw [← lt_top_iff_ne_top, iSup_lt_iff]
+  sorry
+
 #check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
-theorem lowerRamificationGroup_eq_bot_of_ge_val {pb : PowerBasis 𝒪[K] 𝒪[L]} {s : L ≃ₐ[K] L} {u : ℤ} (hu : sorry) : s ∉ G(L/K)_[u] := by
-  intro hs
+theorem aux0 {pb : PowerBasis 𝒪[K] 𝒪[L]}
+  {u : ℕ} (hu : u > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
+  {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[u]) : s = .refl := by
   sorry
 
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := sorry
+theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
+  use (WithTop.untop _ (aux1 K L) : ℕ) + 1
+  sorry
 
 end eq_bot
 
