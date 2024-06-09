@@ -71,7 +71,7 @@ def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
 scoped [Valued] notation:max " G(" S:max "/" R:max ")_[" u:max "] " => lowerRamificationGroup R S u
 
 theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) := by
-  rintro a b hab
+  intro a b hab
   simp only [lowerRamificationGroup, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mk_le_mk,
     Set.setOf_subset_setOf, and_imp]
   rintro s hs1 hs2
@@ -79,7 +79,7 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
   · exact hs1
   · intro y hy
     apply le_trans (hs2 y hy)
-    simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel', inv_le_inv_iff,
+    simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel, inv_le_inv_iff,
       Multiplicative.ofAdd_le]
     exact hab
 
@@ -106,8 +106,9 @@ end autCongr
 section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
 open Classical
-
+#check WithBot.instSupSet
 -- there is no `ConditionallyCompleteLinearOrderTop` in mathlib ...
+-- # The definition of `WithTop.instInfSet` have to be changed
 #check WithBot.linearOrder
 noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithBot α) where
   toConditionallyCompleteLattice := WithBot.conditionallyCompleteLattice
@@ -116,11 +117,11 @@ noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : Conditionall
   decidableEq := WithBot.decidableEq
   decidableLT := WithBot.decidableLT
   csSup_of_not_bddAbove s h := by
-    by_cases hbot : s ⊆ {⊥}
-    · simp [sSup, sInf]
-      sorry
-    · simp [sSup, sInf]
-      intro x hxs hx
+    rw [WithBot.csSup_empty]
+    simp only [sSup, sInf, Set.subset_singleton_iff]
+    by_cases hs : ∀ y ∈ s, y = (⊤ : WithTop αᵒᵈ)
+    · rw [if_pos hs]; rfl
+    · rw [if_neg hs]
       sorry
   csInf_of_not_bddBelow := sorry
   bot_le := WithBot.orderBot.bot_le
@@ -133,6 +134,7 @@ instance {α} [Add α] [ConditionallyCompleteLinearOrder α] : ConditionallyComp
 -- noncomputable instance : ConditionallyCompleteLinearOrderBot ℤₘ₀ := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithZero ℤ))
 
 end WithBot
+
 
 section lowerIndex
 
@@ -234,7 +236,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s =
     _root_.map_zero, ciSup_const, ↓reduceDite]
     sorry
 
---the type of `n` should be changed
+--n the type of `n` should be changed
 -- instead, change when use this theorem
 theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
   simp [AlgEquiv.truncatedLowerIndex]
@@ -367,6 +369,7 @@ attribute [local instance 1001] Algebra.toSMul
 instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
 #check IsIntegralClosure.of_isIntegrallyClosed
+#check IsIntegral
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
   -- apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
   -- intro ⟨x, hx⟩
@@ -446,8 +449,6 @@ theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ
   · unfold AlgEquiv.lowerIndex
     simp only [h, AlgEquiv.iSup_val_map_sub_eq_powerBasis pb, AlgEquiv.val_map_powerBasis_sub_ne_zero pb h, ↓reduceDite]
 
-#synth Fintype (L ≃ₐ[K] L)
-
 theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
   have : s ∈ decompositionGroup K L := by
     rw [decompositionGroup_eq_top]
@@ -458,33 +459,53 @@ theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s �
   rw [Subtype.ext_iff, decompositionGroup_one] at h
   exact hs h
 
-#check nontrivial_iff_exists_ne
-
 variable (K L) in
-open Classical in
 theorem aux1 [Nontrivial (L ≃ₐ[K] L)] :
   ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
   rw [← lt_top_iff_ne_top, iSup_lt_iff]
-  let E : Finset (L ≃ₐ[K] L) := {s : (L ≃ₐ[K] L) | s ≠ .refl}.toFinset
-  have hE : E.Nonempty := by
-    rcases exists_ne (.refl : L ≃ₐ[K] L) with ⟨s, hs⟩
-    use s
-    simp only [Set.toFinset_setOf, ne_eq, Finset.mem_filter, Finset.mem_univ, hs, not_false_eq_true,
-      and_self, E]
-  -- let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ := fun s ↦ WithTop.untop (lowerIndex_ne_refl s.2)
-  sorry
+  let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ :=
+    fun s ↦ WithTop.untop _ (lowerIndex_ne_refl s.2)
+  letI : Nonempty {s : (L ≃ₐ[K] L) // s ≠ .refl} := Exists.casesOn (exists_ne AlgEquiv.refl)
+    fun s hs ↦ Nonempty.intro ⟨s, hs⟩
+  rcases Finite.exists_max f with ⟨a, ha⟩
+  use f a
+  constructor
+  · exact WithTop.coe_lt_top _ -- This is tagged with @[simp] but failed to simp
+  · intro s
+    have : i_[L/K] s = f s := by
+      rw [← ENat.some_eq_coe, WithTop.coe_untop]
+    simp only [ne_eq, this, Nat.cast_le, ha]
 
 #check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
-theorem aux0 {pb : PowerBasis 𝒪[K] 𝒪[L]}
-  {u : ℕ} (hu : u > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
-  {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[u]) : s = .refl := by
-  sorry
+#check mem_lowerRamificationGroup_iff
+theorem aux0
+  {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
+  {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
 
+  sorry
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
-  --use (WithTop.untop _ (aux1 K L) : ℕ) + 1
-  sorry
+  by_cases h : Nontrivial (L ≃ₐ[K] L)
+  · use (WithTop.untop _ (aux1 K L) : ℕ) + 1
+    rw [eq_bot_iff]
+    intro s hs
+    rw [Subgroup.mem_bot, AlgEquiv.aut_one, aux0 _ hs]
+    rw [← ENat.some_eq_coe]
+    simp only [WithTop.coe_add, WithTop.coe_untop, WithTop.coe_one, gt_iff_lt]
+    nth_rw 1 [← add_zero (⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)]
+    have : (0 : ℕ∞) < 1 := by
+      rw [← ENat.coe_one, ← ENat.some_eq_coe, WithTop.zero_lt_coe]
+      exact zero_lt_one
+    convert WithTop.add_lt_add_left (aux1 K L) this
+  · use 0
+    rw [eq_bot_iff]
+    intro s _
+    rw [Subgroup.mem_bot, AlgEquiv.aut_one]
+    letI : Subsingleton (L ≃ₐ[K] L) := not_nontrivial_iff_subsingleton.mp h
+    apply Subsingleton.allEq
+
+#check WithTop.some_lt_some
 
 end eq_bot
 
