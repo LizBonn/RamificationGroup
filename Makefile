@@ -2,9 +2,7 @@
 
 PROJECT = RamificationGroup
 
-.PHONY: all build blueprint analyze serve
-
-.PHONY: all build blueprint analyze serve
+.PHONY: all build blueprint blueprint-dev analyze serve update
 
 all : build blueprint
 
@@ -14,11 +12,15 @@ build:
 blueprint: build
 	(cd blueprint && inv all && cp -r ../.lake/build/doc ./web/)
 
+blueprint-dev:
+	(cd blueprint && inv all)
+
 analyze:
 	(python3 blueprint/blueprint_auto.py -p ${PROJECT})
 
-serve: blueprint analyze
-	(cd blueprint/web && python3 -m http.server)
+serve: blueprint-dev analyze
+	(cd blueprint && inv serve)
 
 update:
-	lake -Kenv=dev update -R
+	(curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain && \
+		lake -Kenv=dev update -R)
