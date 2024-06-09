@@ -754,31 +754,15 @@
                 No documentation.
     \end{theorem}
 
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{definition}\label{AlgEquiv.restrictScalarsHom}
-        \leanok
-        \lean{AlgEquiv.restrictScalarsHom}
-        \uses{ext}
-                No documentation.
-    \end{definition}
-
-\begin{theorem}\label{DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
-        \leanok
-        \lean{DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
-                No documentation.
+\begin{theorem}\label{Valuation.integral_closure_eq_integer_of_complete_of_ext}
+        \lean{Valuation.integral_closure_eq_integer_of_complete_of_ext}
+        \uses{Valued.valuationSubring,ext,ValRingHom.comp}
+                WARNING : not mathematically true? more conditions?
     \end{theorem}
 
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{DiscreteValuationRing.mul_irreducible_of_not_unit}
-        \leanok
-        \lean{DiscreteValuationRing.mul_irreducible_of_not_unit}
-        \uses{Valued.maximalIdeal,ValAlgEquiv.symm}
+\begin{theorem}\label{Valuation.unique_valuationSubring_of_ext}
+        \lean{Valuation.unique_valuationSubring_of_ext}
+        \uses{Valuation.integral_closure_eq_integer_of_complete_of_ext,unique_valuationSubring_of_ext,Valued.valuationSubring,ext,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
@@ -793,7 +777,7 @@
     \leanok
 \end{proof}
 
-\begin{theorem}\label{DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two}
+\begin{theorem}\label{ValAlgEquiv.algEnd_preserve_val}
         \leanok
         \lean{ValAlgEquiv.algEnd_preserve_val}
         \uses{Valuation.unique_val_of_ext,ValAlgebra,ext,ValAlgebra.val_isEquiv_comap}
@@ -804,16 +788,10 @@
     \leanok
 \end{proof}
 
-\begin{theorem}\label{DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
-        \lean{DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
-        \uses{Valued.maximalIdeal,maximalIdeal_eq}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{LocalRing.algebraMap_residue_compat}
+\begin{theorem}\label{ValAlgEquiv.algEquiv_preserve_val}
         \leanok
-        \lean{LocalRing.algebraMap_residue_compat}
-        \uses{Valued.ResidueField,ValRingHom.id,ValRingHom.comp}
+        \lean{ValAlgEquiv.algEquiv_preserve_val}
+        \uses{ValAlgEquiv.algEnd_preserve_val}
                 No documentation.
     \end{theorem}
 
@@ -821,33 +799,27 @@
     \leanok
 \end{proof}
 
-\begin{theorem}\label{LocalRing.residue_irreducible_eq_zero}
-        \leanok
-        \lean{LocalRing.residue_irreducible_eq_zero}
-        \uses{Valued.maximalIdeal,ValRingHom.id}
+\begin{definition}\label{ValAlgEquiv.fromAlgEquiv}
+        \lean{ValAlgEquiv.fromAlgEquiv}
+        \uses{ValAlgEquiv.algEquiv_preserve_val,DiscreteValuation.fromAlgEquiv,ValAlgEquiv.mk'}
                 No documentation.
-    \end{theorem}
+    \end{definition}
 
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{LocalRing.is_unit_iff_residue_ne_zero}
-        \leanok
-        \lean{LocalRing.is_unit_iff_residue_ne_zero}
-        \uses{ValRingHom.id}
+\begin{definition}\label{ValAlgEquiv.equivAlgEquiv}
+        \lean{ValAlgEquiv.equivAlgEquiv}
+        \uses{DiscreteValuation.fromAlgEquiv,DiscreteValuation.equivAlgEquiv,ValAlgEquiv}
                 No documentation.
-    \end{theorem}
+    \end{definition}
 
 \begin{definition}\label{DiscretelyValued.extensionFiniteDimension}
         \lean{DiscretelyValued.extensionFiniteDimension}
         \uses{ext}
                 No documentation.
-    \end{theorem}
+    \end{definition}
 
-\begin{theorem}\label{unique_of_valuation_extension}
-        \lean{unique_of_valuation_extension}
-        \uses{ValAlgebra,ext}
+\begin{theorem}\label{Valuation.isEquiv_of_finiteDimensional}
+        \lean{Valuation.isEquiv_of_finiteDimensional}
+        \uses{ValAlgebra,ext,ValAlgebra.val_isEquiv_comap,ValAlgEquiv}
                 No documentation.
     \end{theorem}
 
@@ -895,8 +867,16 @@
 
 \begin{definition}\label{ValRingHom}
         \leanok
-        \lean{Ideal.quotientAlgebra'}
-                No documentation.
+        \lean{ValRingHom}
+        \uses{ext,ValAlgebra.val_isEquiv_comap}
+                `ValRingHom R S` is the type of ring homomorphisms that preserves valuation from valued ring `R` to valued ring `S`.
+
+Please note that the definition requires `v x ≤ v y ↔ v (f x) ≤ v (f y)` instead of `v x ≤ v y → v (f x) ≤ v (f y)`. For the latter case, one can use order-preserving ring homomorphisms.
+
+When possible, instead of parametrizing results over `(f : ValRingHom R S)`,
+you should parametrize over `(F : Type*) [ValRingHomClass F R S] (f : F)`.
+
+When you extend this structure, make sure to extend `ValRingHomClass`.
     \end{definition}
 
 \begin{definition}\label{ValAlgebra}
@@ -3049,7 +3029,7 @@ from `A` to `B`.
 \begin{theorem}\label{ExtDVR.residue_primitive_of_add_uniformizer}
         \leanok
         \lean{ExtDVR.residue_primitive_of_add_uniformizer}
-        \uses{LocalRing.residue_eq_add_irreducible,Valued.ResidueField,ValRingHom.id}
+        \uses{Valued.ResidueField,ValRingHom.id,LocalRing.residue_eq_add_irreducible}
                 No documentation.
     \end{theorem}
 
@@ -3060,7 +3040,7 @@ from `A` to `B`.
 \begin{theorem}\label{ExtDVR.not_unit_aeval_lift_residue_primitive}
         \leanok
         \lean{ExtDVR.not_unit_aeval_lift_residue_primitive}
-        \uses{LocalRing.algebraMap_residue_compat,LocalRing.is_unit_iff_residue_ne_zero,ValRingHom.id,ValRingHom.comp}
+        \uses{ValRingHom.id,ValRingHom.comp,LocalRing.algebraMap_residue_compat,LocalRing.is_unit_iff_residue_ne_zero}
                 No documentation.
     \end{theorem}
 

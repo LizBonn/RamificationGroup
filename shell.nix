@@ -1,16 +1,10 @@
 { pkgs, ... }:
-let
-  pythonPackages = pkgs.python39Packages;
-  tex = (pkgs.texlive.combine {
-    inherit (pkgs.texlive)
-      scheme-small dvisvgm
-      amsmath hyperref comment;
-  });
+let pythonPackages = pkgs.python39Packages;
 in pkgs.mkShell {
   name = "python-venv";
   venvDir = "./.venv";
 
-  packages = with pkgs; [ tex graphviz pdf2svg elan gnumake ];
+  packages = with pkgs; [ texliveFull graphviz pdf2svg elan gnumake ];
 
   buildInputs = [
     # A Python interpreter including the 'venv' module is required to bootstrap
