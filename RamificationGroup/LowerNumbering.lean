@@ -64,7 +64,7 @@ def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
       _ = v ( s (s⁻¹ a) - s ⁻¹ a) := by
         rw [← Valuation.map_neg]
         congr
-        simp
+        simp only [neg_sub]
       _ ≤ _ := hs.2 ⟨s⁻¹ a, (val_map_le_one_iff (f := (s.symm : S →+* S))
         (Valuation.IsEquiv_comap_symm hs.1) a.1).mpr a.2⟩
 
@@ -238,15 +238,14 @@ theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L
   simp [AlgEquiv.truncatedLowerIndex]
   constructor <;>
   unfold lowerRamificationGroup AlgEquiv.lowerIndex
-  simp
+  simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq, and_imp]
   rintro h
   by_cases hs : iSup (fun x : vL.v.integer => (v (s x - x))) = 0
-  · simp at hs
-    simp [hs]
-  · simp at hs
-    simp [hs]
+  · simp only at hs
+    simp only [hs, ↓reduceDite, le_top, implies_true]
+  · simp only at hs
+    simp only [hs, ↓reduceDite]
     sorry
-  simp
   sorry
 
 
@@ -258,7 +257,7 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
     convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
     sorry
-  · simp [hs] at h
+  · simp only [hs, ↓reduceDite] at h
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
       have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
       have hnt: i_[L/K] s = (WithTop.untop (i_[L/K] s) hs) := by sorry
@@ -274,12 +273,12 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
   rintro hs
   unfold AlgEquiv.truncatedLowerIndex
   by_cases hc : i_[L/K] s = ⊤
-  · simp [hc]
+  · simp only [hc, ↓reduceDite]
     linarith [h]
   · have : ⌈u⌉.toNat + 1 ≤ i_[L/K] s := by
       sorry
       --apply (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).1 hs
-    simp [hc]
+    simp only [hc, ↓reduceDite, ge_iff_le]
     sorry
 
 end lowerIndex_inequality
@@ -457,9 +456,20 @@ theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s �
   rw [Subtype.ext_iff, decompositionGroup_one] at h
   exact hs h
 
+#check nontrivial_iff_exists_ne
+
 variable (K L) in
-theorem aux1 : ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
+open Classical in
+theorem aux1 [Nontrivial (L ≃ₐ[K] L)] :
+  ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
   rw [← lt_top_iff_ne_top, iSup_lt_iff]
+  let E : Finset (L ≃ₐ[K] L) := {s : (L ≃ₐ[K] L) | s ≠ .refl}.toFinset
+  have hE : E.Nonempty := by
+    rcases exists_ne (.refl : L ≃ₐ[K] L) with ⟨s, hs⟩
+    use s
+    simp only [Set.toFinset_setOf, ne_eq, Finset.mem_filter, Finset.mem_univ, hs, not_false_eq_true,
+      and_self, E]
+  let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ := fun s ↦ WithTop.untop (lowerIndex_ne_refl s.2)
   sorry
 
 #check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
