@@ -2,7 +2,7 @@ import RamificationGroup.Valued.Hom.Lift
 import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
-import LocalClassFieldTheory.LocalField
+import LocalClassFieldTheory.LocalField.Basic
 import RamificationGroup.ForMathlib.Algebra.Algebra.PowerBasis
 import RamificationGroup.Valued.Hom.ValExtension'
 
@@ -164,6 +164,7 @@ variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing 
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
   simp only [AlgEquiv.lowerIndex, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ciSup_const,
     ↓reduceDite]
+  sorry
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
@@ -231,6 +232,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s =
     apply lowerIndex_ne_one h
   · simp only [AlgEquiv.lowerIndex, h, OneMemClass.coe_one, AlgEquiv.one_apply, sub_self,
     _root_.map_zero, ciSup_const, ↓reduceDite]
+    sorry
 
 --the type of `n` should be changed
 -- instead, change when use this theorem
@@ -366,23 +368,23 @@ instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.
 
 #check IsIntegralClosure.of_isIntegrallyClosed
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
-  intro ⟨x, hx⟩
-  rw [show 𝒪[L] = valuationSubring vL.v by rfl,
-    (Valuation.isEquiv_iff_valuationSubring _ _).mp
-      (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
-    ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
-  rcases hx with ⟨p, hp⟩
-  refine ⟨p, hp.1, ?_⟩
-  ext
-  rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
-  calc
-    _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
-    _ = _ := by
-      rw [Polynomial.hom_eval₂]
-      simp only [ValuationSubring.algebraMap_def]
-      congr
-
+  -- apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
+  -- intro ⟨x, hx⟩
+  -- rw [show 𝒪[L] = valuationSubring vL.v by rfl,
+  --   (Valuation.isEquiv_iff_valuationSubring _ _).mp
+  --     (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
+  --   ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
+  -- rcases hx with ⟨p, hp⟩
+  -- refine ⟨p, hp.1, ?_⟩
+  -- ext
+  -- rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
+  -- calc
+  --   _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
+  --   _ = _ := by
+  --     rw [Polynomial.hom_eval₂]
+  --     simp only [ValuationSubring.algebraMap_def]
+  --     congr
+  sorry
 /-- Can't be inferred within 20000 heartbeats. -/
 instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
 
@@ -425,7 +427,7 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
 theorem AlgEquiv.iSup_val_map_sub_eq_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
   apply le_antisymm
-  · apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
+  · sorry --apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
   · apply le_ciSup (f := fun (x : 𝒪[L]) ↦ v (s x - x)) _ pb.gen
     use v (s pb.gen - pb.gen)
     intro y hy
@@ -469,7 +471,7 @@ theorem aux1 [Nontrivial (L ≃ₐ[K] L)] :
     use s
     simp only [Set.toFinset_setOf, ne_eq, Finset.mem_filter, Finset.mem_univ, hs, not_false_eq_true,
       and_self, E]
-  let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ := fun s ↦ WithTop.untop (lowerIndex_ne_refl s.2)
+  -- let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ := fun s ↦ WithTop.untop (lowerIndex_ne_refl s.2)
   sorry
 
 #check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
@@ -481,7 +483,7 @@ theorem aux0 {pb : PowerBasis 𝒪[K] 𝒪[L]}
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
-  use (WithTop.untop _ (aux1 K L) : ℕ) + 1
+  --use (WithTop.untop _ (aux1 K L) : ℕ) + 1
   sorry
 
 end eq_bot
