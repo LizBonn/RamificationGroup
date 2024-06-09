@@ -1,215 +1,4 @@
 
-\begin{theorem}\label{HerbrandFunction.sub_of_sum}
-        \leanok
-        \lean{HerbrandFunction.sub_of_sum}
-        \uses{sub_of_sum,ext}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{HerbrandFunction.ceil_eq_floor_add_one_iff}
-        \leanok
-        \lean{HerbrandFunction.ceil_eq_floor_add_one_iff}
-        \uses{ceil_eq_floor_add_one_iff}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{HerbrandFunction.Int.eq_of_ge_of_lt_add_one}
-        \leanok
-        \lean{HerbrandFunction.Int.eq_of_ge_of_lt_add_one}
-        \uses{Int.eq_of_ge_of_lt_add_one,ValAlgEquiv.symm}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{HerbrandFunction.phiDeriv_eq_ceil}
-        \lean{HerbrandFunction.phiDeriv_eq_ceil}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phiDeriv_pos}
-        \lean{HerbrandFunction.phiDeriv_pos}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phiDeriv_neg_int_eq_one}
-        \lean{HerbrandFunction.phiDeriv_neg_int_eq_one}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_int_succ}
-        \lean{HerbrandFunction.phi_int_succ}
-        \uses{sub_of_sum,HerbrandFunction.phiDeriv_neg_int_eq_one,phi_int_succ,ValAlgEquiv.symm}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_mono_int}
-        \lean{HerbrandFunction.phi_mono_int}
-        \uses{HerbrandFunction.phiDeriv_pos,phi_int_succ,phi_mono_int,phi_mono,ValAlgEquiv.trans}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_mono_int'}
-        \lean{HerbrandFunction.phi_mono_int'}
-        \uses{phi_mono_int,phi_mono_int',phi_mono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_rational_floor}
-        \lean{HerbrandFunction.phi_rational_floor}
-        \uses{sub_of_sum,ceil_eq_floor_add_one_iff,HerbrandFunction.phiDeriv_eq_ceil,phi_rational_floor,ValAlgEquiv.symm,ValAlgEquiv.trans}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_rational_ceil}
-        \lean{HerbrandFunction.phi_rational_ceil}
-        \uses{sub_of_sum,ceil_eq_floor_add_one_iff,Int.eq_of_ge_of_lt_add_one,HerbrandFunction.phiDeriv_eq_ceil,phi_rational_ceil,ValAlgEquiv.symm,ExtDVR.3}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_gt_floor}
-        \lean{HerbrandFunction.phi_gt_floor}
-        \uses{phi_mono_int,phi_rational_floor,phi_gt_floor,phi_mono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_lt_ceil}
-        \lean{HerbrandFunction.phi_lt_ceil}
-        \uses{phi_mono_int,phi_rational_ceil,phi_lt_ceil,phi_mono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_mono_in_section}
-        \lean{HerbrandFunction.phi_mono_in_section}
-        \uses{phi_mono_int,phi_rational_floor,phi_mono_in_section,phi_mono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_mono_over_section}
-        \lean{HerbrandFunction.phi_mono_over_section}
-        \uses{phi_mono_int,phi_mono_int',phi_gt_floor,phi_lt_ceil,phi_mono_over_section,phi_mono,ValAlgEquiv.symm}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_mono_iff}
-        \lean{HerbrandFunction.phi_mono_iff}
-        \uses{phi_mono_int,phi_mono_in_section,phi_mono_over_section,phi_mono_iff,phi_mono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_mono}
-        \lean{HerbrandFunction.phi_mono}
-        \uses{phi_mono_int,phi_mono_iff,phi_mono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_bij}
-        \lean{HerbrandFunction.phi_bij}
-        \uses{phi_mono,phi_bij,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.psi_bij}
-        \lean{HerbrandFunction.psi_bij}
-        \uses{phi_bij,psi_bij,injective,surjective}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_zero_eq_zero}
-        \leanok
-        \lean{HerbrandFunction.phi_zero_eq_zero}
-        \uses{phi_zero_eq_zero,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{HerbrandFunction.psi_zero_eq_zero}
-        \lean{HerbrandFunction.psi_zero_eq_zero}
-        \uses{phi_bij,phi_zero_eq_zero,psi_zero_eq_zero,ValRingHom.id,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_inv_psi}
-        \lean{HerbrandFunction.phi_inv_psi}
-        \uses{phi_bij,phi_inv_psi,surjective,ValRingHom.comp,ExtDVR.3}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.G_pairwiseDisjoint}
-        \lean{HerbrandFunction.G_pairwiseDisjoint}
-        \uses{G_pairwiseDisjoint}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.G_n_or_G_lt_n}
-        \lean{HerbrandFunction.G_n_or_G_lt_n}
-        \uses{G_n_or_G_lt_n}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.G_split}
-        \lean{HerbrandFunction.G_split}
-        \uses{G_pairwiseDisjoint,G_n_or_G_lt_n,G_split,ext}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.Sum_Trunc_lower_Index_of_G_n}
-        \lean{HerbrandFunction.Sum_Trunc_lower_Index_of_G_n}
-        \uses{Sum_Trunc_lower_Index_of_G_n,ValAlgEquiv.refl}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.Sum_Trunc_lower_Index_of_diff_G}
-        \lean{HerbrandFunction.Sum_Trunc_lower_Index_of_diff_G}
-        \uses{Sum_Trunc_lower_Index_of_diff_G,ValAlgEquiv.refl}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_eq_sum_inf}
-        \lean{HerbrandFunction.phi_eq_sum_inf}
-        \uses{G_pairwiseDisjoint,G_split,Sum_Trunc_lower_Index_of_G_n,Sum_Trunc_lower_Index_of_diff_G,ValAlgEquiv.refl}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.leftInverse_phi_psi}
-        \lean{HerbrandFunction.leftInverse_phi_psi}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_psi_eq_self}
-        \lean{HerbrandFunction.phi_psi_eq_self}
-        \uses{HerbrandFunction.leftInverse_phi_psi}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_strictMono}
-        \lean{HerbrandFunction.phi_strictMono}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_eq_self_of_le_neg_one}
-        \lean{HerbrandFunction.phi_eq_self_of_le_neg_one}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.psi_eq_self_of_le_neg_one}
-        \lean{HerbrandFunction.psi_eq_self_of_le_neg_one}
-                No documentation.
-    \end{theorem}
-
 \begin{theorem}\label{Valuation.IsEquiv_comap_symm}
         \leanok
         \lean{Valuation.IsEquiv_comap_symm}
@@ -228,22 +17,341 @@
                 No documentation.
     \end{definition}
 
+\begin{theorem}\label{Valued.decompositionGroup_one}
+        \leanok
+        \lean{Valued.decompositionGroup_one}
+        \uses{Valued.decompositionGroup,eq_top,ValRingHom.comp,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Valued.decompositionGroup_eq_top}
+        \leanok
+        \lean{Valued.decompositionGroup_eq_top}
+        \uses{Valued.decompositionGroup,eq_top,ValAlgEquiv.algEquiv_preserve_val,ValRingHom.comp,DiscreteValuation.algEquiv_preserve_val_of_complete,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{ceil_nonpos}
+        \leanok
+        \lean{ceil_nonpos}
+        \uses{ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.phiDeriv_eq_one_of_le_zero}
+        \lean{HerbrandFunction.phiDeriv_eq_one_of_le_zero}
+        \uses{ceil_nonpos,lowerRamificationGroup,lowerRamificationGroup.antitone,RamificationGroup}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_eq_self_of_le_zero}
+        \lean{HerbrandFunction.phi_eq_self_of_le_zero}
+        \uses{ceil_nonpos,HerbrandFunction.phiDeriv_eq_one_of_le_zero}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phiDeriv_pos}
+        \lean{HerbrandFunction.phiDeriv_pos}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phiDeriv_eq_ceil}
+        \leanok
+        \lean{HerbrandFunction.phiDeriv_eq_ceil}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.phi_pos_of_pos}
+        \lean{HerbrandFunction.phi_pos_of_pos}
+        \uses{HerbrandFunction.phiDeriv_pos}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_pos_gt_nonpos}
+        \lean{HerbrandFunction.phi_pos_gt_nonpos}
+        \uses{HerbrandFunction.phi_eq_self_of_le_zero,HerbrandFunction.phi_pos_of_pos}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_of_pos_of_le_one}
+        \leanok
+        \lean{HerbrandFunction.phi_of_pos_of_le_one}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.Finset.sum_Icc_sub_sum_Icc}
+        \lean{HerbrandFunction.Finset.sum_Icc_sub_sum_Icc}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_strictMono_of_gt_one}
+        \lean{HerbrandFunction.phi_strictMono_of_gt_one}
+        \uses{HerbrandFunction.phiDeriv_pos,HerbrandFunction.phiDeriv_eq_ceil,HerbrandFunction.phi_strictMono,ceil_eq_floor_add_one_iff,Int.eq_of_ge_of_lt_add_one,HerbrandFunction.phi_eq_self_of_le_neg_one,ValAlgEquiv.symm,ValAlgEquiv.trans,ExtDVR.3}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_strictMono}
+        \lean{HerbrandFunction.phi_strictMono}
+        \uses{phi_mono_int,phi_mono_iff,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_inf}
+        \lean{HerbrandFunction.phi_inf}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.exist_aux}
+        \lean{HerbrandFunction.exist_aux}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_Bijective}
+        \lean{HerbrandFunction.phi_Bijective}
+        \uses{HerbrandFunction.phi_strictMono,HerbrandFunction.exist_aux,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.psi_bij}
+        \lean{HerbrandFunction.psi_bij}
+        \uses{HerbrandFunction.phi_Bijective,psi_bij,phi_bij,injective,surjective}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_zero_eq_zero}
+        \leanok
+        \lean{HerbrandFunction.phi_zero_eq_zero}
+        \uses{phi_zero_eq_zero,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.leftInverse_phi_psi}
+        \lean{HerbrandFunction.leftInverse_phi_psi}
+        \uses{HerbrandFunction.phi_Bijective,phi_bij,surjective}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_psi_eq_self}
+        \lean{HerbrandFunction.phi_psi_eq_self}
+        \uses{HerbrandFunction.leftInverse_phi_psi}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.psi_eq_self_of_le_neg_one}
+        \lean{HerbrandFunction.psi_eq_self_of_le_neg_one}
+        \uses{HerbrandFunction.phi_eq_self_of_le_zero,HerbrandFunction.phi_Bijective,HerbrandFunction.phi_psi_eq_self,HerbrandFunction.phi_eq_self_of_le_neg_one,phi_bij,injective,ValRingHom.comp,ExtDVR.3}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.Ramification_Group_Disjoint}
+        \lean{HerbrandFunction.Ramification_Group_Disjoint}
+        \uses{lowerRamificationGroup,lowerRamificationGroup.antitone,RamificationGroup,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.Ramification_Group_pairwiseDisjoint}
+        \lean{HerbrandFunction.Ramification_Group_pairwiseDisjoint}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.x_not_in_aux}
+        \lean{HerbrandFunction.x_not_in_aux}
+        \uses{ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.x_in_G_n}
+        \lean{HerbrandFunction.x_in_G_n}
+        \uses{ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.mem_all_lowerRamificationGroup_iff}
+        \lean{HerbrandFunction.mem_all_lowerRamificationGroup_iff}
+        \uses{HerbrandFunction.x_in_G_n,lowerRamificationGroup,lowerIndex_refl,lowerIndex_eq_top_iff_eq_refl,mem_lowerRamificationGroup_iff,eq_top,lowerIndex,RamificationGroup,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.m_lt_n_of_in_G_m_of_notin_G_n}
+        \lean{HerbrandFunction.m_lt_n_of_in_G_m_of_notin_G_n}
+        \uses{lowerRamificationGroup,lowerRamificationGroup.antitone,RamificationGroup}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.G_n_or_G_lt_n}
+        \lean{HerbrandFunction.G_n_or_G_lt_n}
+        \uses{HerbrandFunction.x_in_G_n,HerbrandFunction.mem_all_lowerRamificationGroup_iff,HerbrandFunction.m_lt_n_of_in_G_m_of_notin_G_n,G_n_or_G_lt_n,lowerRamificationGroup,RamificationGroup,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.Raimification_Group_split}
+        \lean{HerbrandFunction.Raimification_Group_split}
+        \uses{HerbrandFunction.Ramification_Group_pairwiseDisjoint,G_n_or_G_lt_n,Sum_Trunc_lower_Index_of_G_n,Sum_Trunc_lower_Index_of_diff_G,ext,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.relindex_aux}
+        \lean{HerbrandFunction.relindex_aux}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_eq_sum_card}
+        \lean{HerbrandFunction.phi_eq_sum_card}
+        \uses{HerbrandFunction.relindex_aux,lowerRamificationGroup,lowerRamificationGroup.antitone,RamificationGroup,ext,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.insert_Icc_left}
+        \leanok
+        \lean{HerbrandFunction.insert_Icc_left}
+        \uses{ext,ValAlgEquiv.symm,ValAlgEquiv.trans}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.insert_Icc_right}
+        \leanok
+        \lean{HerbrandFunction.insert_Icc_right}
+        \uses{ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.sum_insert_left_aux}
+        \leanok
+        \lean{HerbrandFunction.sum_insert_left_aux}
+        \uses{HerbrandFunction.insert_Icc_left}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.sum_insert_left_aux'}
+        \leanok
+        \lean{HerbrandFunction.sum_insert_left_aux'}
+        \uses{HerbrandFunction.insert_Icc_left,HerbrandFunction.sum_insert_left_aux}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.sum_insert_right_aux'}
+        \leanok
+        \lean{HerbrandFunction.sum_insert_right_aux'}
+        \uses{HerbrandFunction.insert_Icc_right}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.sum_sub_aux}
+        \lean{HerbrandFunction.sum_sub_aux}
+        \uses{HerbrandFunction.sum_insert_left_aux,HerbrandFunction.sum_insert_left_aux',HerbrandFunction.sum_insert_right_aux',lowerRamificationGroup,RamificationGroup}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.truncatedLowerindex_eq_if}
+        \lean{HerbrandFunction.truncatedLowerindex_eq_if}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.sum_of_diff_aux}
+        \lean{HerbrandFunction.sum_of_diff_aux}
+        \uses{HerbrandFunction.truncatedLowerindex_eq_if,lowerRamificationGroup,lowerRamificationGroup.antitone,RamificationGroup}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.truncatedLowerindex_eq_of_lt}
+        \lean{HerbrandFunction.truncatedLowerindex_eq_of_lt}
+        \uses{lowerRamificationGroup,mem_lowerRamificationGroup_iff,RamificationGroup,ValAlgEquiv.trans}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.sum_fiberwise_aux}
+        \lean{HerbrandFunction.sum_fiberwise_aux}
+        \uses{HerbrandFunction.Raimification_Group_split,HerbrandFunction.truncatedLowerindex_eq_of_lt,lowerRamificationGroup,lowerRamificationGroup.antitone,RamificationGroup}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.cast_natCast}
+        \lean{HerbrandFunction.cast_natCast}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_eq_sum_inf}
+        \lean{HerbrandFunction.phi_eq_sum_inf}
+        \uses{G_pairwiseDisjoint,G_split,Sum_Trunc_lower_Index_of_G_n,Sum_Trunc_lower_Index_of_diff_G,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_eq_ofEquiv}
+        \lean{HerbrandFunction.phi_eq_ofEquiv}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.psi_eq_ofEquiv}
+        \lean{HerbrandFunction.psi_eq_ofEquiv}
+                No documentation.
+    \end{theorem}
+
 \begin{definition}\label{lowerRamificationGroup}
         \lean{lowerRamificationGroup}
-        \uses{Valuation.IsEquiv_comap_symm,Valued.decompositionGroup,IsValExtension.val_map_le_one_iff,ValRingHom.comp,ValAlgEquiv.symm,RamificationGroup}
+        \uses{Valuation.IsEquiv_comap_symm,Valued.decompositionGroup,RamificationGroup,Valued.zero_le,IsValExtension.val_map_le_one_iff,ValRingHom.comp,ValAlgEquiv.symm,ValAlgEquiv.one_apply}
                 No documentation.
     \end{definition}
 
 \begin{theorem}\label{lowerRamificationGroup.antitone}
         \lean{lowerRamificationGroup.antitone}
-        \uses{lowerRamificationGroup,ValRingHom.id,ValRingHom.comp,ValAlgEquiv.trans,lowerIndex,RamificationGroup}
+        \uses{lowerRamificationGroup,RamificationGroup,ValAlgEquiv.trans}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{autCongr_mem_lowerRamificationGroup_iff}
+        \lean{autCongr_mem_lowerRamificationGroup_iff}
+        \uses{lowerRamificationGroup,mem_lowerRamificationGroup_iff,lowerIndex,RamificationGroup,ValRingHom.id,ValRingHom.comp,ValAlgEquiv.trans,ValAlgEquiv.trans_apply}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{lowerIndex_refl}
         \leanok
         \lean{lowerIndex_refl}
-        \uses{ValAlgEquiv.refl,lowerIndex}
+        \uses{lowerIndex,ValRingHom.id,ValAlgEquiv.refl,ValAlgEquiv.coe_refl}
                 No documentation.
     \end{theorem}
 
@@ -254,7 +362,24 @@
 \begin{theorem}\label{truncatedLowerIndex_refl}
         \leanok
         \lean{truncatedLowerIndex_refl}
-        \uses{ValAlgEquiv.refl}
+        \uses{lowerIndex_refl,lowerIndex,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{lowerIndex_ne_refl_of_FG}
+        \lean{lowerIndex_ne_refl_of_FG}
+        \uses{lowerIndex_ne_refl,lowerIndex,ext,ValRingHom.id,ValAlgEquiv.refl,ValAlgEquiv.coe_refl}
+                `h` should be `𝒪[L] is finite over 𝒪[K]`
+    \end{theorem}
+
+\begin{theorem}\label{lowerIndex_ne_one}
+        \leanok
+        \lean{lowerIndex_ne_one}
+        \uses{Valued.decompositionGroup,Valued.decompositionGroup_one,lowerIndex,IsValExtension.val_map_le_one_iff,ext,ValRingHom.id,ValRingHom.comp,ValAlgEquiv.refl,ValAlgEquiv.coe_refl}
                 No documentation.
     \end{theorem}
 
@@ -263,10 +388,15 @@
 \end{proof}
 
 \begin{theorem}\label{lowerIndex_eq_top_iff_eq_refl}
+        \leanok
         \lean{lowerIndex_eq_top_iff_eq_refl}
-        \uses{eq_top,ext,surjective,ValRingHom.id,ValAlgEquiv.refl,ValAlgEquiv.coe_refl,lowerIndex}
+        \uses{Valued.decompositionGroup,lowerIndex_ne_one,eq_top,lowerIndex,ValRingHom.comp,ValAlgEquiv.refl,ValAlgEquiv.one_apply}
                 No documentation.
     \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{mem_lowerRamificationGroup_iff}
         \lean{mem_lowerRamificationGroup_iff}
@@ -282,7 +412,7 @@
 
 \begin{theorem}\label{le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup}
         \lean{le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup}
-        \uses{lowerRamificationGroup,mem_lowerRamificationGroup_iff,mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one,RamificationGroup}
+        \uses{lowerRamificationGroup,mem_lowerRamificationGroup_iff,mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one,lowerIndex,RamificationGroup}
                 No documentation.
     \end{theorem}
 
@@ -309,39 +439,106 @@
 
 \begin{theorem}\label{lowerRamificationGroup_restrictScalars}
         \lean{lowerRamificationGroup_restrictScalars}
-        \uses{lowerRamificationGroup,RamificationGroup,AlgEquiv.restrictScalarsHom}
+        \uses{lowerRamificationGroup,AlgEquiv.restrictScalarsHom,RamificationGroup,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{lowerRamificationGroup_eq_decompositionGroup}
         \lean{lowerRamificationGroup_eq_decompositionGroup}
-        \uses{Valued.decompositionGroup,lowerRamificationGroup,eq_decompositionGroup,IsValExtension.val_map_le_one_iff,ext,ValRingHom.comp,RamificationGroup}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{decompositionGroup_eq_top}
-        \lean{decompositionGroup_eq_top}
-        \uses{Valued.decompositionGroup,eq_top,ValRingHom.comp,IsValExtension}
+        \uses{Valued.decompositionGroup,lowerRamificationGroup,eq_decompositionGroup,eq_top,RamificationGroup,IsValExtension.val_map_le_one_iff,ext,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{lowerRamificationGroup_eq_top}
         \lean{lowerRamificationGroup_eq_top}
-        \uses{Valued.decompositionGroup,lowerRamificationGroup,lowerRamificationGroup_eq_decompositionGroup,decompositionGroup_eq_top,eq_decompositionGroup,eq_top,ValRingHom.comp,RamificationGroup,IsValExtension}
+        \uses{Valued.decompositionGroup,Valued.decompositionGroup_eq_top,lowerRamificationGroup,lowerRamificationGroup_eq_decompositionGroup,eq_decompositionGroup,eq_top,RamificationGroup,ValRingHom.comp,Valuation.Nontrivial,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{AlgEquiv.val_map_powerBasis_sub_ne_zero}
+        \leanok
+        \lean{AlgEquiv.val_map_powerBasis_sub_ne_zero}
+        \uses{PowerBasis.algEquiv_ext,ext,ValRingHom.id,ValAlgEquiv.refl,ValAlgEquiv.coe_refl,Valued.AlgEquiv.restrictValuationSubring,Valued.AlgEquiv.restrictValuationSubring_apply,Valued.AlgEquiv.eq_iff_ValuationSubring}
+                Can't be inferred within 20000 heartbeats.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{AlgEquiv.val_map_sub_le_powerBasis}
+        \leanok
+        \lean{AlgEquiv.val_map_sub_le_powerBasis}
+        \uses{AlgEquiv.val_map_powerBasis_sub_ne_zero,ext,ValRingHom.id,ValAlgEquiv.refl,ValAlgEquiv.coe_refl,Polynomial.taylor_order_zero_apply_aeval,Valued.AlgEquiv.restrictValuationSubring,Valued.AlgEquiv.restrictValuationSubring_apply}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{AlgEquiv.iSup_val_map_sub_eq_powerBasis}
+        \leanok
+        \lean{AlgEquiv.iSup_val_map_sub_eq_powerBasis}
+        \uses{AlgEquiv.val_map_sub_le_powerBasis,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{lowerIndex_of_powerBasis}
+        \leanok
+        \lean{lowerIndex_of_powerBasis}
+        \uses{lowerIndex_refl,AlgEquiv.val_map_powerBasis_sub_ne_zero,AlgEquiv.iSup_val_map_sub_eq_powerBasis,lowerIndex,ValAlgEquiv.refl}
+                Should I `open Classical`?
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{lowerIndex_ne_refl}
+        \leanok
+        \lean{lowerIndex_ne_refl}
+        \uses{Valued.decompositionGroup,Valued.decompositionGroup_one,Valued.decompositionGroup_eq_top,lowerIndex_ne_one,eq_top,lowerIndex,ext,ValRingHom.comp,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{aux1}
+        \lean{aux1}
+        \uses{lowerRamificationGroup,le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup,lowerIndex_ne_refl,lowerIndex,RamificationGroup,ValAlgEquiv.refl,Valuation.Nontrivial}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{aux0}
+        \lean{aux0}
+        \uses{ValAlgEquiv.refl}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{exist_lowerRamificationGroup_eq_bot}
         \lean{exist_lowerRamificationGroup_eq_bot}
-        \uses{lowerRamificationGroup,RamificationGroup}
+        \uses{lowerRamificationGroup,aux1,RamificationGroup}
                 No documentation.
     \end{theorem}
 
 \begin{definition}\label{upperRamificationGroup_aux}
         \lean{upperRamificationGroup_aux}
-        \uses{lowerRamificationGroup,upperRamificationGroup,RamificationGroup,IsValExtension}
+        \uses{lowerRamificationGroup,upperRamificationGroup,RamificationGroup}
                 No documentation.
     \end{definition}
+
+\begin{theorem}\label{autCongr_mem_upperRamificationGroup_aux_iff}
+        \lean{autCongr_mem_upperRamificationGroup_aux_iff}
+        \uses{HerbrandFunction.psi_eq_ofEquiv,lowerRamificationGroup,autCongr_mem_lowerRamificationGroup_iff,mem_lowerRamificationGroup_iff,upperRamificationGroup_aux,upperRamificationGroup,RamificationGroup,ValAlgEquiv.symm,IsValExtension}
+                No documentation.
+    \end{theorem}
 
 \begin{theorem}\label{preimage_singleton_nonempty}
         \leanok
@@ -380,82 +577,126 @@
 
 \begin{theorem}\label{le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup}
         \lean{le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup}
-        \uses{lowerRamificationGroup,le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup,exist_truncatedLowerIndex_eq_truncatedJ,mem_lowerRamificationGroup_of_le_truncatedJ_sub_one,ValAlgEquiv.refl,ValAlgEquiv,RamificationGroup}
+        \uses{lowerRamificationGroup,le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup,exist_truncatedLowerIndex_eq_truncatedJ,mem_lowerRamificationGroup_of_le_truncatedJ_sub_one,RamificationGroup,ext,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_comp_of_isValExtension'}
+        \lean{HerbrandFunction.phi_comp_of_isValExtension'}
+        \uses{HerbrandFunction.phi_comp_of_isValExtension,ValRingHom.comp,ValAlgHom.comp_apply}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_comp_of_isValExtension}
+        \lean{HerbrandFunction.phi_comp_of_isValExtension}
+        \uses{HerbrandFunction.phi_comp_of_isValExtension',ext,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.Function.comp_left_cancel}
+        \lean{HerbrandFunction.Function.comp_left_cancel}
+        \uses{ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.psi_comp_of_isValExtension}
+        \lean{HerbrandFunction.psi_comp_of_isValExtension}
+        \uses{HerbrandFunction.phi_Bijective,HerbrandFunction.phi_comp_of_isValExtension,HerbrandFunction.Function.comp_left_cancel,injective,ValRingHom.id,ValRingHom.comp,ValAlgHom.id_comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.psi_comp_of_isValExtension'}
+        \lean{HerbrandFunction.psi_comp_of_isValExtension'}
+        \uses{HerbrandFunction.psi_comp_of_isValExtension,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{herbrand}
         \lean{herbrand}
-        \uses{HerbrandFunction.phi_strictMono,lowerRamificationGroup,le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup,phi_truncatedJ_sub_one,le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup,ext,ValAlgEquiv.symm,RamificationGroup,IsValExtension}
+        \uses{HerbrandFunction.phi_strictMono,lowerRamificationGroup,le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup,phi_truncatedJ_sub_one,le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup,RamificationGroup,ext,ValAlgEquiv.symm}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{HerbrandFunction.phi_comp}
-        \lean{HerbrandFunction.phi_comp}
-        \uses{ext,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.phi_phi}
-        \lean{HerbrandFunction.phi_phi}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.psi_comp}
-        \lean{HerbrandFunction.psi_comp}
-        \uses{ext,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{HerbrandFunction.psi_psi}
-        \lean{HerbrandFunction.psi_psi}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{UpperRamificationGroup_aux.map_restrictNormalHom}
-        \lean{UpperRamificationGroup_aux.map_restrictNormalHom}
-        \uses{HerbrandFunction.phi_psi_eq_self,herbrand,HerbrandFunction.psi_comp,map_restrictNormalHom,ValRingHom.comp,ValAlgHom.comp_apply,RamificationGroup}
+\begin{theorem}\label{herbrand'}
+        \lean{herbrand'}
+        \uses{HerbrandFunction.phi_psi_eq_self,HerbrandFunction.psi_comp_of_isValExtension,herbrand,ValRingHom.comp,ValAlgHom.comp_apply}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{UpperRamificationGroup_aux.eq_decompositionGroup}
         \lean{UpperRamificationGroup_aux.eq_decompositionGroup}
-        \uses{HerbrandFunction.psi_eq_self_of_le_neg_one,Valued.decompositionGroup,lowerRamificationGroup,lowerRamificationGroup_eq_decompositionGroup,upperRamificationGroup_aux,upperRamificationGroup,eq_decompositionGroup,ValRingHom.comp,RamificationGroup}
+        \uses{Valued.decompositionGroup,HerbrandFunction.psi_eq_self_of_le_neg_one,lowerRamificationGroup,lowerRamificationGroup_eq_decompositionGroup,upperRamificationGroup_aux,upperRamificationGroup,eq_decompositionGroup,RamificationGroup,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{UpperRamificationGroup_aux.eq_top}
         \lean{UpperRamificationGroup_aux.eq_top}
-        \uses{Valued.decompositionGroup,decompositionGroup_eq_top,UpperRamificationGroup_aux.eq_decompositionGroup,eq_decompositionGroup,eq_top,ValRingHom.comp,RamificationGroup,IsValExtension}
+        \uses{Valued.decompositionGroup,Valued.decompositionGroup_eq_top,UpperRamificationGroup_aux.eq_decompositionGroup,eq_decompositionGroup,eq_top,RamificationGroup,ValRingHom.comp,IsValExtension}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{UpperRamificationGroup_aux.exist_eq_bot}
         \lean{UpperRamificationGroup_aux.exist_eq_bot}
-        \uses{lowerRamificationGroup,exist_lowerRamificationGroup_eq_bot,upperRamificationGroup_aux,upperRamificationGroup,ValRingHom.id,ValRingHom.comp,RamificationGroup,IsValExtension}
+        \uses{lowerRamificationGroup,exist_lowerRamificationGroup_eq_bot,upperRamificationGroup_aux,upperRamificationGroup,RamificationGroup,ValRingHom.id,ValRingHom.comp,IsValExtension}
                 No documentation.
     \end{theorem}
 
-\begin{definition}\label{upperRamificationGroup}
-        \lean{upperRamificationGroup}
-        \uses{upperRamificationGroup_aux,RamificationGroup}
+\begin{theorem}\label{Valued.toUniformSpace_eq_of_v_eq}
+        \leanok
+        \lean{Valued.toUniformSpace_eq_of_v_eq}
+        \uses{ext}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{completeSpaceIsValExtension}
+        \leanok
+        \lean{completeSpaceIsValExtension}
+        \uses{Valued.toUniformSpace_eq_of_v_eq,ext,ValRingHom.comp,isEquiv_iff_eq,extension_valuation_equiv_extendedValuation_of_discrete
+,IsValExtension}
                 No documentation.
     \end{definition}
 
+\begin{definition}\label{upperRamificationGroup}
+        \lean{upperRamificationGroup}
+        \uses{upperRamificationGroup_aux,RamificationGroup,IsValExtension}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{restrictNormal_eq_self}
+        \leanok
+        \lean{restrictNormal_eq_self}
+        \uses{ext}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{restrictNormal_restrictNormal}
+        \lean{restrictNormal_restrictNormal}
+                No documentation.
+    \end{theorem}
+
 \begin{theorem}\label{eq_UpperRamificationGroup_aux}
         \lean{eq_UpperRamificationGroup_aux}
-        \uses{upperRamificationGroup_aux,upperRamificationGroup,RamificationGroup,IsValExtension}
+        \uses{upperRamificationGroup_aux,herbrand,herbrand',upperRamificationGroup,RamificationGroup,ext,ValRingHom.id,IsValExtension}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{mem_iff_mem_UpperRamificationGroup_aux}
         \lean{mem_iff_mem_UpperRamificationGroup_aux}
-        \uses{upperRamificationGroup_aux,upperRamificationGroup,mem_iff,ValRingHom.comp,RamificationGroup}
+        \uses{upperRamificationGroup_aux,upperRamificationGroup,mem_iff,RamificationGroup,ext,ValRingHom.comp,IsValExtension}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{map_restrictNormalHom}
         \lean{map_restrictNormalHom}
+        \uses{upperRamificationGroup_aux,upperRamificationGroup,mem_iff_mem_UpperRamificationGroup_aux,mem_iff,RamificationGroup,ext}
                 No documentation.
     \end{theorem}
 
@@ -465,9 +706,15 @@
                 No documentation.
     \end{theorem}
 
+\begin{theorem}\label{autCongr_mem_upperRamificationGroup_iff}
+        \lean{autCongr_mem_upperRamificationGroup_iff}
+        \uses{upperRamificationGroup,RamificationGroup}
+                No documentation.
+    \end{theorem}
+
 \begin{theorem}\label{eq_decompositionGroup}
         \lean{eq_decompositionGroup}
-        \uses{Valued.decompositionGroup,UpperRamificationGroup_aux.eq_decompositionGroup,eq_UpperRamificationGroup_aux,ValRingHom.comp,RamificationGroup,IsValExtension}
+        \uses{Valued.decompositionGroup,UpperRamificationGroup_aux.eq_decompositionGroup,eq_UpperRamificationGroup_aux,RamificationGroup,ValRingHom.comp,IsValExtension}
                 No documentation.
     \end{theorem}
 
@@ -494,28 +741,10 @@
                 No documentation.
     \end{definition}
 
-\begin{theorem}\label{Valuation.integral_closure_eq_integer_of_helselian}
-        \lean{Valuation.integral_closure_eq_integer_of_helselian}
-        \uses{Valued.valuationSubring}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{Valuation.integral_closure_eq_integer_of_complete_of_ext}
-        \lean{Valuation.integral_closure_eq_integer_of_complete_of_ext}
-        \uses{Valued.valuationSubring,ext,ValRingHom.comp}
-                WARNING : not mathematically true? more conditions?
-    \end{theorem}
-
-\begin{theorem}\label{Valuation.unique_valuationSubring_of_ext}
-        \lean{Valuation.unique_valuationSubring_of_ext}
-        \uses{Valuation.integral_closure_eq_integer_of_complete_of_ext,unique_valuationSubring_of_ext,Valued.valuationSubring,ext,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{Valuation.unique_val_of_ext}
+\begin{theorem}\label{PowerBasis.algEquiv_ext}
         \leanok
-        \lean{Valuation.unique_val_of_ext}
-        \uses{unique_valuationSubring_of_ext,unique_val_of_ext,ValAlgebra,Valued.valuationSubring,ext,ValAlgEquiv}
+        \lean{PowerBasis.algEquiv_ext}
+        \uses{ext}
                 No documentation.
     \end{theorem}
 
@@ -523,68 +752,137 @@
     \leanok
 \end{proof}
 
-\begin{theorem}\label{ValAlgEquiv.algEnd_preserve_val}
+\begin{definition}\label{AlgEquiv.restrictScalarsHom}
         \leanok
-        \lean{ValAlgEquiv.algEnd_preserve_val}
-        \uses{unique_val_of_ext,ValAlgebra,ext,ValAlgebra.val_isEquiv_comap}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{ValAlgEquiv.algEquiv_preserve_val}
-        \leanok
-        \lean{ValAlgEquiv.algEquiv_preserve_val}
-        \uses{ValAlgEquiv.algEnd_preserve_val}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{definition}\label{ValAlgEquiv.fromAlgEquiv}
-        \lean{ValAlgEquiv.fromAlgEquiv}
-        \uses{ValAlgEquiv.algEquiv_preserve_val,DiscreteValuation.fromAlgEquiv,ValAlgEquiv.mk'}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValAlgEquiv.equivAlgEquiv}
-        \lean{ValAlgEquiv.equivAlgEquiv}
-        \uses{DiscreteValuation.fromAlgEquiv,DiscreteValuation.equivAlgEquiv,ValAlgEquiv}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValRingHom.ramificationIndex}
-        \lean{ValRingHom.ramificationIndex}
-        \uses{ValRingHom}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{DiscreteValuation.ofInt}
-        \leanok
-        \lean{DiscreteValuation.ofInt}
-        \uses{ValRingHom.id,ExtDVR.3}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{DiscretelyValued.extensionFiniteDimension}
-        \lean{DiscretelyValued.extensionFiniteDimension}
+        \lean{AlgEquiv.restrictScalarsHom}
         \uses{ext}
                 No documentation.
     \end{definition}
 
-\begin{theorem}\label{Valuation.isEquiv_of_finiteDimensional}
-        \lean{Valuation.isEquiv_of_finiteDimensional}
-        \uses{ValAlgebra,ext,ValAlgebra.val_isEquiv_comap,ValAlgEquiv}
+\begin{theorem}\label{DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
+        \leanok
+        \lean{DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
                 No documentation.
     \end{theorem}
 
-\begin{definition}\label{AlgEquiv.toValAlgEquiv}
-        \lean{AlgEquiv.toValAlgEquiv}
-        \uses{ValAlgEquiv,toValAlgEquiv}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{DiscreteValuationRing.mul_irreducible_of_not_unit}
+        \leanok
+        \lean{DiscreteValuationRing.mul_irreducible_of_not_unit}
+        \uses{Valued.maximalIdeal,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{DiscreteValuationRing.mul_irreducible_square_of_not_unit_of_not_irreducible}
+        \leanok
+        \lean{DiscreteValuationRing.mul_irreducible_square_of_not_unit_of_not_irreducible}
+        \uses{DiscreteValuationRing.mul_irreducible_of_not_unit,ValRingHom.id}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two}
+        \leanok
+        \lean{DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two}
+        \uses{DiscreteValuationRing.unit_mul_irreducible_of_irreducible,LocalRing.is_unit_of_unit_add_nonunit}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
+        \lean{DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
+        \uses{Valued.maximalIdeal,maximalIdeal_eq}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{LocalRing.algebraMap_residue_compat}
+        \leanok
+        \lean{LocalRing.algebraMap_residue_compat}
+        \uses{Valued.ResidueField,ValRingHom.id,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{LocalRing.residue_irreducible_eq_zero}
+        \leanok
+        \lean{LocalRing.residue_irreducible_eq_zero}
+        \uses{Valued.maximalIdeal,ValRingHom.id}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{LocalRing.is_unit_iff_residue_ne_zero}
+        \leanok
+        \lean{LocalRing.is_unit_iff_residue_ne_zero}
+        \uses{ValRingHom.id}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{LocalRing.residue_eq_add_irreducible}
+        \leanok
+        \lean{LocalRing.residue_eq_add_irreducible}
+        \uses{LocalRing.residue_irreducible_eq_zero,ValRingHom.id}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{LocalRing.is_unit_of_unit_add_nonunit}
+        \leanok
+        \lean{LocalRing.is_unit_of_unit_add_nonunit}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{LocalRing.maximalIdeal_eq_jacobson_of_bot}
+        \lean{LocalRing.maximalIdeal_eq_jacobson_of_bot}
+        \uses{Valued.maximalIdeal,maximalIdeal_eq,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{unique_of_valuation_extension}
+        \lean{unique_of_valuation_extension}
+        \uses{ValAlgebra,ext}
+                No documentation.
+    \end{theorem}
+
+\begin{definition}\label{toValAlgEquiv}
+        \lean{toValAlgEquiv}
+        \uses{ValAlgEquiv}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{Ideal.quotientAlgebra'}
+        \leanok
+        \lean{Ideal.quotientAlgebra'}
                 No documentation.
     \end{definition}
 
@@ -609,38 +907,30 @@ When you extend this structure, make sure to extend `ValRingHomClass`.
                 A valued algebra over a valued commutative ring `R`, is a valued ring `A` together with a ring map into the center of `A` that preserves the valuation.
     \end{definition}
 
-\begin{definition}\label{multiplicity'}
-        \leanok
-        \lean{multiplicity'}
-        \uses{ValRingHom.id}
-                `multiplicity a b` returns the largest natural number `n` such that
-  `a ^ n ∣ b`, as a `PartENat` or natural with infinity. If `∀ n, a ^ n ∣ b`,
-  then it returns `⊤`
+\begin{definition}\label{DiscretelyValued.extensionFiniteDimension}
+        \lean{DiscretelyValued.extensionFiniteDimension}
+        \uses{ext}
+                No documentation.
     \end{definition}
 
-\begin{theorem}\label{finite_nat_iff'}
-        \lean{finite_nat_iff'}
+\begin{theorem}\label{Valuation.isEquiv_of_finiteDimensional}
+        \lean{Valuation.isEquiv_of_finiteDimensional}
+        \uses{ValAlgebra,ext,ValAlgebra.val_isEquiv_comap,ValAlgEquiv}
                 No documentation.
     \end{theorem}
 
-\begin{definition}\label{padicValNat'}
-        \leanok
-        \lean{padicValNat'}
-                For `p ≠ 1`, the `p`-adic valuation of a natural `n ≠ 0` is the largest natural number `k` such
-that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults to `0`.
+\begin{definition}\label{AlgEquiv.toValAlgEquiv}
+        \lean{AlgEquiv.toValAlgEquiv}
+        \uses{toValAlgEquiv,ValAlgEquiv}
+                No documentation.
     \end{definition}
 
-\begin{theorem}\label{finite_ideal_iff}
-        \lean{finite_ideal_iff}
-        \uses{ValRingHom.id,ValRingHom.comp}
+\begin{definition}\label{DiscreteValuation.ofInt}
+        \leanok
+        \lean{DiscreteValuation.ofInt}
+        \uses{ValRingHom.id,ExtDVR.3}
                 No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{ord_top}
-        \lean{ord_top}
-        \uses{finite_ideal_iff,ValRingHom.id,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
+    \end{definition}
 
 \begin{definition}\label{Valuation.leIdeal}
         \lean{Valuation.leIdeal}
@@ -687,80 +977,206 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 \begin{definition}\label{CompleteDiscreteValuationRing}
         \leanok
         \lean{CompleteDiscreteValuationRing}
-        \uses{ext,CompleteValuationRing}
+        \uses{CompleteValuationRing,ext}
                 No documentation.
     \end{definition}
 
 \begin{definition}\label{CompleteValuationField}
         \leanok
         \lean{CompleteValuationField}
-        \uses{ext,CompleteValuationRing}
+        \uses{CompleteValuationRing,ext}
                 No documentation.
     \end{definition}
 
 \begin{definition}\label{CompleteDiscreteValuationField}
         \leanok
         \lean{CompleteDiscreteValuationField}
-        \uses{ext,ValRingHom.comp,CompleteValuationRing}
+        \uses{CompleteValuationRing,ext,ValRingHom.comp}
                 No documentation.
     \end{definition}
 
-\begin{theorem}\label{lowerindex_ge_iff_lowerramificationGroup}
-        \lean{lowerindex_ge_iff_lowerramificationGroup}
+\begin{definition}\label{ValRingHom.ramificationIndex}
+        \lean{ValRingHom.ramificationIndex}
+        \uses{ValRingHom}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{multiplicity'}
+        \leanok
+        \lean{multiplicity'}
+        \uses{ValRingHom.id}
+                `multiplicity a b` returns the largest natural number `n` such that
+  `a ^ n ∣ b`, as a `PartENat` or natural with infinity. If `∀ n, a ^ n ∣ b`,
+  then it returns `⊤`
+    \end{definition}
+
+\begin{theorem}\label{finite_nat_iff'}
+        \lean{finite_nat_iff'}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{lowerindex_eq_iff_lowerramificationGroup}
-        \lean{lowerindex_eq_iff_lowerramificationGroup}
+\begin{definition}\label{padicValNat'}
+        \leanok
+        \lean{padicValNat'}
+                For `p ≠ 1`, the `p`-adic valuation of a natural `n ≠ 0` is the largest natural number `k` such
+that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults to `0`.
+    \end{definition}
+
+\begin{theorem}\label{finite_ideal_iff}
+        \lean{finite_ideal_iff}
+        \uses{ValRingHom.id,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{lowerramificationGroup_has_top}
-        \lean{lowerramificationGroup_has_top}
-        \uses{ValRingHom.comp,ValAlgEquiv,lowerIndex}
+\begin{theorem}\label{ord_top}
+        \lean{ord_top}
+        \uses{finite_ideal_iff,ValRingHom.id,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{varphi'_pos}
-        \lean{varphi'_pos}
-        \uses{phi'_pos}
+\begin{theorem}\label{Valuation.integral_closure_eq_integer_of_helselian}
+        \lean{Valuation.integral_closure_eq_integer_of_helselian}
+        \uses{Valued.valuationSubring}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{varphi_mono_int}
-        \lean{varphi_mono_int}
-        \uses{phi_mono_int,phi_mono,varphi_mono}
+\begin{theorem}\label{Valuation.integral_closure_eq_integer_of_complete_of_ext}
+        \lean{Valuation.integral_closure_eq_integer_of_complete_of_ext}
+        \uses{Valued.valuationSubring,ext,ValRingHom.comp}
+                WARNING : not mathematically true? more conditions?
+    \end{theorem}
+
+\begin{theorem}\label{Valuation.unique_valuationSubring_of_ext}
+        \lean{Valuation.unique_valuationSubring_of_ext}
+        \uses{Valuation.integral_closure_eq_integer_of_complete_of_ext,unique_valuationSubring_of_ext,Valued.valuationSubring,ext,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{varphi_lt_int_ceil}
-        \lean{varphi_lt_int_ceil}
+\begin{theorem}\label{Valuation.unique_val_of_ext}
+        \leanok
+        \lean{Valuation.unique_val_of_ext}
+        \uses{ValAlgebra,unique_valuationSubring_of_ext,Valued.valuationSubring,ext,ValAlgEquiv}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{varphi_mono_section}
-        \lean{varphi_mono_section}
-        \uses{phi_mono,varphi'_pos,varphi_mono,phi'_pos}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{ValAlgEquiv.algEnd_preserve_val}
+        \leanok
+        \lean{ValAlgEquiv.algEnd_preserve_val}
+        \uses{ValAlgebra,Valuation.unique_val_of_ext,ext,ValAlgebra.val_isEquiv_comap}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{varphi_mono}
-        \lean{varphi_mono}
-        \uses{phi_mono_int,phi_mono,varphi_mono_int,varphi_lt_int_ceil,varphi_mono_section}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{ValAlgEquiv.algEquiv_preserve_val}
+        \leanok
+        \lean{ValAlgEquiv.algEquiv_preserve_val}
+        \uses{ValAlgEquiv.algEnd_preserve_val}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{varphi_bij}
-        \lean{varphi_bij}
-        \uses{phi_bij}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{ValAlgEquiv.fromAlgEquiv}
+        \lean{ValAlgEquiv.fromAlgEquiv}
+        \uses{ValAlgEquiv.algEquiv_preserve_val,DiscreteValuation.fromAlgEquiv,ValAlgEquiv.mk'}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValAlgEquiv.equivAlgEquiv}
+        \lean{ValAlgEquiv.equivAlgEquiv}
+        \uses{DiscreteValuation.fromAlgEquiv,DiscreteValuation.equivAlgEquiv,ValAlgEquiv}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{CompleteValuationRing}
+        \leanok
+        \lean{CompleteValuationRing}
+        \uses{ext}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{CompleteValuedField}
+        \leanok
+        \lean{CompleteValuedField}
+        \uses{CompleteValuationRing,ValRingHom.comp}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{CompleteDiscreteValuedField}
+        \leanok
+        \lean{CompleteDiscreteValuedField}
+        \uses{CompleteValuedField,ext}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{RingHom.liftValuationInteger}
+        \lean{RingHom.liftValuationInteger}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{PreserveValuation}
+        \leanok
+        \lean{PreserveValuation}
+        \uses{ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValuationExtension}
+        \leanok
+        \lean{ValuationExtension}
+        \uses{ext,ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValuationExtension'}
+        \lean{ValuationExtension'}
+        \uses{PreserveValuation,ValuationExtension,ext,ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valuation.isEquiv_of_finiteDimensional_of_valuationExtension}
+        \lean{Valuation.isEquiv_of_finiteDimensional_of_valuationExtension}
+        \uses{Valuation.isEquiv_of_finiteDimensional,ValuationExtension}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{psi_bij}
-        \lean{psi_bij}
-        \uses{ExtDVR.3}
+\begin{theorem}\label{Valuation.preserveValuation_of_finiteDimensional_algebra_hom}
+        \lean{Valuation.preserveValuation_of_finiteDimensional_algebra_hom}
+        \uses{PreserveValuation}
                 No documentation.
     \end{theorem}
+
+\begin{definition}\label{AlgHom.liftValuationInteger}
+        \lean{AlgHom.liftValuationInteger}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{AlgEquiv.liftValuationInteger}
+        \lean{AlgEquiv.liftValuationInteger}
+        \uses{AlgHom.liftValuationInteger}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{AlgHom.liftResidueField}
+        \lean{AlgHom.liftResidueField}
+        \uses{Valued.ResidueField,ValRingHom.id,liftResidueField}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{AlgEquiv.liftResidueField}
+        \lean{AlgEquiv.liftResidueField}
+        \uses{ValAlgebra,Valued.ResidueField,ValRingHom.id,ValAlgEquiv,liftResidueField}
+                No documentation.
+    \end{definition}
 
 \begin{theorem}\label{varphi_zero_eq_zero}
         \leanok
@@ -780,8 +1196,132 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
     \end{theorem}
 
 \begin{theorem}\label{psi_zero_eq_zero}
-        \leanok
         \lean{psi_zero_eq_zero}
+        \uses{phi_zero_eq_zero,phi_bij,ValRingHom.id,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi_bij}
+        \lean{varphi_bij}
+        \uses{phi_bij,varphi_mono,phi_mono,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{psi_bij}
+        \lean{psi_bij}
+        \uses{phi_bij,injective,surjective}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{Varphi_eq_Sum_Inf}
+        \lean{Varphi_eq_Sum_Inf}
+        \uses{G_pairwiseDisjoint,G_split,Sum_Trunc_lower_Index_of_G_n,Sum_Trunc_lower_Index_of_diff_G,ValAlgEquiv.refl,ValAlgEquiv}
+                No documentation.
+    \end{theorem}
+
+\begin{definition}\label{ValuationExtension''}
+        \lean{ValuationExtension''}
+        \uses{PreserveValuation,ValuationExtension,ValuationExtension',ext,ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{Valuation.ramificationIndex}
+        \lean{Valuation.ramificationIndex}
+        \uses{ValRingHom.ramificationIndex,ValuationExtension}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{DiscreteValuation.toInt}
+        \lean{DiscreteValuation.toInt}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{lowerIndex}
+        \leanok
+        \lean{lowerIndex}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{RamificationGroup}
+        \lean{RamificationGroup}
+        \uses{ValuationExtension,lowerIndex,ValRingHom.id,ValRingHom.comp}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{lower_numbering_inf}
+        \lean{lower_numbering_inf}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{index_subgroup}
+        \lean{index_subgroup}
+        \uses{ValuationExtension,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{index_quotient_group}
+        \lean{index_quotient_group}
+                No documentation.
+    \end{theorem}
+
+\begin{definition}\label{ValuationRingTopology.ValuationRing.setoid}
+        \lean{ValuationRingTopology.ValuationRing.setoid}
+        \uses{ValRingHom.id}
+                The preorder of divisibility associated to a valuation ring, i.e. `a ≤ b` if there exist `c`, such that `a * c = b`.
+    \end{definition}
+
+\begin{definition}\label{ValuationRingTopology.ValuationRing.ValueMonoid}
+        \lean{ValuationRingTopology.ValuationRing.ValueMonoid}
+        \uses{ValuationRingTopology.ValuationRing.setoid,ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValuationRingTopology.Valuation.leIdeal}
+        \lean{ValuationRingTopology.Valuation.leIdeal}
+        \uses{ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValuationRingTopology.Valuation.ltIdeal}
+        \lean{ValuationRingTopology.Valuation.ltIdeal}
+        \uses{ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValuationRingTopology.Valuation.maximalIdeal}
+        \lean{ValuationRingTopology.Valuation.maximalIdeal}
+        \uses{ValuationRingTopology.Valuation.ltIdeal,Valued.maximalIdeal,Valued.ResidueField,ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Prop18}
+        \lean{Prop18}
+                No documentation.
+    \end{theorem}
+
+\begin{definition}\label{aaa}
+        \leanok
+        \lean{aaa}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{LinearEquiv.ofSubalgebraEqTop}
+        \lean{LinearEquiv.ofSubalgebraEqTop}
+        \uses{eq_top}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{AlgEquiv.ofTop}
+        \leanok
+        \lean{AlgEquiv.ofTop}
+        \uses{ValAlgEquiv.symm}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{HerbrandFunction.sub_of_sum}
+        \leanok
+        \lean{HerbrandFunction.sub_of_sum}
+        \uses{sub_of_sum,ext}
                 No documentation.
     \end{theorem}
 
@@ -789,8 +1329,195 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
     \leanok
 \end{proof}
 
-\begin{theorem}\label{Varphi_eq_Sum_Inf}
-        \lean{Varphi_eq_Sum_Inf}
+\begin{theorem}\label{HerbrandFunction.ceil_eq_floor_add_one_iff}
+        \leanok
+        \lean{HerbrandFunction.ceil_eq_floor_add_one_iff}
+        \uses{ceil_eq_floor_add_one_iff}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.Int.eq_of_ge_of_lt_add_one}
+        \leanok
+        \lean{HerbrandFunction.Int.eq_of_ge_of_lt_add_one}
+        \uses{Int.eq_of_ge_of_lt_add_one,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{HerbrandFunction.phiDeriv_neg_int_eq_one}
+        \lean{HerbrandFunction.phiDeriv_neg_int_eq_one}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_int_succ}
+        \lean{HerbrandFunction.phi_int_succ}
+        \uses{sub_of_sum,HerbrandFunction.phiDeriv_neg_int_eq_one,phi_int_succ,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_eq_self_of_le_neg_one}
+        \lean{HerbrandFunction.phi_eq_self_of_le_neg_one}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_mono_int}
+        \lean{HerbrandFunction.phi_mono_int}
+        \uses{HerbrandFunction.phiDeriv_pos,phi_int_succ,phi_mono_int,phi_mono,ValAlgEquiv.trans}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_mono_int'}
+        \lean{HerbrandFunction.phi_mono_int'}
+        \uses{phi_mono_int,phi_mono_int',phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_rational_floor}
+        \lean{HerbrandFunction.phi_rational_floor}
+        \uses{HerbrandFunction.phiDeriv_eq_ceil,sub_of_sum,ceil_eq_floor_add_one_iff,HerbrandFunction.phi_eq_self_of_le_neg_one,phi_rational_floor,ValAlgEquiv.symm,ValAlgEquiv.trans}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_rational_ceil}
+        \lean{HerbrandFunction.phi_rational_ceil}
+        \uses{sub_of_sum,ceil_eq_floor_add_one_iff,phi_rational_ceil}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_gt_floor}
+        \lean{HerbrandFunction.phi_gt_floor}
+        \uses{phi_mono_int,phi_rational_floor,phi_gt_floor,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_lt_ceil}
+        \lean{HerbrandFunction.phi_lt_ceil}
+        \uses{phi_mono_int,phi_rational_ceil,phi_lt_ceil,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_mono_in_section}
+        \lean{HerbrandFunction.phi_mono_in_section}
+        \uses{phi_mono_int,phi_rational_floor,phi_mono_in_section,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_mono_over_section}
+        \lean{HerbrandFunction.phi_mono_over_section}
+        \uses{phi_mono_int,phi_mono_int',phi_gt_floor,phi_lt_ceil,phi_mono_over_section,phi_mono,ValAlgEquiv.symm}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_mono_iff}
+        \lean{HerbrandFunction.phi_mono_iff}
+        \uses{HerbrandFunction.phiDeriv_pos,phi_mono_int,phi_mono_in_section,phi_mono_over_section,phi_mono_iff,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.phi_bij}
+        \lean{HerbrandFunction.phi_bij}
+        \uses{HerbrandFunction.phi_eq_self_of_le_zero,HerbrandFunction.phiDeriv_pos,HerbrandFunction.phi_pos_gt_nonpos,HerbrandFunction.phi_of_pos_of_le_one,HerbrandFunction.phi_strictMono_of_gt_one,HerbrandFunction.phi_strictMono,phi_bij,ValAlgEquiv.trans}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.psi_zero_eq_zero}
+        \lean{HerbrandFunction.psi_zero_eq_zero}
+        \uses{HerbrandFunction.phi_Bijective,phi_zero_eq_zero,psi_zero_eq_zero,phi_bij,ValRingHom.id,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.G_pairwiseDisjoint}
+        \lean{HerbrandFunction.G_pairwiseDisjoint}
+        \uses{G_pairwiseDisjoint}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.G_split}
+        \lean{HerbrandFunction.G_split}
+        \uses{G_n_or_G_lt_n,G_pairwiseDisjoint,G_split,ext}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.Sum_Trunc_lower_Index_of_G_n}
+        \lean{HerbrandFunction.Sum_Trunc_lower_Index_of_G_n}
+        \uses{Sum_Trunc_lower_Index_of_G_n,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{HerbrandFunction.Sum_Trunc_lower_Index_of_diff_G}
+        \lean{HerbrandFunction.Sum_Trunc_lower_Index_of_diff_G}
+        \uses{Sum_Trunc_lower_Index_of_diff_G,ValAlgEquiv.refl}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi'_pos}
+        \lean{varphi'_pos}
+        \uses{phi'_pos}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi_mono_int}
+        \lean{varphi_mono_int}
+        \uses{phi_mono_int,varphi_mono,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi_lt_int_ceil}
+        \lean{varphi_lt_int_ceil}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi_mono_section}
+        \lean{varphi_mono_section}
+        \uses{varphi'_pos,varphi_mono,phi'_pos,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi_mono}
+        \lean{varphi_mono}
+        \uses{phi_mono_int,varphi_mono_int,varphi_lt_int_ceil,varphi_mono_section,phi_mono}
+                No documentation.
+    \end{theorem}
+
+\begin{definition}\label{Lift_Galois_ValEquiv}
+        \lean{Lift_Galois_ValEquiv}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{Galois_to_Quotient}
+        \lean{Galois_to_Quotient}
+        \uses{ValAlgebra,ValAlgebra.val_isEquiv_comap}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Varphi_With_i'}
+        \lean{Varphi_With_i'}
+        \uses{Lift_Galois_ValEquiv,Galois_to_Quotient,ValAlgEquiv.mk'}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{Herbrand_Thm}
+        \lean{Herbrand_Thm}
+        \uses{Lift_Galois_ValEquiv,Galois_to_Quotient,ValAlgEquiv.mk'}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{varphi_comp_field_ext}
+        \lean{varphi_comp_field_ext}
+        \uses{ext,ValRingHom.comp}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{psi_comp_field_ext}
+        \lean{psi_comp_field_ext}
+        \uses{ext,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
@@ -854,7 +1581,7 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 
 \begin{theorem}\label{phi_mono_int}
         \lean{phi_mono_int}
-        \uses{phi_int_succ,phi_mono,phi'_pos,ValAlgEquiv.trans}
+        \uses{phi_int_succ,phi'_pos,phi_mono,ValAlgEquiv.trans}
                 No documentation.
     \end{theorem}
 
@@ -931,7 +1658,7 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 
 \begin{theorem}\label{phi_inv_psi}
         \lean{phi_inv_psi}
-        \uses{phi_bij,ValAlgebra,surjective,ValRingHom.comp,ExtDVR.3}
+        \uses{ValAlgebra,phi_bij,surjective,ValRingHom.comp,ExtDVR.3}
                 No documentation.
     \end{theorem}
 
@@ -947,7 +1674,7 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 
 \begin{theorem}\label{G_split}
         \lean{G_split}
-        \uses{G_pairwiseDisjoint,G_n_or_G_lt_n,ext}
+        \uses{G_n_or_G_lt_n,G_pairwiseDisjoint,ext}
                 No documentation.
     \end{theorem}
 
@@ -963,56 +1690,19 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{Prop18}
-        \lean{Prop18}
+\begin{theorem}\label{lowerindex_ge_iff_lowerramificationGroup}
+        \lean{lowerindex_ge_iff_lowerramificationGroup}
                 No documentation.
     \end{theorem}
 
-\begin{definition}\label{LinearEquiv.ofSubalgebraEqTop}
-        \lean{LinearEquiv.ofSubalgebraEqTop}
-        \uses{eq_top}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{AlgEquiv.ofTop}
-        \leanok
-        \lean{AlgEquiv.ofTop}
-        \uses{ValAlgEquiv.symm}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{Lift_Galois_ValEquiv}
-        \lean{Lift_Galois_ValEquiv}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{Galois_to_Quotient}
-        \lean{Galois_to_Quotient}
-        \uses{ValAlgebra,ValAlgebra.val_isEquiv_comap}
-                No documentation.
-    \end{definition}
-
-\begin{theorem}\label{Varphi_With_i'}
-        \lean{Varphi_With_i'}
-        \uses{Lift_Galois_ValEquiv,Galois_to_Quotient,ValAlgEquiv.mk'}
+\begin{theorem}\label{lowerindex_eq_iff_lowerramificationGroup}
+        \lean{lowerindex_eq_iff_lowerramificationGroup}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{Herbrand_Thm}
-        \lean{Herbrand_Thm}
-        \uses{Lift_Galois_ValEquiv,Galois_to_Quotient,ValAlgEquiv.mk'}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{varphi_comp_field_ext}
-        \lean{varphi_comp_field_ext}
-        \uses{HerbrandFunction.phi_comp,ext,ValRingHom.comp}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{psi_comp_field_ext}
-        \lean{psi_comp_field_ext}
-        \uses{HerbrandFunction.psi_comp,ext,ValRingHom.comp}
+\begin{theorem}\label{lowerramificationGroup_has_top}
+        \lean{lowerramificationGroup_has_top}
+        \uses{lowerIndex,ValRingHom.comp,ValAlgEquiv}
                 No documentation.
     \end{theorem}
 
@@ -1044,13 +1734,13 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 \begin{definition}\label{Valued.valuationSubring}
         \leanok
         \lean{Valued.valuationSubring}
-        \uses{liftInteger,ValAlgEquiv.mk'}
-                An `Valued` version of `Valuation.valuationSubring`, it serves for the notation `𝒪[K]`
+                A `Valued` version of `Valuation.valuationSubring`, enabling the notation `𝒪[K]` for valued field `K`
     \end{definition}
 
 \begin{theorem}\label{Valued.integer_valuation_eq}
         \leanok
         \lean{Valued.integer_valuation_eq}
+        \uses{integer_valuation_eq}
                 No documentation.
     \end{theorem}
 
@@ -1060,12 +1750,14 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 
 \begin{theorem}\label{Valued.integerAlgebraMap.monotone}
         \lean{Valued.integerAlgebraMap.monotone}
+        \uses{integerAlgebraMap.monotone}
                 No documentation.
     \end{theorem}
 
 \begin{theorem}\label{Valued.integer_val_coe}
         \leanok
         \lean{Valued.integer_val_coe}
+        \uses{integer_val_coe}
                 No documentation.
     \end{theorem}
 
@@ -1076,7 +1768,7 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 \begin{theorem}\label{Valued.valuationSubring_val_coe}
         \leanok
         \lean{Valued.valuationSubring_val_coe}
-        \uses{Valued.valuationSubring}
+        \uses{Valued.valuationSubring,valuationSubring_val_coe}
                 No documentation.
     \end{theorem}
 
@@ -1087,6 +1779,7 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 \begin{theorem}\label{Valued.integer_val_le_one}
         \leanok
         \lean{Valued.integer_val_le_one}
+        \uses{integer_val_le_one}
                 No documentation.
     \end{theorem}
 
@@ -1097,97 +1790,21 @@ that `p^k` divides `z`. If `n = 0` or `p = 1`, then `padicValNat p q` defaults t
 \begin{definition}\label{Valued.maximalIdeal}
         \leanok
         \lean{Valued.maximalIdeal}
-                An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a `Valued` instance, it serves for notation `𝓂[K]`
+                An abbrevation for `LocalRing.maximalIdeal 𝒪[K]` of a valued field `K`, enabling the notation `𝓂[K]`
     \end{definition}
 
 \begin{theorem}\label{Valued.maximalIdeal_eq}
         \lean{Valued.maximalIdeal_eq}
-        \uses{Valued.maximalIdeal}
+        \uses{Valued.maximalIdeal,maximalIdeal_eq}
                 No documentation.
     \end{theorem}
 
 \begin{definition}\label{Valued.ResidueField}
         \leanok
         \lean{Valued.ResidueField}
-        \uses{Valued.valuationSubring,ValRingHom.id}
-                An abbrevation for `LocalRing.ResidueField 𝒪[K]` of a `Valued` instance, it serves for notation `𝓀[K]`
+        \uses{Valued.valuationSubring,ValRingHom.id,ValAlgEquiv.mk',liftInteger}
+                An abbrevation for `LocalRing.ResidueField 𝒪[K]` of a `Valued` instance, enabling the notation `𝓀[K]`
     \end{definition}
-
-\begin{definition}\label{liftInteger}
-        \leanok
-        \lean{liftInteger}
-        \uses{ValAlgebra,ValRingEquiv,ext}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{liftValuationSubring}
-        \leanok
-        \lean{liftValuationSubring}
-        \uses{liftInteger}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{liftResidueField}
-        \lean{liftResidueField}
-        \uses{Valued.ResidueField,liftInteger,ValRingEquiv,ValRingHom.id,ValAlgHom,ValAlgEquiv}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValAlgHom.liftValuationIntegerQuotientleIdeal}
-        \lean{ValAlgHom.liftValuationIntegerQuotientleIdeal}
-        \uses{ValAlgHom,AlgHom.liftValuationInteger}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValAlgIso.liftValuationIntegerQuotientleIdeal}
-        \lean{ValAlgIso.liftValuationIntegerQuotientleIdeal}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{AlgHom.liftResidueField}
-        \lean{AlgHom.liftResidueField}
-        \uses{Valued.ResidueField,liftResidueField,ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{AlgEquiv.liftResidueField}
-        \lean{AlgEquiv.liftResidueField}
-        \uses{Valued.ResidueField,liftResidueField,ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{theorem}\label{ValAlgEquiv.coe_liftInteger}
-        \leanok
-        \lean{ValAlgEquiv.coe_liftInteger}
-        \uses{liftInteger}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{ValAlgEquiv.liftInteger_refl}
-        \leanok
-        \lean{ValAlgEquiv.liftInteger_refl}
-        \uses{ValAlgebra,liftInteger,ext,ValAlgEquiv.refl}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{ValAlgEquiv.eq_refl_of_liftInteger_eq_refl}
-        \leanok
-        \lean{ValAlgEquiv.eq_refl_of_liftInteger_eq_refl}
-        \uses{liftInteger,ext,surjective,ValAlgEquiv.refl,ValAlgEquiv}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
 
 \begin{definition}\label{ValRingEquiv}
         \leanok
@@ -2061,149 +2678,69 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{definition}\label{ValuationExtension''}
-        \lean{ValuationExtension''}
-        \uses{ext,ValRingHom.id,PreserveValuation,ValuationExtension,ValuationExtension'}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{Valuation.ramificationIndex}
-        \lean{Valuation.ramificationIndex}
-        \uses{ValRingHom.ramificationIndex,ValuationExtension}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{DiscreteValuation.toInt}
-        \lean{DiscreteValuation.toInt}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{lowerIndex}
+\begin{definition}\label{liftInteger}
         \leanok
-        \lean{lowerIndex}
+        \lean{liftInteger}
+        \uses{ValAlgebra,ValRingEquiv,ext}
                 No documentation.
     \end{definition}
 
-\begin{definition}\label{RamificationGroup}
-        \lean{RamificationGroup}
-        \uses{ValRingHom.id,ValRingHom.comp,lowerIndex,ValuationExtension}
+\begin{definition}\label{liftValuationSubring}
+        \leanok
+        \lean{liftValuationSubring}
+        \uses{liftInteger}
                 No documentation.
     \end{definition}
 
-\begin{theorem}\label{lower_numbering_inf}
-        \lean{lower_numbering_inf}
+\begin{definition}\label{liftResidueField}
+        \lean{liftResidueField}
+        \uses{Valued.ResidueField,ValRingEquiv,ValRingHom.id,ValAlgHom,ValAlgEquiv,liftInteger}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValAlgHom.liftValuationIntegerQuotientleIdeal}
+        \lean{ValAlgHom.liftValuationIntegerQuotientleIdeal}
+        \uses{AlgHom.liftValuationInteger,ValAlgHom}
+                No documentation.
+    \end{definition}
+
+\begin{definition}\label{ValAlgIso.liftValuationIntegerQuotientleIdeal}
+        \lean{ValAlgIso.liftValuationIntegerQuotientleIdeal}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{ValAlgEquiv.coe_liftInteger}
+        \leanok
+        \lean{ValAlgEquiv.coe_liftInteger}
+        \uses{liftInteger}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{index_subgroup}
-        \lean{index_subgroup}
-        \uses{ValRingHom.comp,ValuationExtension}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{ValAlgEquiv.liftInteger_refl}
+        \leanok
+        \lean{ValAlgEquiv.liftInteger_refl}
+        \uses{ValAlgebra,ext,ValAlgEquiv.refl,liftInteger}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{index_quotient_group}
-        \lean{index_quotient_group}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{ValAlgEquiv.eq_refl_of_liftInteger_eq_refl}
+        \leanok
+        \lean{ValAlgEquiv.eq_refl_of_liftInteger_eq_refl}
+        \uses{ext,surjective,ValAlgEquiv.refl,ValAlgEquiv,liftInteger}
                 No documentation.
     \end{theorem}
 
-\begin{definition}\label{ValuationRingTopology.ValuationRing.setoid}
-        \lean{ValuationRingTopology.ValuationRing.setoid}
-        \uses{ValRingHom.id}
-                The preorder of divisibility associated to a valuation ring, i.e. `a ≤ b` if there exist `c`, such that `a * c = b`.
-    \end{definition}
-
-\begin{definition}\label{ValuationRingTopology.ValuationRing.ValueMonoid}
-        \lean{ValuationRingTopology.ValuationRing.ValueMonoid}
-        \uses{ValuationRingTopology.ValuationRing.setoid,ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValuationRingTopology.Valuation.leIdeal}
-        \lean{ValuationRingTopology.Valuation.leIdeal}
-        \uses{ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValuationRingTopology.Valuation.ltIdeal}
-        \lean{ValuationRingTopology.Valuation.ltIdeal}
-        \uses{ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValuationRingTopology.Valuation.maximalIdeal}
-        \lean{ValuationRingTopology.Valuation.maximalIdeal}
-        \uses{ValuationRingTopology.Valuation.ltIdeal,Valued.maximalIdeal,Valued.ResidueField,ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{RingHom.liftValuationInteger}
-        \lean{RingHom.liftValuationInteger}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{PreserveValuation}
-        \leanok
-        \lean{PreserveValuation}
-        \uses{ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValuationExtension}
-        \leanok
-        \lean{ValuationExtension}
-        \uses{ext,ValRingHom.id}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{ValuationExtension'}
-        \lean{ValuationExtension'}
-        \uses{ext,ValRingHom.id,PreserveValuation,ValuationExtension}
-                No documentation.
-    \end{definition}
-
-\begin{theorem}\label{Valuation.isEquiv_of_finiteDimensional_of_valuationExtension}
-        \lean{Valuation.isEquiv_of_finiteDimensional_of_valuationExtension}
-        \uses{Valuation.isEquiv_of_finiteDimensional,ValuationExtension}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{Valuation.preserveValuation_of_finiteDimensional_algebra_hom}
-        \lean{Valuation.preserveValuation_of_finiteDimensional_algebra_hom}
-        \uses{PreserveValuation}
-                No documentation.
-    \end{theorem}
-
-\begin{definition}\label{AlgHom.liftValuationInteger}
-        \lean{AlgHom.liftValuationInteger}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{AlgEquiv.liftValuationInteger}
-        \lean{AlgEquiv.liftValuationInteger}
-        \uses{AlgHom.liftValuationInteger}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{CompleteValuationRing}
-        \leanok
-        \lean{CompleteValuationRing}
-        \uses{ext}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{CompleteValuedField}
-        \leanok
-        \lean{CompleteValuedField}
-        \uses{ValRingHom.comp,CompleteValuationRing}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{CompleteDiscreteValuedField}
-        \leanok
-        \lean{CompleteDiscreteValuedField}
-        \uses{ext,CompleteValuedField}
-                No documentation.
-    \end{definition}
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{Int.eq_neg_one_of_dvd_neg_one}
         \leanok
@@ -2216,19 +2753,14 @@ from `A` to `B`.
 \end{proof}
 
 \begin{theorem}\label{WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one}
-        \leanok
         \lean{WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one}
-        \uses{ValAlgEquiv.symm,Int.eq_neg_one_of_dvd_neg_one}
+        \uses{Valued.zero_le,Int.eq_neg_one_of_dvd_neg_one}
                 No documentation.
     \end{theorem}
 
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{lemma}\label{Valuation.eq_one_of_eq_one_of_le_one_le_one}
+\begin{lemma}\label{eq_one_of_eq_one_of_le_one_le_one}
         \leanok
-        \lean{Valuation.eq_one_of_eq_one_of_le_one_le_one}
+        \lean{eq_one_of_eq_one_of_le_one_le_one}
         \uses{ValAlgEquiv.symm}
                 No documentation.
     \end{lemma}
@@ -2237,9 +2769,9 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{Valuation.map_zpow}
+\begin{theorem}\label{map_zpow}
         \leanok
-        \lean{Valuation.map_zpow}
+        \lean{map_zpow}
         \uses{Valued.valuationSubring}
                 No documentation.
     \end{theorem}
@@ -2248,9 +2780,9 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{Valuation.val_valuationSubring_unit}
+\begin{theorem}\label{val_valuationSubring_unit}
         \leanok
-        \lean{Valuation.val_valuationSubring_unit}
+        \lean{val_valuationSubring_unit}
         \uses{Valued.valuationSubring}
                 No documentation.
     \end{theorem}
@@ -2259,9 +2791,9 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{Valuation.isUnit_in_valuationSubring_of_val_eq_one}
+\begin{theorem}\label{isUnit_in_valuationSubring_of_val_eq_one}
         \leanok
-        \lean{Valuation.isUnit_in_valuationSubring_of_val_eq_one}
+        \lean{isUnit_in_valuationSubring_of_val_eq_one}
         \uses{Valued.valuationSubring}
                 No documentation.
     \end{theorem}
@@ -2270,10 +2802,10 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{Valuation.UnitOfValOne_elem}
+\begin{theorem}\label{unitOfValOne_elem}
         \leanok
-        \lean{Valuation.UnitOfValOne_elem}
-        \uses{Valued.valuationSubring,Valuation.isUnit_in_valuationSubring_of_val_eq_one}
+        \lean{unitOfValOne_elem}
+        \uses{Valued.valuationSubring,isUnit_in_valuationSubring_of_val_eq_one}
                 create a term of `v.valuationSubringˣ` from a term `x : K` with `v x = 1`
     \end{theorem}
 
@@ -2281,10 +2813,10 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{Valuation.val_UnitOfValOne_eq_one}
+\begin{theorem}\label{val_unitOfValOne_eq_one}
         \leanok
-        \lean{Valuation.val_UnitOfValOne_eq_one}
-        \uses{Valuation.UnitOfValOne_elem}
+        \lean{val_unitOfValOne_eq_one}
+        \uses{unitOfValOne_elem}
                 No documentation.
     \end{theorem}
 
@@ -2292,9 +2824,9 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{DiscreteValuation.pow_Uniformizer_all}
+\begin{theorem}\label{pow_Uniformizer_all}
         \leanok
-        \lean{DiscreteValuation.pow_Uniformizer_all}
+        \lean{pow_Uniformizer_all}
         \uses{Valued.valuationSubring,ext,ValRingHom.id,ValAlgEquiv.symm}
                 No documentation.
     \end{theorem}
@@ -2303,9 +2835,9 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{DiscreteValuation.pow_Uniformizer'}
+\begin{theorem}\label{pow_Uniformizer'}
         \leanok
-        \lean{DiscreteValuation.pow_Uniformizer'}
+        \lean{pow_Uniformizer'}
         \uses{Valued.valuationSubring,ext,ValRingHom.id}
                 No documentation.
     \end{theorem}
@@ -2314,10 +2846,10 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{DiscreteValuation.val_pow_Uniformizer}
+\begin{theorem}\label{val_pow_Uniformizer}
         \leanok
-        \lean{DiscreteValuation.val_pow_Uniformizer}
-        \uses{Valued.valuationSubring,Valuation.map_zpow,Valuation.val_valuationSubring_unit}
+        \lean{val_pow_Uniformizer}
+        \uses{Valued.valuationSubring,val_valuationSubring_unit}
                 No documentation.
     \end{theorem}
 
@@ -2325,10 +2857,10 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{theorem}\label{DiscreteValuation.val_pow_Uniformizer_all}
+\begin{theorem}\label{val_pow_Uniformizer_all}
         \leanok
-        \lean{DiscreteValuation.val_pow_Uniformizer_all}
-        \uses{Valued.valuationSubring,Valuation.map_zpow,Valuation.val_valuationSubring_unit,DiscreteValuation.pow_Uniformizer_all,DiscreteValuation.val_pow_Uniformizer}
+        \lean{val_pow_Uniformizer_all}
+        \uses{Valued.valuationSubring,map_zpow,val_valuationSubring_unit,pow_Uniformizer_all,val_pow_Uniformizer}
                 No documentation.
     \end{theorem}
 
@@ -2336,50 +2868,85 @@ from `A` to `B`.
     \leanok
 \end{proof}
 
-\begin{lemma}\label{DiscreteValuation.isUniformizer_of_uniformizer_of_le_one_le_one}
-        \leanok
-        \lean{DiscreteValuation.isUniformizer_of_uniformizer_of_le_one_le_one}
-        \uses{Valued.valuationSubring,ValAlgEquiv.symm,WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one,Valuation.eq_one_of_eq_one_of_le_one_le_one,Valuation.map_zpow,Valuation.val_valuationSubring_unit,DiscreteValuation.pow_Uniformizer_all}
-                If `π : K` is a uniformizer for `v`, and `v x ≤ 1 → v' x ≤ 1 ∀x : K`, then `π` is also a uniformizer for `v'`.
+\begin{theorem}\label{val_pow_Uniformizer_all'}
+        \lean{val_pow_Uniformizer_all'}
+        \uses{Valued.valuationSubring,ValAlgEquiv.mk',pow_Uniformizer_all,val_pow_Uniformizer,val_pow_Uniformizer_all}
+                No documentation.
+    \end{theorem}
+
+\begin{lemma}\label{isUniformizer_of_uniformizer_of_le_one_le_one}
+        \lean{isUniformizer_of_uniformizer_of_le_one_le_one}
+        \uses{Valued.valuationSubring,ValAlgEquiv.symm,WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one,eq_one_of_eq_one_of_le_one_le_one,map_zpow,val_valuationSubring_unit,pow_Uniformizer_all}
+                If `π : K` is a uniformizer for `v`, and `v x ≤ 1 → v' x ≤ 1, ∀ x : K`, then `π` is also a uniformizer for `v'`.
     \end{lemma}
 
-\begin{proof}
-    \leanok
-\end{proof}
+\begin{theorem}\label{isUniformizer_of_uniformizer_of_equiv}
+        \lean{isUniformizer_of_uniformizer_of_equiv}
+        \uses{isUniformizer_of_uniformizer_of_le_one_le_one}
+                If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.
+    \end{theorem}
 
-\begin{theorem}\label{DiscreteValuation.isEquiv_of_le_one_le_one}
-        \lean{DiscreteValuation.isEquiv_of_le_one_le_one}
-        \uses{Valued.zero_le,ValRingHom.id,DiscreteValuation.pow_Uniformizer'}
+\begin{theorem}\label{val_pow_Uniformizer_all_of_equiv}
+        \lean{val_pow_Uniformizer_all_of_equiv}
+        \uses{Valued.valuationSubring,map_zpow,val_valuationSubring_unit,pow_Uniformizer_all,val_pow_Uniformizer,val_pow_Uniformizer_all,isUniformizer_of_uniformizer_of_equiv}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{lt_one_lt_one_of_le_one_le_one}
+        \lean{lt_one_lt_one_of_le_one_le_one}
+        \uses{Valued.valuationSubring,ValAlgEquiv.mk',eq_one_of_eq_one_of_le_one_le_one,val_valuationSubring_unit,unitOfValOne_elem,pow_Uniformizer',val_pow_Uniformizer,isUniformizer_of_uniformizer_of_le_one_le_one}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{isEquiv_of_le_one_le_one}
+        \lean{isEquiv_of_le_one_le_one}
+        \uses{Valued.zero_le,lt_one_lt_one_of_le_one_le_one}
                 Two discrete valuations `v` and `v'` on a field `K` are equivalent, if `v x ≤ 1 → v' x ≤ 1, ∀x : K`.
     \end{theorem}
 
-\begin{theorem}\label{DiscreteValuation.isEquiv_iff_eq}
-        \lean{DiscreteValuation.isEquiv_iff_eq}
-        \uses{Valued.maximalIdeal,ValRingHom.comp}
+\begin{theorem}\label{isEquiv_iff_eq}
+        \lean{isEquiv_iff_eq}
+        \uses{ext,pow_Uniformizer_all,val_pow_Uniformizer,val_pow_Uniformizer_all,val_pow_Uniformizer_all_of_equiv}
+                For discrete valuations, being equivalent is the same as being equal.
+    \end{theorem}
+
+\begin{definition}\label{Valuation.Nontrivial}
+        \leanok
+        \lean{Valuation.Nontrivial}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valuation.nontrivial_def}
+        \leanok
+        \lean{Valuation.nontrivial_def}
+        \uses{Valuation.Nontrivial}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{isHausdorff_of_complete_of_discrete}
-        \lean{isHausdorff_of_complete_of_discrete}
-        \uses{Valued.valuationSubring,Valued.maximalIdeal,ValRingHom.comp}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{DiscreteValuation.valuationSubring_DVR_of_equiv_discrete}
+        \leanok
+        \lean{DiscreteValuation.valuationSubring_DVR_of_equiv_discrete}
+        \uses{Valued.valuationSubring}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{Polynomial.taylor_order_one}
-        \lean{Polynomial.taylor_order_one}
-        \uses{ValRingHom.comp}
-                No documentation.
-    \end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
 
-\begin{theorem}\label{Polynomial.taylor_order_one_apply}
-        \lean{Polynomial.taylor_order_one_apply}
-        \uses{ValRingHom.comp,ValAlgEquiv.one_apply,Polynomial.taylor_order_one}
+\begin{definition}\label{DiscreteValuation.ofNontrivial}
+        \lean{DiscreteValuation.ofNontrivial}
+        \uses{Valuation.Nontrivial}
                 No documentation.
-    \end{theorem}
+    \end{definition}
 
-\begin{theorem}\label{Polynomial.taylor_order_one_apply₂}
-        \lean{Polynomial.taylor_order_one_apply₂}
-        \uses{ValAlgEquiv.one_apply,Polynomial.taylor_order_one,Polynomial.taylor_order_one_apply}
+\begin{theorem}\label{DiscreteValuation.isEquiv_ofNontrivial}
+        \lean{DiscreteValuation.isEquiv_ofNontrivial}
+        \uses{Valued.valuationSubring,Valued.maximalIdeal,ValRingHom.comp,Valuation.Nontrivial,DiscreteValuation.valuationSubring_DVR_of_equiv_discrete,DiscreteValuation.ofNontrivial}
                 No documentation.
     \end{theorem}
 
@@ -2387,7 +2954,7 @@ from `A` to `B`.
         \leanok
         \lean{ExtDVR.exists_lift_residue_primitive}
         \uses{Valued.ResidueField,surjective,ValRingHom.id,ExtDVR.exists_primitive}
-                exists `x : B` generating `k_B` over `k_A`
+                There exists `x : B` generating `k_B` over `k_A`
     \end{theorem}
 
 \begin{proof}
@@ -2407,13 +2974,13 @@ from `A` to `B`.
 
 \begin{lemma}\label{ExtDVR.adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top}
         \lean{ExtDVR.adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top}
-        \uses{eq_top,Valued.maximalIdeal,Valued.maximalIdeal_eq,Valued.ResidueField,surjective,ValRingHom.id,ValRingHom.comp,LocalRing.algebraMap_residue_compat}
+        \uses{eq_top,LocalRing.algebraMap_residue_compat,Valued.maximalIdeal,maximalIdeal_eq,Valued.ResidueField,surjective,ValRingHom.id,ValRingHom.comp}
                 Auxiliary lemma: `A[x, ϖ] ⊔ m_B = ⊤`. Can be strenthened to `A[x] ⊔ m_B = B`
     \end{lemma}
 
 \begin{lemma}\label{ExtDVR.adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top}
         \lean{ExtDVR.adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top}
-        \uses{eq_top,Valued.maximalIdeal,Valued.maximalIdeal_eq,ValRingHom.id,ExtDVR.adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top,Algebra.pow_mem_adjoin_singleton,DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
+        \uses{eq_top,DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow,Valued.maximalIdeal,maximalIdeal_eq,ValRingHom.id,ExtDVR.adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top,Algebra.pow_mem_adjoin_singleton}
                 Auxiliary lemma: `A[x, ϖ] ⊔ m_B ^ i = ⊤` for any `i : ℕ`
     \end{lemma}
 
@@ -2443,7 +3010,7 @@ from `A` to `B`.
 \begin{theorem}\label{ExtDVR.residue_primitive_of_add_uniformizer}
         \leanok
         \lean{ExtDVR.residue_primitive_of_add_uniformizer}
-        \uses{Valued.ResidueField,ValRingHom.id,LocalRing.residue_eq_add_irreducible}
+        \uses{LocalRing.residue_eq_add_irreducible,Valued.ResidueField,ValRingHom.id}
                 No documentation.
     \end{theorem}
 
@@ -2454,7 +3021,7 @@ from `A` to `B`.
 \begin{theorem}\label{ExtDVR.not_unit_aeval_lift_residue_primitive}
         \leanok
         \lean{ExtDVR.not_unit_aeval_lift_residue_primitive}
-        \uses{ValRingHom.id,ValRingHom.comp,LocalRing.algebraMap_residue_compat,LocalRing.is_unit_iff_residue_ne_zero}
+        \uses{LocalRing.algebraMap_residue_compat,LocalRing.is_unit_iff_residue_ne_zero,ValRingHom.id,ValRingHom.comp}
                 No documentation.
     \end{theorem}
 
@@ -2463,11 +3030,16 @@ from `A` to `B`.
 \end{proof}
 
 \begin{theorem}\label{ExtDVR.irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve}
+        \leanok
         \lean{ExtDVR.irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve}
-        \uses{ValRingHom.id,ValRingHom.comp,ValAlgEquiv.one_apply,Polynomial.taylor_order_one,Polynomial.taylor_order_one_apply,Polynomial.taylor_order_one_apply₂,ExtDVR.not_unit_aeval_lift_residue_primitive,LocalRing.algebraMap_residue_compat,LocalRing.is_unit_iff_residue_ne_zero,DiscreteValuationRing.mul_irreducible_square_of_not_unit_of_not_irreducible,DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two}
+        \uses{DiscreteValuationRing.mul_irreducible_square_of_not_unit_of_not_irreducible,DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two,LocalRing.algebraMap_residue_compat,LocalRing.is_unit_iff_residue_ne_zero,ValRingHom.id,ValRingHom.comp,ValAlgEquiv.one_apply,ExtDVR.not_unit_aeval_lift_residue_primitive,Polynomial.taylor_order_one,Polynomial.taylor_order_one_apply,Polynomial.taylor_order_one_apply₂}
                 This is the first part of lemma 4:
 If `f x` has valuation ≥ 2, then `f (x + ϖ)` is a uniformizer.
     \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{ExtDVR.adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive}
         \lean{ExtDVR.adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive}
@@ -2483,6 +3055,92 @@ If `f x` has valuation ≥ 2, then `f (x + ϖ)` is a uniformizer.
 there exists `x : B` s.t. `B = A[x]`
     \end{theorem}
 
+\begin{theorem}\label{Polynomial.hasseDeriv_coeff_zero}
+        \leanok
+        \lean{Polynomial.hasseDeriv_coeff_zero}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.hasseDeriv_coeff_one}
+        \leanok
+        \lean{Polynomial.hasseDeriv_coeff_one}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.X_sq_dvd_hassDeriv_sub_coeff_sub_derivative_coeff}
+        \leanok
+        \lean{Polynomial.X_sq_dvd_hassDeriv_sub_coeff_sub_derivative_coeff}
+        \uses{Polynomial.hasseDeriv_coeff_zero,Polynomial.hasseDeriv_coeff_one}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.taylor_order_one}
+        \leanok
+        \lean{Polynomial.taylor_order_one}
+        \uses{ValRingHom.comp,Polynomial.X_sq_dvd_hassDeriv_sub_coeff_sub_derivative_coeff}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.taylor_order_one_apply}
+        \leanok
+        \lean{Polynomial.taylor_order_one_apply}
+        \uses{ValRingHom.comp,ValAlgEquiv.one_apply,Polynomial.taylor_order_one}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.taylor_order_one_apply₂}
+        \leanok
+        \lean{Polynomial.taylor_order_one_apply₂}
+        \uses{ValAlgEquiv.one_apply,Polynomial.taylor_order_one,Polynomial.taylor_order_one_apply}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.taylor_order_one_apply_aeval}
+        \leanok
+        \lean{Polynomial.taylor_order_one_apply_aeval}
+        \uses{ValAlgEquiv.one_apply,Polynomial.taylor_order_one,Polynomial.taylor_order_one_apply,Polynomial.taylor_order_one_apply₂}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Polynomial.taylor_order_zero_apply_aeval}
+        \leanok
+        \lean{Polynomial.taylor_order_zero_apply_aeval}
+        \uses{ValAlgEquiv.one_apply,Polynomial.taylor_order_one,Polynomial.taylor_order_one_apply,Polynomial.taylor_order_one_apply_aeval}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
 \begin{theorem}\label{Algebra.pow_mem_adjoin_singleton}
         \leanok
         \lean{Algebra.pow_mem_adjoin_singleton}
@@ -2493,23 +3151,9 @@ there exists `x : B` s.t. `B = A[x]`
     \leanok
 \end{proof}
 
-\begin{definition}\label{Ideal.quotientAlgebra'}
+\begin{theorem}\label{integer_valuation_eq}
         \leanok
-        \lean{Ideal.quotientAlgebra'}
-                No documentation.
-    \end{definition}
-
-\begin{definition}\label{AlgEquiv.restrictScalarsHom}
-        \leanok
-        \lean{AlgEquiv.restrictScalarsHom}
-        \uses{ext}
-                No documentation.
-    \end{definition}
-
-\begin{theorem}\label{LocalRing.algebraMap_residue_compat}
-        \leanok
-        \lean{LocalRing.algebraMap_residue_compat}
-        \uses{Valued.ResidueField,ValRingHom.id,ValRingHom.comp}
+        \lean{integer_valuation_eq}
                 No documentation.
     \end{theorem}
 
@@ -2517,115 +3161,58 @@ there exists `x : B` s.t. `B = A[x]`
     \leanok
 \end{proof}
 
-\begin{theorem}\label{LocalRing.residue_irreducible_eq_zero}
+\begin{theorem}\label{integerAlgebraMap.monotone}
+        \lean{integerAlgebraMap.monotone}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{integer_val_coe}
         \leanok
-        \lean{LocalRing.residue_irreducible_eq_zero}
+        \lean{integer_val_coe}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{valuationSubring_val_coe}
+        \leanok
+        \lean{valuationSubring_val_coe}
+        \uses{Valued.valuationSubring}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{integer_val_le_one}
+        \leanok
+        \lean{integer_val_le_one}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{maximalIdeal_eq}
+        \lean{maximalIdeal_eq}
         \uses{Valued.maximalIdeal,ValRingHom.id}
                 No documentation.
     \end{theorem}
 
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{LocalRing.is_unit_iff_residue_ne_zero}
+\begin{theorem}\label{Valuation.isEquiv_iff_integer}
         \leanok
-        \lean{LocalRing.is_unit_iff_residue_ne_zero}
-        \uses{ValRingHom.id}
+        \lean{Valuation.isEquiv_iff_integer}
+        \uses{Valued.valuationSubring,ext}
                 No documentation.
     \end{theorem}
 
 \begin{proof}
     \leanok
 \end{proof}
-
-\begin{theorem}\label{LocalRing.residue_eq_add_irreducible}
-        \leanok
-        \lean{LocalRing.residue_eq_add_irreducible}
-        \uses{ValRingHom.id,LocalRing.residue_irreducible_eq_zero}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{LocalRing.is_unit_of_unit_add_nonunit}
-        \leanok
-        \lean{LocalRing.is_unit_of_unit_add_nonunit}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{LocalRing.maximalIdeal_eq_jacobson_of_bot}
-        \lean{LocalRing.maximalIdeal_eq_jacobson_of_bot}
-        \uses{Valued.maximalIdeal,Valued.maximalIdeal_eq,ValAlgEquiv.symm}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
-        \leanok
-        \lean{DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{DiscreteValuationRing.mul_irreducible_of_not_unit}
-        \leanok
-        \lean{DiscreteValuationRing.mul_irreducible_of_not_unit}
-        \uses{Valued.maximalIdeal,ValAlgEquiv.symm}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{DiscreteValuationRing.mul_irreducible_square_of_not_unit_of_not_irreducible}
-        \leanok
-        \lean{DiscreteValuationRing.mul_irreducible_square_of_not_unit_of_not_irreducible}
-        \uses{ValRingHom.id,DiscreteValuationRing.mul_irreducible_of_not_unit}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two}
-        \leanok
-        \lean{DiscreteValuationRing.irreducible_of_irreducible_add_addVal_ge_two}
-        \uses{LocalRing.is_unit_of_unit_add_nonunit,DiscreteValuationRing.unit_mul_irreducible_of_irreducible}
-                No documentation.
-    \end{theorem}
-
-\begin{proof}
-    \leanok
-\end{proof}
-
-\begin{theorem}\label{DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
-        \lean{DiscreteValuationRing.maximalIdeal_pow_eq_span_irreducible_pow}
-        \uses{Valued.maximalIdeal,Valued.maximalIdeal_eq}
-                No documentation.
-    \end{theorem}
-
-\begin{theorem}\label{unique_of_valuation_extension}
-        \lean{unique_of_valuation_extension}
-        \uses{ValAlgebra,ext}
-                No documentation.
-    \end{theorem}
-
-\begin{definition}\label{toValAlgEquiv}
-        \lean{toValAlgEquiv}
-        \uses{ValAlgEquiv}
-                No documentation.
-    \end{definition}
 
 \begin{theorem}\label{Valuation.eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one}
         \leanok
@@ -2639,37 +3226,83 @@ there exists `x : B` s.t. `B = A[x]`
 
 \begin{theorem}\label{Valuation.aeval_valuationSubring_lt_one_of_lt_one
 }
+        \leanok
         \lean{Valuation.aeval_valuationSubring_lt_one_of_lt_one
 }
-        \uses{Valued.valuationSubring,ValAlgEquiv.trans,Valuation.eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one}
+        \uses{Valued.valuationSubring,Valuation.eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one}
                 No documentation.
     \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Valuation.aeval_valuationSubring_lt_one_of_lt_one_self
+}
+        \leanok
+        \lean{Valuation.aeval_valuationSubring_lt_one_of_lt_one_self
+}
+        \uses{Valued.valuationSubring,Valuation.eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{Valuation.mem_integer_of_mem_integral_closure}
+        \leanok
         \lean{Valuation.mem_integer_of_mem_integral_closure}
-        \uses{Valued.valuationSubring,ValAlgEquiv.trans,Valuation.eq_integer_of_subset_integer}
+        \uses{Valued.valuationSubring,ValAlgEquiv.trans}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{Valuation.eq_integer_of_subset_integer}
-        \lean{Valuation.eq_integer_of_subset_integer}
-        \uses{ext}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{nontrivial_of_valuation_extension}
+        \leanok
+        \lean{nontrivial_of_valuation_extension}
+        \uses{ext,ValRingHom.id,Valuation.Nontrivial}
                 No documentation.
     \end{theorem}
 
-\begin{theorem}\label{aux0}
-        \lean{aux0}
-        \uses{Valued.valuationSubring,ext,ValAlgEquiv.symm,Valuation.mem_integer_of_mem_integral_closure,Valuation.eq_integer_of_subset_integer}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{extension_valuation_equiv_extendedValuation_of_discrete
+}
+        \lean{extension_valuation_equiv_extendedValuation_of_discrete
+}
+        \uses{Valued.valuationSubring,ext,ValAlgEquiv.symm,ValAlgEquiv.trans,isEquiv_of_le_one_le_one,Valuation.Nontrivial,DiscreteValuation.ofNontrivial,DiscreteValuation.isEquiv_ofNontrivial,Valuation.mem_integer_of_mem_integral_closure,nontrivial_of_valuation_extension}
+                If a valuation `v : L → ℤₘ₀` extends a discrete valuation on `K`, then `v` is equivalent to `extendedValuation K L`.
+    \end{theorem}
+
+\begin{theorem}\label{extension_integer_eq_extendedValuation_of_discrete}
+        \leanok
+        \lean{extension_integer_eq_extendedValuation_of_discrete}
+        \uses{ext,Valuation.isEquiv_iff_integer}
                 No documentation.
     \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{integral_closure_eq_integer_of_complete_discrete
 }
+        \leanok
         \lean{integral_closure_eq_integer_of_complete_discrete
 }
-        \uses{Valued.valuationSubring,ext,ValRingHom.comp,aux0}
+        \uses{Valued.valuationSubring,ext,ValRingHom.comp,extension_integer_eq_extendedValuation_of_discrete}
                 No documentation.
     \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{unique_valuationSubring_of_ext}
         \leanok
@@ -2682,10 +3315,12 @@ there exists `x : B` s.t. `B = A[x]`
     \leanok
 \end{proof}
 
-\begin{theorem}\label{unique_val_of_ext}
+\begin{theorem}\label{unique_val_of_ext
+}
         \leanok
-        \lean{unique_val_of_ext}
-        \uses{unique_valuationSubring_of_ext,Valued.valuationSubring,ext,IsValExtension}
+        \lean{unique_val_of_ext
+}
+        \uses{unique_valuationSubring_of_ext,Valuation.unique_val_of_ext,Valued.valuationSubring,ext,IsValExtension}
                 No documentation.
     \end{theorem}
 
@@ -2696,7 +3331,7 @@ there exists `x : B` s.t. `B = A[x]`
 \begin{theorem}\label{DiscreteValuation.algHom_preserve_val_of_complete}
         \leanok
         \lean{DiscreteValuation.algHom_preserve_val_of_complete}
-        \uses{unique_val_of_ext,ext,ValRingHom.comp,ValAlgebra.val_isEquiv_comap,IsValExtension}
+        \uses{Valuation.unique_val_of_ext,ext,ValRingHom.comp,ValAlgebra.val_isEquiv_comap,IsValExtension}
                 No documentation.
     \end{theorem}
 
@@ -2726,6 +3361,129 @@ there exists `x : B` s.t. `B = A[x]`
         \uses{DiscreteValuation.fromAlgEquiv}
                 No documentation.
     \end{definition}
+
+\begin{theorem}\label{ringHomClass_eq_iff_valuationSubring}
+        \leanok
+        \lean{ringHomClass_eq_iff_valuationSubring}
+        \uses{Valued.valuationSubring,ext}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{Valued.RingHom.restrictInteger}
+        \leanok
+        \lean{Valued.RingHom.restrictInteger}
+        \uses{IsValExtension.val_map_le_one_iff,ValRingHom.id}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valued.RingHom.restrictInteger_apply}
+        \leanok
+        \lean{Valued.RingHom.restrictInteger_apply}
+        \uses{Valued.valuationSubring,Valued.RingHom.restrictInteger,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{Valued.RingHom.restrictValuationSubring}
+        \leanok
+        \lean{Valued.RingHom.restrictValuationSubring}
+        \uses{Valued.RingHom.restrictInteger}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valued.RingHom.restrictValuationSubring_apply}
+        \leanok
+        \lean{Valued.RingHom.restrictValuationSubring_apply}
+        \uses{Valued.RingHom.restrictValuationSubring}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{Valued.AlgHom.restrictValuationSubring}
+        \leanok
+        \lean{Valued.AlgHom.restrictValuationSubring}
+        \uses{Valued.valuationSubring,ext,ValRingHom.id,Valued.RingHom.restrictValuationSubring,Valued.RingHom.restrictValuationSubring_apply,IsValExtension,IsValExtension.coe_algebraMap_valuationSubring}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valued.AlgHom.restrictValuationSubring_apply}
+        \leanok
+        \lean{Valued.AlgHom.restrictValuationSubring_apply}
+        \uses{Valued.decompositionGroup,Valued.valuationSubring,ValRingHom.comp,Valued.AlgHom.restrictValuationSubring,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{Valued.DecompositionGroup.restrictValuationSubring}
+        \leanok
+        \lean{Valued.DecompositionGroup.restrictValuationSubring}
+        \uses{Valued.decompositionGroup,ext,ValRingHom.comp,ValAlgEquiv.symm,ValAlgEquiv.apply_symm_apply,ValAlgEquiv.symm_apply_apply,Valued.AlgHom.restrictValuationSubring}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valued.DecompositionGroup.restrictValuationSubring_apply}
+        \leanok
+        \lean{Valued.DecompositionGroup.restrictValuationSubring_apply}
+        \uses{Valued.decompositionGroup,ValRingHom.comp,Valued.DecompositionGroup.restrictValuationSubring}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}\label{Valued.elem_decompositionGroup_eq_iff_ValuationSubring}
+        \leanok
+        \lean{Valued.elem_decompositionGroup_eq_iff_ValuationSubring}
+        \uses{Valued.decompositionGroup,Valued.valuationSubring,ext,ValRingHom.comp,ringHomClass_eq_iff_valuationSubring,Valued.DecompositionGroup.restrictValuationSubring,Valued.DecompositionGroup.restrictValuationSubring_apply,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}\label{Valued.AlgEquiv.restrictValuationSubring}
+        \lean{Valued.AlgEquiv.restrictValuationSubring}
+        \uses{Valued.decompositionGroup,Valued.decompositionGroup_eq_top,eq_top,ValRingHom.comp,Valued.DecompositionGroup.restrictValuationSubring}
+                No documentation.
+    \end{definition}
+
+\begin{theorem}\label{Valued.AlgEquiv.restrictValuationSubring_apply}
+        \lean{Valued.AlgEquiv.restrictValuationSubring_apply}
+        \uses{Valued.AlgEquiv.restrictValuationSubring}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{Valued.AlgEquiv.eq_iff_ValuationSubring}
+        \lean{Valued.AlgEquiv.eq_iff_ValuationSubring}
+        \uses{Valued.decompositionGroup,ext,ValRingHom.comp,Valued.elem_decompositionGroup_eq_iff_ValuationSubring,Valued.AlgEquiv.restrictValuationSubring}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{nontrivial_of_valExtension}
+        \leanok
+        \lean{nontrivial_of_valExtension}
+        \uses{ValAlgEquiv.symm,Valuation.Nontrivial,Valuation.nontrivial_def,IsValExtension.val_map_eq_iff,IsValExtension.val_map_eq_one_iff,IsValExtension}
+                No documentation.
+    \end{theorem}
+
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}\label{IsValExtension.val_map_le_iff}
         \leanok
@@ -2792,26 +3550,27 @@ there exists `x : B` s.t. `B = A[x]`
         \leanok
         \lean{IsValExtension}
         \uses{ValAlgebra.val_isEquiv_comap}
-                An instance of `IsValExtension R A` states that the valuation of `A` is an extension of the valuation on `R`.
+                The class `IsValExtension R A` states that the valuation of `A` is an extension of the valuation
+on `R`. More precisely, the valuation on `R` is equivlent to the comap of the valuation on `A`.
     \end{definition}
 
 \begin{definition}\label{IsValExtension.ofIntegerComap}
         \leanok
         \lean{IsValExtension.ofIntegerComap}
-        \uses{ValAlgebra.val_isEquiv_comap,IsValExtension}
+        \uses{DiscreteValuation.ofInt,ValAlgebra.val_isEquiv_comap,IsValExtension}
                 No documentation.
     \end{definition}
 
 \begin{definition}\label{IsValExtension.ofValuationSubringComap}
         \lean{IsValExtension.ofValuationSubringComap}
-        \uses{Valued.valuationSubring,IsValExtension.val_map_le_one_iff,ext,ValAlgEquiv.mk',IsValExtension,IsValExtension.ofIntegerComap}
+        \uses{DiscreteValuation.ofInt,IsValExtension.val_map_le_one_iff,ext,ValAlgEquiv.mk',IsValExtension,IsValExtension.ofIntegerComap}
                 No documentation.
     \end{definition}
 
 \begin{theorem}\label{IsValExtension.coe_algebraMap_integer}
         \leanok
         \lean{IsValExtension.coe_algebraMap_integer}
-        \uses{Valued.valuationSubring,IsValExtension}
+        \uses{IsValExtension}
                 No documentation.
     \end{theorem}
 
@@ -2821,7 +3580,13 @@ there exists `x : B` s.t. `B = A[x]`
 
 \begin{theorem}\label{IsValExtension.coe_algebraMap_valuationSubring}
         \lean{IsValExtension.coe_algebraMap_valuationSubring}
-        \uses{Valued.valuationSubring,IsValExtension.val_map_eq_one_iff,IsValExtension}
+        \uses{Valued.valuationSubring,IsValExtension.val_map_eq_one_iff}
+                No documentation.
+    \end{theorem}
+
+\begin{theorem}\label{IsValExtension.integerAlgebra_injective}
+        \lean{IsValExtension.integerAlgebra_injective}
+        \uses{Valued.valuationSubring,ext,injective,IsValExtension,IsValExtension.coe_algebraMap_valuationSubring}
                 No documentation.
     \end{theorem}
 
