@@ -3,7 +3,6 @@ import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.GroupTheory.Index
 import Mathlib.Logic.Function.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
-import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Data.Int.Cast.Basic
 
@@ -291,16 +290,18 @@ theorem mem_all_lowerRamificationGroup_iff {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, 
     by_contra hc
     simp at hc
     push_neg at *
-    obtain ⟨m, hx, hx', hx''⟩ := x_in_G_n K L hc
+    obtain ⟨m, hx, hx', hx''⟩ := x_in_G_n K L sorry -- hc
     apply hx''
     apply h
-  apply lowerIndex_eq_top_iff_eq_refl.1 htop
-  rintro n
-  have : x ∈ G(L/K)_[n.toNat] := by
-    apply (mem_lowerRamificationGroup_iff n.toNat).2
-    rw [h, (lowerIndex_refl (R := K) (S := L))]
-    simp
   sorry
+  sorry
+  -- apply lowerIndex_eq_top_iff_eq_refl.1 htop
+  -- rintro n
+  -- have : x ∈ G(L/K)_[n.toNat] := by
+  --   apply (mem_lowerRamificationGroup_iff n.toNat).2
+  --   rw [h, (lowerIndex_refl (R := K) (S := L))]
+  --   simp
+  -- sorry
 
 theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x ∈ G(L/K)_[m]) (hn : x ∉ G(L/K)_[n]) : m ≤ n - 1 := by
   by_contra hc
@@ -597,6 +598,7 @@ theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((F
         intro x hx
         simp [truncatedLowerindex_eq_if K L (by linarith [huc'']) hx]
       simp [huc', huc'', hsum, mul_comm, mul_assoc, mul_inv_self]
+      sorry
   · have hu' : 0 ≤ ⌈u⌉ - 1 := by
       push_neg at hu
       simp [add_one_le_ceil_iff.2 hu, hu]
@@ -605,7 +607,8 @@ theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((F
         apply phi_eq_sum_card K L
       _ = (1 / Nat.card G(L/K)_[0]) * ((∑ i in Finset.Icc 0 (⌈u⌉ - 1), Nat.card G(L/K)_[i]) + (u - (max 0 (⌈u⌉ - 1))) * (Nat.card G(L/K)_[⌈u⌉])) - (1 : ℕ) := by
         have h : 0 < Nat.card G(L/K)_[0] := by sorry
-        erw [← sum_insert_left_aux 0 (⌈u⌉ - 1) hu' (fun x => Nat.card (lowerRamificationGroup K L x)), ← (Nat.div_self h), Nat.cast_div (by simp) (by simp [h]), ← (mul_one_div ((Nat.card G(L/K)_[0]) : ℚ) ((Nat.card G(L/K)_[0]) : ℚ)), (mul_comm ((Nat.card ↥ G(L/K)_[0]) : ℚ) (1 / ↑(Nat.card ↥ G(L/K)_[0] ))), ← mul_sub, Nat.cast_sub]
+        erw [← sum_insert_left_aux 0 (⌈u⌉ - 1) hu' (fun x => Nat.card (lowerRamificationGroup K L x)), ← (Nat.div_self h), Nat.cast_div (by simp) (by sorry -- simp [h]
+        ), ← (mul_one_div ((Nat.card G(L/K)_[0]) : ℚ) ((Nat.card G(L/K)_[0]) : ℚ)), (mul_comm ((Nat.card ↥ G(L/K)_[0]) : ℚ) (1 / ↑(Nat.card ↥ G(L/K)_[0] ))), ← mul_sub, Nat.cast_sub]
         --simp [add_comm, add_sub, add_comm]
         sorry
         sorry
@@ -627,3 +630,8 @@ theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((F
       _ = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) - 1 := by
         congr 2
         apply (sum_fiberwise_aux K L (u := u)).symm
+
+variable (S' : Type*) [Ring S'] [vS' : Valued S' ℤₘ₀] [Algebra R S']
+theorem phi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phi R S u = phi R S' u := sorry
+
+theorem psi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : psi R S u = psi R S' u := sorry
