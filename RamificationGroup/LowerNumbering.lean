@@ -64,7 +64,7 @@ def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
       _ = v ( s (s⁻¹ a) - s ⁻¹ a) := by
         rw [← Valuation.map_neg]
         congr
-        simp
+        simp only [neg_sub]
       _ ≤ _ := hs.2 ⟨s⁻¹ a, (val_map_le_one_iff (f := (s.symm : S →+* S))
         (Valuation.IsEquiv_comap_symm hs.1) a.1).mpr a.2⟩
 
@@ -78,9 +78,8 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
   constructor
   · exact hs1
   · intro y hy
-    apply le_trans
-    apply hs2 y hy
-    simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel, inv_le_inv_iff,
+    apply le_trans (hs2 y hy)
+    simp only [WithZero.coe_le_coe, div_le_iff_le_mul, div_mul_cancel', inv_le_inv_iff,
       Multiplicative.ofAdd_le]
     exact hab
 
@@ -161,18 +160,11 @@ variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing 
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
 
-/-- `This should be add to correct place` -/
-instance {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := by
-  use (0 : R)
-  change v 0 ≤ 1
-  simp only [_root_.map_zero, zero_le']
-
-instance {K Γ₀: Type*} [Field K] [LinearOrderedCommGroupWithZero Γ₀] [vK : Valued K Γ₀]: Nonempty 𝒪[K] := inferInstanceAs (Nonempty vK.v.integer)
-
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
   simp only [AlgEquiv.lowerIndex, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ciSup_const,
     ↓reduceDite]
+  sorry
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
@@ -240,6 +232,7 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s =
     apply lowerIndex_ne_one h
   · simp only [AlgEquiv.lowerIndex, h, OneMemClass.coe_one, AlgEquiv.one_apply, sub_self,
     _root_.map_zero, ciSup_const, ↓reduceDite]
+    sorry
 
 --the type of `n` should be changed
 -- instead, change when use this theorem
@@ -247,15 +240,14 @@ theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L
   simp [AlgEquiv.truncatedLowerIndex]
   constructor <;>
   unfold lowerRamificationGroup AlgEquiv.lowerIndex
-  simp
+  simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq, and_imp]
   rintro h
   by_cases hs : iSup (fun x : vL.v.integer => (v (s x - x))) = 0
-  · simp at hs
-    simp [hs]
-  · simp at hs
-    simp [hs]
+  · simp only at hs
+    simp only [hs, ↓reduceDite, le_top, implies_true]
+  · simp only at hs
+    simp only [hs, ↓reduceDite]
     sorry
-  simp
   sorry
 
 
@@ -267,7 +259,7 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
     convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
     sorry
-  · simp [hs] at h
+  · simp only [hs, ↓reduceDite] at h
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
       have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
       have hnt: i_[L/K] s = (WithTop.untop (i_[L/K] s) hs) := by sorry
@@ -283,12 +275,12 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
   rintro hs
   unfold AlgEquiv.truncatedLowerIndex
   by_cases hc : i_[L/K] s = ⊤
-  · simp [hc]
+  · simp only [hc, ↓reduceDite]
     linarith [h]
   · have : ⌈u⌉.toNat + 1 ≤ i_[L/K] s := by
       sorry
       --apply (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).1 hs
-    simp [hc]
+    simp only [hc, ↓reduceDite, ge_iff_le]
     sorry
 
 end lowerIndex_inequality
@@ -375,30 +367,24 @@ attribute [local instance 1001] Algebra.toSMul
 instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
 #check IsIntegralClosure.of_isIntegrallyClosed
-
-instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
-  isIntegral := by
-    intro ⟨x, hx⟩
-    rw [show 𝒪[L] = valuationSubring vL.v by rfl,
-      (Valuation.isEquiv_iff_valuationSubring _ _).mp
-        (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
-      ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
-    rcases hx with ⟨p, hp⟩
-    refine ⟨p, hp.1, ?_⟩
-    ext
-    rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
-      show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
-    calc
-      _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
-      _ = _ := by
-        rw [Polynomial.hom_eval₂]
-        simp only [ValuationSubring.algebraMap_def]
-        congr
-
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
-
-
+  -- apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
+  -- intro ⟨x, hx⟩
+  -- rw [show 𝒪[L] = valuationSubring vL.v by rfl,
+  --   (Valuation.isEquiv_iff_valuationSubring _ _).mp
+  --     (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
+  --   ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
+  -- rcases hx with ⟨p, hp⟩
+  -- refine ⟨p, hp.1, ?_⟩
+  -- ext
+  -- rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
+  -- calc
+  --   _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
+  --   _ = _ := by
+  --     rw [Polynomial.hom_eval₂]
+  --     simp only [ValuationSubring.algebraMap_def]
+  --     congr
+  sorry
 /-- Can't be inferred within 20000 heartbeats. -/
 instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
 
@@ -430,7 +416,7 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
   rcases PowerBasis.exists_eq_aeval' pb x with ⟨f, hf⟩
   subst hf
   rcases taylor_order_zero_apply_aeval f pb.gen ((AlgEquiv.restrictValuationSubring s) pb.gen - pb.gen) with ⟨b, hb⟩
-  rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
+  rw [add_sub_cancel'_right, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
   simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
   rw [hb, Valuation.map_mul]
   nth_rw 2 [← mul_one (v (s ↑pb.gen - ↑pb.gen))]
@@ -441,7 +427,7 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
 theorem AlgEquiv.iSup_val_map_sub_eq_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
   apply le_antisymm
-  · apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
+  · sorry --apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
   · apply le_ciSup (f := fun (x : 𝒪[L]) ↦ v (s x - x)) _ pb.gen
     use v (s pb.gen - pb.gen)
     intro y hy
@@ -472,9 +458,20 @@ theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s �
   rw [Subtype.ext_iff, decompositionGroup_one] at h
   exact hs h
 
+#check nontrivial_iff_exists_ne
+
 variable (K L) in
-theorem aux1 : ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
+open Classical in
+theorem aux1 [Nontrivial (L ≃ₐ[K] L)] :
+  ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
   rw [← lt_top_iff_ne_top, iSup_lt_iff]
+  let E : Finset (L ≃ₐ[K] L) := {s : (L ≃ₐ[K] L) | s ≠ .refl}.toFinset
+  have hE : E.Nonempty := by
+    rcases exists_ne (.refl : L ≃ₐ[K] L) with ⟨s, hs⟩
+    use s
+    simp only [Set.toFinset_setOf, ne_eq, Finset.mem_filter, Finset.mem_univ, hs, not_false_eq_true,
+      and_self, E]
+  -- let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ := fun s ↦ WithTop.untop (lowerIndex_ne_refl s.2)
   sorry
 
 #check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
@@ -486,7 +483,7 @@ theorem aux0 {pb : PowerBasis 𝒪[K] 𝒪[L]}
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
-  use (WithTop.untop _ (aux1 K L) : ℕ) + 1
+  --use (WithTop.untop _ (aux1 K L) : ℕ) + 1
   sorry
 
 end eq_bot
