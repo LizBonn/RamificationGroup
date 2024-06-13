@@ -60,7 +60,7 @@ variable (v) in
 theorem map_zpow (x : K) (n : ℤ) :
   v (x ^ n) = v x ^ n := by
   match n with
-  | .ofNat a => simp only [Int.ofNat_eq_coe, zpow_coe_nat, _root_.map_pow]
+  | .ofNat a => simp only [Int.ofNat_eq_coe, zpow_natCast, _root_.map_pow]
   | .negSucc a => simp only [zpow_negSucc, map_inv₀, _root_.map_pow]
 
 end division_ring
@@ -117,7 +117,7 @@ theorem pow_Uniformizer_all {x : K} (hx : x ≠ 0) (π : Uniformizer v) :
     rcases pow_Uniformizer v this π with ⟨n, u, hnu⟩
     use -n, u⁻¹
     rw [← inv_inj, show x⁻¹ = r.1 by rfl, hnu, mul_inv]
-    simp only [SubmonoidClass.coe_pow, zpow_neg, zpow_coe_nat, inv_inv, mul_eq_mul_left_iff, pow_eq_zero_iff', ZeroMemClass.coe_eq_zero, ne_eq]
+    simp only [SubmonoidClass.coe_pow, zpow_neg, zpow_natCast, inv_inv, mul_eq_mul_left_iff, pow_eq_zero_iff', ZeroMemClass.coe_eq_zero, ne_eq]
     left; rw [← inv_eq_iff_eq_inv]
     field_simp; symm
     calc
@@ -240,8 +240,8 @@ class Nontrivial (v : Valuation R Γ) : Prop where
 @[deprecated]
 theorem nontrivial_def (v : Valuation R Γ) [Nontrivial v] : ∃ r : R, v r ≠ 0 ∧ v r ≠ 1 := Nontrivial.nontrivial
 
-instance instNontrivialToRankOne (v : Valuation R Γ) [IsRankOne v] : v.Nontrivial where
-  nontrivial := IsRankOne.nontrivial
+instance instNontrivialToRankOne (v : Valuation R Γ) [RankOne v] : v.Nontrivial where
+  nontrivial := RankOne.nontrivial v
 
 end Valuation
 

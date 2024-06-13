@@ -27,6 +27,9 @@ def decompositionGroup : Subgroup (S ≃ₐ[R] S) where
     apply Valuation.IsEquiv_comap_symm
     exact h
 
+theorem decompositionGroup_one : (1 : decompositionGroup R S).1 = .refl := by
+  simp only [OneMemClass.coe_one, AlgEquiv.aut_one]
+
 section eq_top
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]

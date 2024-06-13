@@ -57,7 +57,7 @@ lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top : to
       ← IntermediateField.adjoin_simple_toSubalgebra_of_integral (IsIntegral.of_finite _ _), hx]
     simp only [top_toSubalgebra, Algebra.mem_top]
   let g : A[X] := (map_surjective (residue A) Ideal.Quotient.mk_surjective g0).choose
-  rw [show y = g.eval₂ (algebraMap A B) x + (y - g.eval₂ (algebraMap A B) x) by rw [add_sub_cancel'_right]]
+  rw [show y = g.eval₂ (algebraMap A B) x + (y - g.eval₂ (algebraMap A B) x) by rw [add_sub_cancel]]
   apply Submodule.add_mem_sup
   · rw [Subalgebra.mem_toSubmodule]
     apply Algebra.adjoin_mono (show ({x} : Set B) ⊆ {x, ϖ} by simp only [Set.singleton_subset_iff,
@@ -103,7 +103,7 @@ lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top 
         · assumption
     · rw [Submodule.restrictScalars_mem, maximalIdeal_pow_eq_span_irreducible_pow hϖ, Ideal.mem_span_singleton']
       use w
-      rw [mul_comm, pow_succ, mul_comm ϖ]
+      rw [mul_comm, pow_succ]
 
 /-- `m_A • B ≠ ⊥` -/
 theorem maximalIdeal_map_ne_bot_of_injective (h_inj : Function.Injective (algebraMap A B)) : (maximalIdeal A).map (algebraMap A B) ≠ ⊥ := by

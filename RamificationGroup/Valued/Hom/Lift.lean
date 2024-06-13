@@ -144,7 +144,6 @@ end discrete
 
 end Galois
 
-
 end Valued
 
 end lift

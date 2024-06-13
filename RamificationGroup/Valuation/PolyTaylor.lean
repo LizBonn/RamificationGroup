@@ -2,7 +2,7 @@
 GOAL:
 1. one order taylor expansion
 -/
-import Mathlib.Data.Polynomial.Taylor
+import Mathlib.Algebra.Polynomial.Taylor
 
 namespace Polynomial
 
@@ -56,7 +56,7 @@ theorem taylor_order_one (h : A) :
     exact h'
   rcases this with ⟨g, hg⟩
   use g
-  simp only [← hg, add_add_sub_cancel, add_sub_cancel'_right]
+  simp only [← hg, add_add_sub_cancel, add_sub_cancel]
 
 theorem taylor_order_one_apply (x h : A) :
   ∃gx : A, f.eval (x + h) =

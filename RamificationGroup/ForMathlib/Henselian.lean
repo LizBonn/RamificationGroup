@@ -10,6 +10,6 @@ instance instHenselianLocalToHenselian [l : LocalRing R] [h : HenselianRing R <|
     is_henselian := by
       convert h.is_henselian
       letI : IsLocalRingHom (Ideal.Quotient.mk (maximalIdeal R)) := by
-        apply LocalRing.instIsLocalRingHomResidueFieldToSemiringToCommSemiringToSemiringToDivisionSemiringToSemifieldFieldResidue
+        apply  LocalRing.instIsLocalRingHomResidueFieldResidue
       rw [isUnit_map_iff]
   }
