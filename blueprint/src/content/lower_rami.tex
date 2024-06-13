@@ -1,0 +1,28 @@
+\begin{definition}[Decomposition Group]
+    \label{decompositionGroup}
+    \leanok
+    \uses{Valuation.IsEquiv_comap_symm,ValRingHom.comp,ValAlgEquiv.refl,ValAlgEquiv.symm}
+    The decomposition group of $L/K$ is the subgroup \[\{\sigma\in\Gal(L/K)\mid \sigma(\mathcal{O}_L) \subset \mathcal{O}_L\}\] of $\Gal(L/K)$ 
+\end{definition}
+
+\begin{definition}[Lower Index]\label{lowerIndex}
+    \leanok
+    The lower index of $\sigma\in\Gal(L/K)$ is \[i_{L/K}(\sigma) := \begin{cases}
+        \infty, &\sigma = 1,\\
+        , &\sigma\ne 1.
+    \end{cases}\]
+\end{definition}
+
+\begin{theorem}
+    \label{lowerIndex_ne_one}
+\end{theorem}
+
+\begin{theorem}
+    \label{lowerIndex_eq_top_iff_eq_refl}
+    \leanok
+    \uses{decompositionGroup, lowerIndex}
+    If $\sigma\in\Gal(L/K)$ lies in the decomposition group of $L/K$, then \[i_{L/K}(\sigma) = \infty\iff s = 1.\]
+\end{theorem}
+\begin{proof}
+    \uses{lowerIndex_ne_one}
+\end{proof}

@@ -107,6 +107,7 @@ section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
 open Classical
 #check WithBot.instSupSet
+#check WithTop.conditionallyCompleteLattice
 -- there is no `ConditionallyCompleteLinearOrderTop` in mathlib ...
 -- # The definition of `WithTop.instInfSet` have to be changed
 #check WithBot.linearOrder
@@ -162,13 +163,7 @@ variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing 
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
 
-/-- `This should be add to correct place` -/
-instance {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := by
-  use (0 : R)
-  change v 0 ≤ 1
-  simp only [_root_.map_zero, zero_le']
-
-instance {K Γ₀: Type*} [Field K] [LinearOrderedCommGroupWithZero Γ₀] [vK : Valued K Γ₀]: Nonempty 𝒪[K] := inferInstanceAs (Nonempty vK.v.integer)
+instance Valuation.instNonemptyToValuation {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := Zero.instNonempty
 
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
@@ -190,29 +185,17 @@ theorem lowerIndex_ne_refl_of_FG (h : sorry) {s : L ≃ₐ[K] L} (hs : s ≠ .re
   intro heq
   simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
     dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at heq
-  have : ∀ x : vL.v.integer, v (s x - x) = 0 := by
-    intro x
-    apply le_of_eq at heq
-    rw [show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
-    refine (ciSup_le_iff' ?_).mp heq x -- this sorry is should be filled with bounded by one
-    use 1
-    intro a ha
-    rcases ha with ⟨y, hy⟩
-    rw [← hy, ← Valuation.mem_integer_iff]
-    apply Subring.sub_mem
-    sorry; sorry
-  apply hs
-  ext x
+  have : ∀ x : vL.v.integer, v (s x - x) = 0 := sorry
+  apply hs; ext x
   rw [AlgEquiv.coe_refl, id_eq, ← sub_eq_zero, ← Valuation.zero_iff vL.v]
   rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
-  · sorry
-  · sorry
+  sorry; sorry
 
-theorem lowerIndex_ne_one {s : decompositionGroup K L} (hs : s ≠ 1) : i_[L/K] s ≠ ⊤ := by
+theorem lowerIndex_ne_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
   intro heq
   simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
     dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at heq
-  have hL : ∀ x : vL.v.integer, s.1 x = x := by
+  have hL : ∀ x : vL.v.integer, s x = x := by
     intro x
     apply le_of_eq at heq
     rw [← sub_eq_zero, ← Valuation.zero_iff vL.v, show (0 : ℤₘ₀) = ⊥ by rfl, eq_bot_iff]
@@ -222,51 +205,63 @@ theorem lowerIndex_ne_one {s : decompositionGroup K L} (hs : s ≠ 1) : i_[L/K] 
     rcases ha with ⟨y, hy⟩
     rw [← hy, ← Valuation.mem_integer_iff]
     apply Subring.sub_mem
-    · rw [mem_integer_iff, val_map_le_one_iff s.2]
+    · rw [mem_integer_iff, val_map_le_one_iff hs']
       exact y.2
-    · exact y.2 -- should have be proved somewhere else?
+    · exact y.2 -- should have been proved somewhere else?
   apply hs
   ext x
-  rw [decompositionGroup_one, AlgEquiv.coe_refl, id_eq]
   rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
   · exact hL ⟨x, h⟩
   · calc
-    _ = (s.1 x⁻¹)⁻¹ := by simp only [inv_inv, map_inv₀]
-    _ = _ := by rw [hL ⟨x⁻¹, h⟩, inv_inv]
+    _ = (s x⁻¹)⁻¹ := by simp only [inv_inv, map_inv₀]
+    _ = _ := by
+      rw [hL ⟨x⁻¹, h⟩, inv_inv, AlgEquiv.coe_refl, id_eq]
 
 @[simp]
-theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s = ⊤ ↔ s = 1 := by
+theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) : i_[L/K] s = ⊤ ↔ s = .refl := by
   constructor <;> intro h
   · contrapose! h
-    apply lowerIndex_ne_one h
-  · simp only [AlgEquiv.lowerIndex, h, OneMemClass.coe_one, AlgEquiv.one_apply, sub_self,
-    _root_.map_zero, ciSup_const, ↓reduceDite]
+    apply lowerIndex_ne_one hs' h
+  · simp only [h, lowerIndex_refl]
 
---n the type of `n` should be changed
+theorem iSup_val_map_sub_eq_zero_iff_eq_refl {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) :
+  ⨆ x : vL.v.integer, vL.v (s x - x) = 0 ↔ s = .refl := by
+  rw [← lowerIndex_eq_top_iff_eq_refl]
+  simp only [AlgEquiv.toEquiv_eq_coe, EquivLike.coe_coe, AlgEquiv.lowerIndex, dite_eq_left_iff,
+    ENat.coe_ne_top, imp_false, Decidable.not_not]
+  exact hs'
+
+-- the type of `n` should be changed
 -- instead, change when use this theorem
-theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L/K)_[n] ↔ (n + 1 : ℕ) ≤ i_[L/K] s := by
-  simp [AlgEquiv.truncatedLowerIndex]
-  constructor <;>
-  unfold lowerRamificationGroup AlgEquiv.lowerIndex
-  simp
-  rintro h
-  by_cases hs : iSup (fun x : vL.v.integer => (v (s x - x))) = 0
-  · simp at hs
-    simp [hs]
-  · simp at hs
-    simp [hs]
-    sorry
-  simp
-  sorry
+theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (n : ℕ) : s ∈ G(L/K)_[n] ↔ n + 1 ≤ i_[L/K] s := by
+  simp only [lowerRamificationGroup, Subtype.forall, Subgroup.mem_mk,
+    Set.mem_setOf_eq, AlgEquiv.lowerIndex]
+  by_cases hrefl : s = .refl
+  · simp only [hrefl, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ofAdd_sub, ofAdd_neg,
+    zero_le', implies_true, and_true, ciSup_const, ↓reduceDite, le_top, iff_true]
+    exact refl_mem_decompositionGroup K L
+  · have : ¬ iSup (fun x : vL.v.integer => (vL.v (s x - x))) = 0 := by
+      rw [iSup_val_map_sub_eq_zero_iff_eq_refl hs']; exact hrefl
+    constructor
+    · intro ⟨_, hs⟩
+      simp only [this, ↓reduceDite, ge_iff_le]
+      rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe]
+      sorry
+    · intro h
+      simp only [hs', true_and]
+      simp only [this, ↓reduceDite] at h
+      rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe] at h
+      intro x hx
+      sorry
 
 
-theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐ[K] L} {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
+theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
   unfold AlgEquiv.truncatedLowerIndex at h
   by_cases hs : i_[L/K] s = ⊤
   · simp [hs] at h
     --maybe there is a better way
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
-    convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
+    convert (mem_lowerRamificationGroup_iff hs' ⌈u⌉.toNat).2 this
     sorry
   · simp [hs] at h
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
@@ -275,22 +270,13 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
       rw [hnt]
       convert (le_min_iff.1 h').right
       sorry
-    convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
+    convert (mem_lowerRamificationGroup_iff hs' ⌈u⌉.toNat).2 this
     sorry
 
 theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐ[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
   constructor
   apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
-  rintro hs
-  unfold AlgEquiv.truncatedLowerIndex
-  by_cases hc : i_[L/K] s = ⊤
-  · simp [hc]
-    linarith [h]
-  · have : ⌈u⌉.toNat + 1 ≤ i_[L/K] s := by
-      sorry
-      --apply (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).1 hs
-    simp [hc]
-    sorry
+  sorry; sorry
 
 end lowerIndex_inequality
 
@@ -375,8 +361,6 @@ attribute [local instance 1001] Algebra.toSMul
 
 instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
-#check IsIntegralClosure.of_isIntegrallyClosed
-
 instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
   isIntegral := by
     intro ⟨x, hx⟩
@@ -415,6 +399,10 @@ end algebra_instances
 variable {K L}
 variable [CompleteSpace K]
 
+theorem AlgEquiv.mem_decompositionGroup [CompleteSpace K] (s : L ≃ₐ[K] L) : s ∈ decompositionGroup K L := by
+  rw [decompositionGroup_eq_top]
+  exact Subgroup.mem_top s
+
 theorem AlgEquiv.val_map_powerBasis_sub_ne_zero (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
   by_contra h
   rw [zero_iff, sub_eq_zero] at h
@@ -442,7 +430,8 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
 theorem AlgEquiv.iSup_val_map_sub_eq_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
   apply le_antisymm
-  · apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
+  · letI : Nonempty 𝒪[L] := inferInstanceAs (Nonempty vL.v.integer)
+    apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
   · apply le_ciSup (f := fun (x : 𝒪[L]) ↦ v (s x - x)) _ pb.gen
     use v (s pb.gen - pb.gen)
     intro y hy
@@ -462,17 +451,13 @@ theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ
     simp only [h, AlgEquiv.iSup_val_map_sub_eq_powerBasis pb, AlgEquiv.val_map_powerBasis_sub_ne_zero pb h, ↓reduceDite]
 
 theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
-  have : s ∈ decompositionGroup K L := by
-    rw [decompositionGroup_eq_top]
-    exact Subgroup.mem_top s
-  rw [show s = (⟨s, this⟩ : decompositionGroup K L).1 by rfl]
   apply lowerIndex_ne_one
-  intro h
-  rw [Subtype.ext_iff, decompositionGroup_one] at h
-  exact hs h
+  rw [decompositionGroup_eq_top]
+  apply Subgroup.mem_top s
+  exact hs
 
 variable (K L) in
-theorem aux1 [Nontrivial (L ≃ₐ[K] L)] :
+theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
   ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s ≠ ⊤ := by
   rw [← lt_top_iff_ne_top, iSup_lt_iff]
   let f : {s : (L ≃ₐ[K] L) // s ≠ .refl} → ℕ :=
@@ -488,18 +473,22 @@ theorem aux1 [Nontrivial (L ≃ₐ[K] L)] :
       rw [← ENat.some_eq_coe, WithTop.coe_untop]
     simp only [ne_eq, this, Nat.cast_le, ha]
 
-#check le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup
-#check mem_lowerRamificationGroup_iff
 theorem aux0
   {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
   {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
-
-  sorry
+  apply (mem_lowerRamificationGroup_iff s.mem_decompositionGroup n).mp at hs
+  by_contra! h
+  rw [ENat.add_one_le_iff (by simp only [ne_eq, ENat.coe_ne_top, not_false_eq_true])] at hs
+  have : i_[L/K] s < n := by
+    apply lt_of_le_of_lt _ hu
+    rw [show s = (⟨s, h⟩ : {s // s ≠ .refl}).1 by rfl]
+    apply le_iSup (fun (x : {s // s ≠ .refl}) => i_[L/K] x) (⟨s, h⟩ : {s // s ≠ .refl})
+  apply lt_asymm hs this
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
 theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
   by_cases h : Nontrivial (L ≃ₐ[K] L)
-  · use (WithTop.untop _ (aux1 K L) : ℕ) + 1
+  · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1
     rw [eq_bot_iff]
     intro s hs
     rw [Subgroup.mem_bot, AlgEquiv.aut_one, aux0 _ hs]
@@ -509,15 +498,13 @@ theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ 
     have : (0 : ℕ∞) < 1 := by
       rw [← ENat.coe_one, ← ENat.some_eq_coe, WithTop.zero_lt_coe]
       exact zero_lt_one
-    convert WithTop.add_lt_add_left (aux1 K L) this
+    convert WithTop.add_lt_add_left (iSup_ne_refl_lowerIndex_ne_top K L) this
   · use 0
     rw [eq_bot_iff]
     intro s _
     rw [Subgroup.mem_bot, AlgEquiv.aut_one]
     letI : Subsingleton (L ≃ₐ[K] L) := not_nontrivial_iff_subsingleton.mp h
     apply Subsingleton.allEq
-
-#check WithTop.some_lt_some
 
 end eq_bot
 

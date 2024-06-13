@@ -27,8 +27,14 @@ def decompositionGroup : Subgroup (S ≃ₐ[R] S) where
     apply Valuation.IsEquiv_comap_symm
     exact h
 
+/-- This stupid theorem should be parametrized over `Subgroup (S ≃ₐ[R] S)`. -/
 theorem decompositionGroup_one : (1 : decompositionGroup R S).1 = .refl := by
   simp only [OneMemClass.coe_one, AlgEquiv.aut_one]
+
+/-- This stupid theorem should be parametrized over `Subgroup (S ≃ₐ[R] S)`. -/
+theorem refl_mem_decompositionGroup : .refl ∈ decompositionGroup R S := by
+  rw [← decompositionGroup_one R S]
+  exact (1 : decompositionGroup R S).2
 
 section eq_top
 
