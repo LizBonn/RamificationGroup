@@ -167,7 +167,7 @@ theorem phi_strictMono : StrictMono (phi R S) := by
 theorem phi_inf (y : ℚ) : ∃ (n : ℕ) , ¬ phi R S n ≤ y := by sorry
 
 --i don't know
---the proof is not good
+--this proof is not good
 theorem exist_aux (y : ℚ) : ∃ (n : ℕ) , phi R S (n - 1) ≤ y ∧ y < phi R S n := by
   by_contra h
   push_neg at h
