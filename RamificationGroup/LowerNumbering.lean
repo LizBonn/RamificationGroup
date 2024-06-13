@@ -64,7 +64,7 @@ def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
       _ = v ( s (s⁻¹ a) - s ⁻¹ a) := by
         rw [← Valuation.map_neg]
         congr
-        simp only [neg_sub]
+        simp
       _ ≤ _ := hs.2 ⟨s⁻¹ a, (val_map_le_one_iff (f := (s.symm : S →+* S))
         (Valuation.IsEquiv_comap_symm hs.1) a.1).mpr a.2⟩
 
@@ -162,11 +162,18 @@ variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing 
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
 
+/-- `This should be add to correct place` -/
+instance {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := by
+  use (0 : R)
+  change v 0 ≤ 1
+  simp only [_root_.map_zero, zero_le']
+
+instance {K Γ₀: Type*} [Field K] [LinearOrderedCommGroupWithZero Γ₀] [vK : Valued K Γ₀]: Nonempty 𝒪[K] := inferInstanceAs (Nonempty vK.v.integer)
+
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
   simp only [AlgEquiv.lowerIndex, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ciSup_const,
     ↓reduceDite]
-  sorry
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
@@ -234,7 +241,6 @@ theorem lowerIndex_eq_top_iff_eq_refl {s : decompositionGroup K L} : i_[L/K] s =
     apply lowerIndex_ne_one h
   · simp only [AlgEquiv.lowerIndex, h, OneMemClass.coe_one, AlgEquiv.one_apply, sub_self,
     _root_.map_zero, ciSup_const, ↓reduceDite]
-    sorry
 
 --n the type of `n` should be changed
 -- instead, change when use this theorem
@@ -242,14 +248,15 @@ theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (n : ℕ) : s ∈ G(L
   simp [AlgEquiv.truncatedLowerIndex]
   constructor <;>
   unfold lowerRamificationGroup AlgEquiv.lowerIndex
-  simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq, and_imp]
+  simp
   rintro h
   by_cases hs : iSup (fun x : vL.v.integer => (v (s x - x))) = 0
-  · simp only at hs
-    simp only [hs, ↓reduceDite, le_top, implies_true]
-  · simp only at hs
-    simp only [hs, ↓reduceDite]
+  · simp at hs
+    simp [hs]
+  · simp at hs
+    simp [hs]
     sorry
+  simp
   sorry
 
 
@@ -261,7 +268,7 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
     convert (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).2 this
     sorry
-  · simp only [hs, ↓reduceDite] at h
+  · simp [hs] at h
     have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
       have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
       have hnt: i_[L/K] s = (WithTop.untop (i_[L/K] s) hs) := by sorry
@@ -277,12 +284,12 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
   rintro hs
   unfold AlgEquiv.truncatedLowerIndex
   by_cases hc : i_[L/K] s = ⊤
-  · simp only [hc, ↓reduceDite]
+  · simp [hc]
     linarith [h]
   · have : ⌈u⌉.toNat + 1 ≤ i_[L/K] s := by
       sorry
       --apply (mem_lowerRamificationGroup_iff ⌈u⌉.toNat).1 hs
-    simp only [hc, ↓reduceDite, ge_iff_le]
+    simp [hc]
     sorry
 
 end lowerIndex_inequality
@@ -369,25 +376,30 @@ attribute [local instance 1001] Algebra.toSMul
 instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
 #check IsIntegralClosure.of_isIntegrallyClosed
-#check IsIntegral
+
+instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
+  isIntegral := by
+    intro ⟨x, hx⟩
+    rw [show 𝒪[L] = valuationSubring vL.v by rfl,
+      (Valuation.isEquiv_iff_valuationSubring _ _).mp
+        (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
+      ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
+    rcases hx with ⟨p, hp⟩
+    refine ⟨p, hp.1, ?_⟩
+    ext
+    rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
+      show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
+    calc
+      _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
+      _ = _ := by
+        rw [Polynomial.hom_eval₂]
+        simp only [ValuationSubring.algebraMap_def]
+        congr
+
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  -- apply IsIntegralClosure.of_isIntegrallyClosed (R := 𝒪[L]) (S := 𝒪[K]) (K := L)
-  -- intro ⟨x, hx⟩
-  -- rw [show 𝒪[L] = valuationSubring vL.v by rfl,
-  --   (Valuation.isEquiv_iff_valuationSubring _ _).mp
-  --     (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
-  --   ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
-  -- rcases hx with ⟨p, hp⟩
-  -- refine ⟨p, hp.1, ?_⟩
-  -- ext
-  -- rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
-  -- calc
-  --   _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
-  --   _ = _ := by
-  --     rw [Polynomial.hom_eval₂]
-  --     simp only [ValuationSubring.algebraMap_def]
-  --     congr
-  sorry
+  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
+
+
 /-- Can't be inferred within 20000 heartbeats. -/
 instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
 
@@ -419,7 +431,7 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
   rcases PowerBasis.exists_eq_aeval' pb x with ⟨f, hf⟩
   subst hf
   rcases taylor_order_zero_apply_aeval f pb.gen ((AlgEquiv.restrictValuationSubring s) pb.gen - pb.gen) with ⟨b, hb⟩
-  rw [add_sub_cancel'_right, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
+  rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
   simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
   rw [hb, Valuation.map_mul]
   nth_rw 2 [← mul_one (v (s ↑pb.gen - ↑pb.gen))]
@@ -430,7 +442,7 @@ theorem AlgEquiv.val_map_sub_le_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s 
 theorem AlgEquiv.iSup_val_map_sub_eq_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ[K] L) :
   ⨆ x : vL.v.integer, v (s x - x) = v (s pb.gen - pb.gen) := by
   apply le_antisymm
-  · sorry --apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
+  · apply ciSup_le <| AlgEquiv.val_map_sub_le_powerBasis pb s
   · apply le_ciSup (f := fun (x : 𝒪[L]) ↦ v (s x - x)) _ pb.gen
     use v (s pb.gen - pb.gen)
     intro y hy

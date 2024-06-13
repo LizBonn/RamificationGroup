@@ -1,11 +1,11 @@
 { pkgs, ... }:
 let
-  pythonPackages = pkgs.python39Packages;
-  tex = (pkgs.texlive.combine {
-    inherit (pkgs.texlive)
-      scheme-small dvisvgm
-      amsmath hyperref comment;
-  });
+   pythonPackages = pkgs.python39Packages;
+   tex = (pkgs.texlive.combine {
+     inherit (pkgs.texlive)
+       scheme-small dvisvgm
+       amsmath hyperref comment;
+   });
 in pkgs.mkShell {
   name = "python-venv";
   venvDir = "./.venv";
