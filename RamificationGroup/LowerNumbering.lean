@@ -29,8 +29,6 @@ section def_lower_rami_grp
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra R S]
 
--- variable (K L : Type*) {ΓL : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ℤₘ₀] [Algebra K L]
-
 def lowerRamificationGroup (u : ℤ) : Subgroup (S ≃ₐ[R] S) where
     carrier := {s | s ∈ decompositionGroup R S ∧ ∀ x : vS.v.integer, Valued.v (s x - x) ≤ .coe (.ofAdd (- u - 1))}
     mul_mem' {a} {b} ha hb := by
@@ -85,6 +83,8 @@ theorem lowerRamificationGroup.antitone : Antitone (lowerRamificationGroup R S) 
 
 end def_lower_rami_grp
 
+instance Valuation.instNonemptyToValuation {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := Zero.instNonempty
+
 section autCongr
 
 variable {R S S': Type*} {ΓR : outParam Type*} [CommRing R] [Ring S] [Ring S'] [vS : Valued S ℤₘ₀] [vS : Valued S' ℤₘ₀] [Algebra R S] [Algebra R S']
@@ -104,7 +104,7 @@ theorem autCongr_mem_lowerRamificationGroup_iff {f : S ≃ₐ[R] S'} (hf : ∀ a
 end autCongr
 
 section WithBot
--- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Muliplicative`, `Additive`
+-- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Multiplicative`, `Additive`
 open Classical
 #check WithBot.instSupSet
 #check WithTop.conditionallyCompleteLattice
@@ -136,7 +136,6 @@ instance {α} [Add α] [ConditionallyCompleteLinearOrder α] : ConditionallyComp
 
 end WithBot
 
-
 section lowerIndex
 
 variable (R S : Type*) [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra R S]
@@ -144,7 +143,7 @@ variable (R S : Type*) [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra 
 open Classical
 -- 0 if lower than 0
 noncomputable def AlgEquiv.lowerIndex (s : S ≃ₐ[R] S) : ℕ∞ :=
-  if h : iSup (fun x : vS.v.integer => (Valued.v (s x - x))) = 0 then ⊤
+  if h : ⨆ x : vS.v.integer, vS.v (s x - x) = 0 then ⊤
   else (- Multiplicative.toAdd (WithZero.unzero h)).toNat
 
 scoped [Valued] notation:max " i_[" S:max "/" R:max "]" => AlgEquiv.lowerIndex R S
@@ -155,6 +154,34 @@ noncomputable def AlgEquiv.truncatedLowerIndex (u : ℚ) (s : (S ≃ₐ[R] S)) :
 
 scoped [Valued] notation:max " i_[" L:max "/" K:max "]ₜ" => AlgEquiv.truncatedLowerIndex K L
 
+section lowerIndex_inequality
+
+variable {R S}
+
+/-- One of `val_map_sub_le_one` and `sub_self_mem_integer` should be thrown away.-/
+theorem sub_self_mem_integer {s : S ≃ₐ[R] S} (hs' : s ∈ decompositionGroup R S)
+  (x : vS.v.integer) :
+    s x - x ∈ vS.v.integer := by
+  apply Subring.sub_mem
+  · rw [mem_integer_iff, val_map_le_one_iff hs']; exact x.2
+  · exact x.2
+
+/-- One of `val_map_sub_le_one` and `sub_self_mem_integer` should be thrown away.-/
+theorem val_map_sub_le_one {s : S ≃ₐ[R] S} (hs' : s ∈ decompositionGroup R S)
+  (x : vS.v.integer) :
+    v (s x - x) ≤ 1 := sub_self_mem_integer hs' x
+
+theorem toAdd_iSup_val_map_sub_le_zero_of_ne_zero {s : S ≃ₐ[R] S} (hs' : s ∈ decompositionGroup R S)
+  (h : ⨆ x : vS.v.integer, vS.v (s x - x) ≠ 0) :
+    Multiplicative.toAdd (WithZero.unzero h) ≤ 0 := by
+  change (WithZero.unzero h) ≤ 1
+  suffices ⨆ x : vS.v.integer, vS.v (s x - x) ≤ 1 from by
+    rw [← WithZero.coe_le_coe, WithZero.coe_unzero h]
+    exact this
+  apply ciSup_le <| val_map_sub_le_one hs'
+
+end lowerIndex_inequality
+
 end lowerIndex
 
 section ScalarTower
@@ -162,8 +189,6 @@ section ScalarTower
 variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing R] [CommRing R'] [Ring S]
 [vS : Valued S ℤₘ₀]
 [Algebra R S] [Algebra R R'] [Algebra R' S] [IsScalarTower R R' S]
-
-instance Valuation.instNonemptyToValuation {R Γ₀: Type*} [Ring R] [LinearOrderedCommGroupWithZero Γ₀] (v : Valuation R Γ₀): Nonempty v.integer := Zero.instNonempty
 
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
@@ -176,21 +201,13 @@ theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u 
 
 section lowerIndex_inequality
 
+section K_not_field
+
 variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [CommRing K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
 [LinearOrderedCommGroupWithZero ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L]
 [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L]
 
-/-- `h` should be `𝒪[L] is finite over 𝒪[K]`-/
-theorem lowerIndex_ne_refl_of_FG (h : sorry) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
-  intro heq
-  simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
-    dite_eq_left_iff, ENat.coe_ne_top, imp_false, not_not] at heq
-  have : ∀ x : vL.v.integer, v (s x - x) = 0 := sorry
-  apply hs; ext x
-  rw [AlgEquiv.coe_refl, id_eq, ← sub_eq_zero, ← Valuation.zero_iff vL.v]
-  rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
-  sorry; sorry
-
+/-- Another version where `𝒪[L] is finite over 𝒪[K]` -/
 theorem lowerIndex_ne_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
   intro heq
   simp only [AlgEquiv.lowerIndex, AddSubgroupClass.coe_sub,
@@ -203,11 +220,8 @@ theorem lowerIndex_ne_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K 
     use 1
     intro a ha
     rcases ha with ⟨y, hy⟩
-    rw [← hy, ← Valuation.mem_integer_iff]
-    apply Subring.sub_mem
-    · rw [mem_integer_iff, val_map_le_one_iff hs']
-      exact y.2
-    · exact y.2 -- should have been proved somewhere else?
+    rw [← hy]
+    exact sub_self_mem_integer hs' _
   apply hs
   ext x
   rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
@@ -231,29 +245,62 @@ theorem iSup_val_map_sub_eq_zero_iff_eq_refl {s : L ≃ₐ[K] L} (hs' : s ∈ de
     ENat.coe_ne_top, imp_false, Decidable.not_not]
   exact hs'
 
+end K_not_field
+
+section K_is_field
+
+variable {K K' L : Type*} {ΓK ΓK' : outParam Type*} [Field K] [Field K'] [Field L] [LinearOrderedCommGroupWithZero ΓK]
+[LinearOrderedCommGroupWithZero ΓK'] [vL : Valued L ℤₘ₀] [Algebra K L]
+[Algebra K K'] [Algebra K' L] [IsScalarTower K K' L]
+
+-- theorem aux1 [Algebra.FiniteType 𝒪[K] 𝒪[L]] :
+--   BddAbove (Set.range fun x ↦ v (s ↑x - ↑x)) := by
+--   sorry
+
 -- the type of `n` should be changed
 -- instead, change when use this theorem
-theorem mem_lowerRamificationGroup_iff {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (n : ℕ) : s ∈ G(L/K)_[n] ↔ n + 1 ≤ i_[L/K] s := by
+open Multiplicative in
+theorem mem_lowerRamificationGroup_iff
+  {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (n : ℕ) :
+    s ∈ G(L/K)_[n] ↔ n + 1 ≤ i_[L/K] s := by
   simp only [lowerRamificationGroup, Subtype.forall, Subgroup.mem_mk,
     Set.mem_setOf_eq, AlgEquiv.lowerIndex]
   by_cases hrefl : s = .refl
   · simp only [hrefl, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ofAdd_sub, ofAdd_neg,
     zero_le', implies_true, and_true, ciSup_const, ↓reduceDite, le_top, iff_true]
     exact refl_mem_decompositionGroup K L
-  · have : ¬ iSup (fun x : vL.v.integer => (vL.v (s x - x))) = 0 := by
+  · have hne0 : ¬ ⨆ x : vL.v.integer, vL.v (s x - x) = 0 := by
       rw [iSup_val_map_sub_eq_zero_iff_eq_refl hs']; exact hrefl
     constructor
     · intro ⟨_, hs⟩
-      simp only [this, ↓reduceDite, ge_iff_le]
+      simp only [hne0, ↓reduceDite, ge_iff_le]
       rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe]
-      sorry
+      rw [Int.le_toNat (by simp only [Left.nonneg_neg_iff, toAdd_iSup_val_map_sub_le_zero_of_ne_zero hs']),
+        le_neg]
+      change _ ≤ toAdd (ofAdd (-(n + 1) : ℤ))
+      rw [toAdd_le]
+      /- The following part should be extract.
+      It is also used in `toAdd_iSup_val_map_sub_le_zero_of_ne_zero`. -/
+      suffices ⨆ x : vL.v.integer, vL.v (s x - x) ≤ ofAdd (-(n + 1) : ℤ) from by
+        rw [← WithZero.coe_le_coe, WithZero.coe_unzero hne0]
+        exact this
+      apply ciSup_le
+      /- end -/
+      intro x
+      rw [neg_add']
+      exact hs x.1 x.2
     · intro h
       simp only [hs', true_and]
-      simp only [this, ↓reduceDite] at h
-      rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe] at h
+      simp only [hne0, ↓reduceDite] at h
+      rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe,
+        Int.le_toNat (by simp only [Left.nonneg_neg_iff, toAdd_iSup_val_map_sub_le_zero_of_ne_zero hs']),
+        le_neg] at h
+      change _ ≤ toAdd (ofAdd (-(n + 1) : ℤ)) at h
+      rw [toAdd_le, ← WithZero.coe_le_coe, WithZero.coe_unzero hne0, neg_add'] at h
       intro x hx
+      apply le_trans _ h
+      apply le_ciSup (f := fun (x : vL.v.integer) ↦ v (s x - x)) _ ⟨x, hx⟩
       sorry
-
 
 theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
   unfold AlgEquiv.truncatedLowerIndex at h
@@ -277,6 +324,8 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
   constructor
   apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
   sorry; sorry
+
+end K_is_field
 
 end lowerIndex_inequality
 
@@ -361,7 +410,7 @@ attribute [local instance 1001] Algebra.toSMul
 
 instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
 
-instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
+instance [CompleteSpace K] : Algebra.IsIntegral 𝒪[K] 𝒪[L] where
   isIntegral := by
     intro ⟨x, hx⟩
     rw [show 𝒪[L] = valuationSubring vL.v by rfl,
@@ -371,8 +420,7 @@ instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
     rcases hx with ⟨p, hp⟩
     refine ⟨p, hp.1, ?_⟩
     ext
-    rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2,
-      show algebraMap (vK.v.valuationSubring) L = algebraMap 𝒪[K] L by rfl]
+    rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
     calc
       _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
       _ = _ := by
@@ -382,7 +430,6 @@ instance [CompleteSpace K]: Algebra.IsIntegral 𝒪[K] 𝒪[L] where
 
 instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
   apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
-
 
 /-- Can't be inferred within 20000 heartbeats. -/
 instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
@@ -394,6 +441,17 @@ noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [Is
   letI : Nontrivial vL.v := nontrivial_of_valExtension K L
   PowerBasisExtDVR (integerAlgebra_injective K L)
 
+instance instAlgebraFiniteTypeToIsNoetherian (R A : Type*) [CommSemiring R] [Semiring A] [Algebra R A] [IsNoetherian R A] :
+  Algebra.FiniteType R A where
+    out := by
+      apply Subalgebra.fg_of_fg_toSubmodule
+      rw [Algebra.top_toSubmodule]
+      apply isNoetherian_def.mp
+      assumption
+
+example [CompleteSpace K] [IsSeparable K L] :
+  Algebra.FiniteType 𝒪[K] 𝒪[L] := inferInstance
+
 end algebra_instances
 
 variable {K L}
@@ -403,6 +461,7 @@ theorem AlgEquiv.mem_decompositionGroup [CompleteSpace K] (s : L ≃ₐ[K] L) : 
   rw [decompositionGroup_eq_top]
   exact Subgroup.mem_top s
 
+/-- Should be strenthened to ` > 0`-/
 theorem AlgEquiv.val_map_powerBasis_sub_ne_zero (pb : PowerBasis 𝒪[K] 𝒪[L]) {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : vL.v (s pb.gen - pb.gen) ≠ 0 := by
   by_contra h
   rw [zero_iff, sub_eq_zero] at h
@@ -467,7 +526,7 @@ theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
   rcases Finite.exists_max f with ⟨a, ha⟩
   use f a
   constructor
-  · exact WithTop.coe_lt_top _ -- This is tagged with @[simp] but failed to simp
+  · exact WithTop.coe_lt_top _
   · intro s
     have : i_[L/K] s = f s := by
       rw [← ENat.some_eq_coe, WithTop.coe_untop]
