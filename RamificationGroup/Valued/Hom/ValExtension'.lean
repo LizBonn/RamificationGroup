@@ -1,4 +1,5 @@
 import RamificationGroup.Valued.Hom.ValExtension
+import RamificationGroup.ForMathlib.LocalRing.Basic
 import RamificationGroup.Valuation.Discrete
 
 /-!
@@ -25,3 +26,21 @@ theorem nontrivial_of_valExtension : Nontrivial vA.v where
     simp only [_root_.map_zero, h0, not_false_eq_true]
 
 end nontrivial
+
+section field
+
+variable (K L : Type*) {ΓK ΓL : outParam Type*} [Field K] [Field L]
+    [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
+    [Algebra K L] [vK : Valued K ΓK] [vL : Valued L ΓL] [IsValExtension K L]
+
+noncomputable def LocalField.ramificationIdx : ℕ :=
+  LocalRing.ramificationIdx 𝒪[K] 𝒪[L]
+
+open LocalField
+
+theorem aux2 [FiniteDimensional K L] : ramificationIdx K L ≠ 0 := sorry
+
+
+#check Ideal.ramificationIdx
+
+end field

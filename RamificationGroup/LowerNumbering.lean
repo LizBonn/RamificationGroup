@@ -642,3 +642,59 @@ variable [LocalField K] [LocalField L] [IsSeparable K L]
 end eq_bot
 
 end ExhausiveSeperated
+
+section sum_lowerIndex
+
+open LocalField
+
+variable {K M L : Type*} [Field K] [Field M] [Field L]
+[Algebra K L] [Algebra K M] [Algebra M L] [IsScalarTower K M L]
+[FiniteDimensional K L] [Normal K M]
+[vK : Valued K ℤₘ₀]
+[vM : Valued M ℤₘ₀]
+[vL : Valued L ℤₘ₀]
+[IsValExtension K L]
+
+-- #synth FiniteDimensional M L
+
+#check AlgEquiv.restrictNormalHom_surjective
+
+variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
+#check s.restrictNormal M
+#check (AlgEquiv.restrictNormalHom (K₁ := L) M)⁻¹' {σ}
+#synth Finite ((AlgEquiv.restrictNormalHom (K₁ := L) M)⁻¹' {σ})
+#check Finset.sum
+
+#check LocalField
+
+#check aux2 K L
+
+#check Eq.subst
+
+theorem aux3 {α : Type*} [DecidableEq α] {f : α → ℕ∞} {s : Finset α}
+  {a : α} (has : a ∈ s) (hfa : f a = ⊤) :
+    ∑ x ∈ s, f x = ⊤ := by
+  induction s using Finset.induction with
+  | empty => contradiction
+  | @insert b t hb ht => sorry
+
+
+
+open Classical AlgEquiv in
+theorem prop3
+  (σ : M ≃ₐ[K] M) :
+    ∑ s ∈ ((restrictNormalHom M)⁻¹' {σ}), i_[L/K] s
+    = (ramificationIdx K L) * i_[M/K] σ := by
+  by_cases hσ : σ = .refl
+  · subst hσ
+    rw [lowerIndex_refl, ENat.mul_top]
+    · have : (.refl : L ≃ₐ[K] L) ∈ (restrictNormalHom M)⁻¹' {.refl} := by
+        rw [Set.mem_preimage, Set.mem_singleton_iff, ← AlgEquiv.aut_one, ← AlgEquiv.aut_one,
+          _root_.map_one]
+      apply aux3 (Set.mem_toFinset.mpr this) lowerIndex_refl
+    · intro h
+      rw [← ENat.coe_zero, ← ENat.some_eq_coe, WithTop.coe_eq_coe] at h
+      exact aux2 K L h
+  · sorry
+
+end sum_lowerIndex
