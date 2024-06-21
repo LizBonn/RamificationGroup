@@ -671,14 +671,18 @@ variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 
 #check Eq.subst
 
-theorem aux3 {α : Type*} [DecidableEq α] {f : α → ℕ∞} {s : Finset α}
+open Finset in
+@[deprecated WithTop.sum_eq_top_iff]
+theorem ENat.sum_eq_top_of_map_eq_top {α : Type*} [DecidableEq α] {f : α → ℕ∞} {s : Finset α}
   {a : α} (has : a ∈ s) (hfa : f a = ⊤) :
     ∑ x ∈ s, f x = ⊤ := by
   induction s using Finset.induction with
   | empty => contradiction
-  | @insert b t hb ht => sorry
-
-
+  | @insert b t hb ht =>
+    rcases mem_insert.mp has with h | h <;> rw [sum_insert hb]
+    · subst h
+      rw [hfa, WithTop.top_add]
+    · rw [ht h, WithTop.add_top]
 
 open Classical AlgEquiv in
 theorem prop3
@@ -691,7 +695,8 @@ theorem prop3
     · have : (.refl : L ≃ₐ[K] L) ∈ (restrictNormalHom M)⁻¹' {.refl} := by
         rw [Set.mem_preimage, Set.mem_singleton_iff, ← AlgEquiv.aut_one, ← AlgEquiv.aut_one,
           _root_.map_one]
-      apply aux3 (Set.mem_toFinset.mpr this) lowerIndex_refl
+      rw [WithTop.sum_eq_top_iff]
+      exact ⟨.refl, Set.mem_toFinset.mpr this, lowerIndex_refl⟩
     · intro h
       rw [← ENat.coe_zero, ← ENat.some_eq_coe, WithTop.coe_eq_coe] at h
       exact aux2 K L h
