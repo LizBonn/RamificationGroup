@@ -18,7 +18,7 @@ variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
 variable [IsSeparable (ResidueField A) (ResidueField B)]
 variable [Module.Finite A B]
 
-instance instFiniteExtResidue : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
+instance : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
 
 variable (A) (B) in
 /-- There exists `x : B` generating `k_B` over `k_A` -/

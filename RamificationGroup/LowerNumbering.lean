@@ -291,8 +291,7 @@ theorem lowerIndex_ne_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K 
   · exact hL ⟨x, h⟩
   · calc
     _ = (s x⁻¹)⁻¹ := by simp only [inv_inv, map_inv₀]
-    _ = _ := by
-      rw [hL ⟨x⁻¹, h⟩, inv_inv, AlgEquiv.coe_refl, id_eq]
+    _ = _ := by rw [hL ⟨x⁻¹, h⟩, inv_inv, AlgEquiv.coe_refl, id_eq]
 
 @[simp]
 theorem lowerIndex_eq_top_iff_eq_refl {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) : i_[L/K] s = ⊤ ↔ s = .refl := by
@@ -333,8 +332,8 @@ theorem mem_lowerRamificationGroup_iff_of_generator
     constructor
     · intro ⟨_, hs⟩
       simp only [hne0, ↓reduceDite, ge_iff_le]
-      rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe]
-      rw [Int.le_toNat (by simp only [Left.nonneg_neg_iff, toAdd_iSup_val_map_sub_le_zero_of_ne_zero hs']),
+      rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe,
+        Int.le_toNat (by simp only [Left.nonneg_neg_iff, toAdd_iSup_val_map_sub_le_zero_of_ne_zero hs']),
         le_neg]
       change _ ≤ toAdd (ofAdd (-(n + 1) : ℤ))
       rw [toAdd_le]
@@ -446,8 +445,8 @@ variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete
 
 section algebra_instances
 
-/-- The conditions might be too strong.
-The proof is almost the SAME with `Valuation.mem_integer_of_mem_integral_closure`. -/
+/-- 1. The conditions might be too strong.
+2. The proof is almost the SAME with `Valuation.mem_integer_of_mem_integral_closure`. -/
 instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] := by
   rw [isIntegrallyClosed_iff K]
   intro x ⟨p, hp⟩
@@ -492,13 +491,13 @@ instance [CompleteSpace K] : Algebra.IsIntegral 𝒪[K] 𝒪[L] where
         simp only [ValuationSubring.algebraMap_def]
         congr
 
-instance instIsIntegralClosureToValuationSubring [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
+instance [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
   apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
 
 /-- Can't be inferred within 20000 heartbeats. -/
-instance instIsNoetherianToValuationSubring : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
+instance : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
 
-instance instNoethertianToValuationSubringExtension [CompleteSpace K] [IsSeparable K L] : IsNoetherian 𝒪[K] 𝒪[L] :=
+instance [CompleteSpace K] [IsSeparable K L] : IsNoetherian 𝒪[K] 𝒪[L] :=
   IsIntegralClosure.isNoetherian 𝒪[K] K L 𝒪[L]
 
 noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : PowerBasis 𝒪[K] 𝒪[L] :=
@@ -606,7 +605,6 @@ theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
 theorem aux0 [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
   {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
   {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
-
   apply (mem_lowerRamificationGroup_iff_of_generator (PowerBasis.adjoin_gen_eq_top (PowerBasisValExtension K L)) s.mem_decompositionGroup n).mp at hs
   by_contra! h
   rw [ENat.add_one_le_iff (by simp only [ne_eq, ENat.coe_ne_top, not_false_eq_true])] at hs
@@ -617,7 +615,9 @@ theorem aux0 [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (Lo
   apply lt_asymm hs this
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
+theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [IsSeparable K L]
+  [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] :
+    ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
   by_cases h : Nontrivial (L ≃ₐ[K] L)
   · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1
     rw [eq_bot_iff]
@@ -644,16 +644,20 @@ end eq_bot
 end ExhausiveSeperated
 
 section sum_lowerIndex
+#check lowerIndex_of_powerBasis
+#check PowerBasisValExtension
 
 open LocalField
 
 variable {K M L : Type*} [Field K] [Field M] [Field L]
 [Algebra K L] [Algebra K M] [Algebra M L] [IsScalarTower K M L]
-[FiniteDimensional K L] [Normal K M]
-[vK : Valued K ℤₘ₀]
-[vM : Valued M ℤₘ₀]
-[vL : Valued L ℤₘ₀]
-[IsValExtension K L]
+[FiniteDimensional K L] [FiniteDimensional K M] [FiniteDimensional M L]
+[Normal K M]
+[vK : Valued K ℤₘ₀] [IsDiscrete vK.v]
+[vM : Valued M ℤₘ₀] [IsDiscrete vM.v]
+[vL : Valued L ℤₘ₀] [IsDiscrete vL.v]
+[IsValExtension K L] [IsValExtension M L]
+[CompleteSpace K]
 
 -- #synth FiniteDimensional M L
 
@@ -686,7 +690,7 @@ theorem ENat.sum_eq_top_of_map_eq_top {α : Type*} [DecidableEq α] {f : α → 
 
 open Classical AlgEquiv in
 theorem prop3
-  (σ : M ≃ₐ[K] M) :
+  (σ : M ≃ₐ[K] M) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[M] 𝒪[L]) :
     ∑ s ∈ ((restrictNormalHom M)⁻¹' {σ}), i_[L/K] s
     = (ramificationIdx K L) * i_[M/K] σ := by
   by_cases hσ : σ = .refl
@@ -700,6 +704,12 @@ theorem prop3
     · intro h
       rw [← ENat.coe_zero, ← ENat.some_eq_coe, WithTop.coe_eq_coe] at h
       exact aux2 K L h
-  · sorry
+  ·
+    /- Need:
+    2. all valuations are discrete
+    3. 𝒪[L] / 𝒪[M] admits a power basis b, so that the minpoly of b over M has coeff in 𝒪[M]
+    -/
+    sorry
+
 
 end sum_lowerIndex

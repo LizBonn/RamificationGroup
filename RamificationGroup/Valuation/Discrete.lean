@@ -266,9 +266,9 @@ theorem isEquiv_ofNontrivial : v.IsEquiv (ofNontrivial v) := by sorry
 
 #check DiscreteValuationRing
 
-instance instIsDiscreteToOfNontrivial : IsDiscrete (ofNontrivial v) := by sorry
+instance : IsDiscrete (ofNontrivial v) := by sorry
 
-instance instDiscreteValuationRingToNontrivial : DiscreteValuationRing v.valuationSubring :=
+instance : DiscreteValuationRing v.valuationSubring :=
   valuationSubring_DVR_of_equiv_discrete (isEquiv_ofNontrivial v)
 
 end DiscreteValuation
