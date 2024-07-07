@@ -68,16 +68,28 @@ def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset
 
 
 theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (AlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  AlgEquiv.truncatedLowerIndex K L u s = HerbrandFunction.truncatedJ L u σ := by
-  simp
-  unfold truncatedJ
-  sorry
+  have hnem : ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}).Nonempty := by
+    have h1 : Set.SurjOn (AlgEquiv.restrictNormalHom K' (K₁ := L)) ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) {σ} := by
+      simp
+      sorry
+    apply Set.SurjOn.comap_nonempty h1 (by simp)
+  --i'm not sure this condition below is satisfy in our sugestion.If the extension is finite, this proof make sense.
+  have hfin : Finite ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) := by sorry
+  obtain ⟨s, hs⟩ := Set.exists_max_image ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) (fun x => AlgEquiv.truncatedLowerIndex K L u x) hfin hnem
+  use s
+  rcases hs with ⟨hs1, hs2⟩
+  constructor
+  · exact hs1
+  · sorry
 
 
 variable {σ : K' ≃ₐ[K] K'}
 
 #check exist_truncatedLowerIndex_eq_truncatedJ 1 σ
 
-theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by sorry
+theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by
+  obtain ⟨s, hs1, hs2⟩ :=  exist_truncatedLowerIndex_eq_truncatedJ (K := K) (K' := K') (L := L) u σ
+
 
 #check FiniteDimensional K L
 #check FiniteDimensional K K'

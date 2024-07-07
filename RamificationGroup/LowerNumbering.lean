@@ -492,3 +492,7 @@ theorem exist_lowerRamificationGroup_eq_bot [LocalField K] [LocalField L] : ∃ 
 end eq_bot
 
 end ExhausiveSeperated
+
+section aux
+
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
