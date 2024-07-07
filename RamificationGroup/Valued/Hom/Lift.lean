@@ -122,6 +122,31 @@ theorem elem_decompositionGroup_eq_iff_ValuationSubring (s t : decompositionGrou
   · ext; simpa only [DecompositionGroup.restrictValuationSubring_apply] using h x
   · simp only [← DecompositionGroup.restrictValuationSubring_apply, h x]
 
+def DecompositionGroup.restrictValuationSubring' {s : L ≃ₐ[K] L}
+  (h : s ∈ decompositionGroup K L) :
+    𝒪[L] ≃ₐ[𝒪[K]] 𝒪[L] := {
+    AlgHom.restrictValuationSubring (f := s) (by apply h) with
+  invFun := (AlgHom.restrictValuationSubring (f := ((s⁻¹ : L ≃ₐ[K] L) : L →ₐ[K] L)) (by convert (⟨s, h⟩ : decompositionGroup K L)⁻¹.2))
+  left_inv := by
+    intro x; ext; simp
+    convert AlgEquiv.symm_apply_apply _ _
+  right_inv := by
+    intro x; ext; simp
+    convert AlgEquiv.apply_symm_apply _ _
+  }
+
+@[simp]
+theorem DecompositionGroup.restrictValuationSubring_apply'
+  {s : L ≃ₐ[K] L} (h : s ∈ decompositionGroup K L) (x : 𝒪[L]) :
+  (DecompositionGroup.restrictValuationSubring' h) x = s x := rfl
+
+theorem elem_decompositionGroup_eq_iff_ValuationSubring' {s t : L ≃ₐ[K] L} (hs : s ∈ decompositionGroup K L) (ht : t ∈ decompositionGroup K L) :
+  s = t ↔ DecompositionGroup.restrictValuationSubring' hs = DecompositionGroup.restrictValuationSubring' ht := by
+  rw [ringHomClass_eq_iff_valuationSubring, AlgEquiv.ext_iff]
+  constructor <;> intro h x
+  · ext; simpa only [DecompositionGroup.restrictValuationSubring_apply] using h x
+  · simp only [hs, ← DecompositionGroup.restrictValuationSubring_apply', AlgEquiv.toEquiv_eq_coe,
+    EquivLike.coe_coe, h x, ht]
 end decomposition_grp
 
 section discrete

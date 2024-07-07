@@ -13,8 +13,7 @@ variable {ϖ x : A} (hϖ : Irreducible ϖ)
 
 theorem unit_mul_irreducible_of_irreducible (hx : Irreducible x) : ∃u : A, IsUnit u ∧ x = u * ϖ := by
   obtain ⟨u, hu⟩ : ∃u : A, x = u * ϖ := by
-    refine exists_eq_mul_left_of_dvd (addVal_le_iff_dvd.mp ?_)
-    apply le_of_eq
+    refine exists_eq_mul_left_of_dvd <| addVal_le_iff_dvd.mp <| le_of_eq ?_
     rw [addVal_uniformizer hx, addVal_uniformizer hϖ]
   have : IsUnit u := Or.resolve_right (Irreducible.isUnit_or_isUnit hx hu) hϖ.not_unit
   use u
@@ -39,8 +38,7 @@ theorem mul_irreducible_square_of_not_unit_of_not_irreducible (h1 : ¬Irreducibl
 theorem irreducible_of_irreducible_add_addVal_ge_two (hx : Irreducible x) {y : A} : Irreducible (x + y * ϖ ^ 2) := by
   rcases unit_mul_irreducible_of_irreducible hϖ hx with ⟨u, hu, hxu⟩
   rw [hxu, pow_two, ← mul_assoc, ← add_mul]
-  apply (irreducible_isUnit_mul _).mpr hϖ
-  apply LocalRing.is_unit_of_unit_add_nonunit hu
+  apply (irreducible_isUnit_mul (LocalRing.is_unit_of_unit_add_nonunit hu _)).mpr hϖ
   simp only [mem_nonunits_iff, IsUnit.mul_iff, not_and]
   exact fun _ ↦ Irreducible.not_unit hϖ
 
@@ -48,3 +46,9 @@ theorem maximalIdeal_pow_eq_span_irreducible_pow (n : ℕ) : maximalIdeal A ^ n 
   rw [Irreducible.maximalIdeal_eq hϖ, Ideal.span_singleton_pow]
 
 end uniformiser
+
+section ramiIdx
+
+/- Show `p = P^e` under suitable conditions. -/
+
+end ramiIdx
