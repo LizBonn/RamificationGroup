@@ -41,8 +41,10 @@ noncomputable def LocalField.ramificationIdx : ℕ :=
 
 open LocalField
 
+#check exists_Uniformizer_ofDiscrete
 theorem aux2 [FiniteDimensional K L] : ramificationIdx K L ≠ 0 := by
-
+  /- `e` should be the number s.t. `π[K] = π[L] ^ e` -/
+  /- should prove a version for DVR's first -/
   sorry
 
 end general

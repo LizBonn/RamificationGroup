@@ -45,10 +45,13 @@ theorem irreducible_of_irreducible_add_addVal_ge_two (hx : Irreducible x) {y : A
 theorem maximalIdeal_pow_eq_span_irreducible_pow (n : ℕ) : maximalIdeal A ^ n = Ideal.span {ϖ ^ n} := by
   rw [Irreducible.maximalIdeal_eq hϖ, Ideal.span_singleton_pow]
 
+theorem ideal_le_iff {m n : ℕ} :
+  Ideal.span {ϖ ^ n} ≤ Ideal.span {ϖ ^ m} ↔ m ≤ n := by
+  constructor
+  · intro h
+    rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_span_singleton, pow_dvd_pow_iff (Irreducible.ne_zero hϖ) hϖ.not_unit] at h
+    exact h
+  · rw [← Ideal.span_singleton_pow, ← Ideal.span_singleton_pow]
+    exact Ideal.pow_le_pow_right
+
 end uniformiser
-
-section ramiIdx
-
-/- Show `p = P^e` under suitable conditions. -/
-
-end ramiIdx
