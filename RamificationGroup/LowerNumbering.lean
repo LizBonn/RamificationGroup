@@ -121,7 +121,7 @@ open Classical
 #check WithBot.instSupSet
 #check WithTop.conditionallyCompleteLattice
 -- there is no `ConditionallyCompleteLinearOrderTop` in mathlib ...
--- # The definition of `WithTop.instInfSet` have to be changed
+-- # The definition of `WithTop.instInfSet` have to be changed （done in latest version）
 #check WithBot.linearOrder
 noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithBot α) where
   toConditionallyCompleteLattice := WithBot.conditionallyCompleteLattice
@@ -674,19 +674,6 @@ variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 #check aux2 K L
 
 #check Eq.subst
-
-open Finset in
-@[deprecated WithTop.sum_eq_top_iff]
-theorem ENat.sum_eq_top_of_map_eq_top {α : Type*} [DecidableEq α] {f : α → ℕ∞} {s : Finset α}
-  {a : α} (has : a ∈ s) (hfa : f a = ⊤) :
-    ∑ x ∈ s, f x = ⊤ := by
-  induction s using Finset.induction with
-  | empty => contradiction
-  | @insert b t hb ht =>
-    rcases mem_insert.mp has with h | h <;> rw [sum_insert hb]
-    · subst h
-      rw [hfa, WithTop.top_add]
-    · rw [ht h, WithTop.add_top]
 
 open Classical AlgEquiv in
 theorem prop3
