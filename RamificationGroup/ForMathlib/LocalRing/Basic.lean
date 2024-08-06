@@ -1,4 +1,5 @@
 import Mathlib.NumberTheory.RamificationInertia
+import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 
 namespace LocalRing
 

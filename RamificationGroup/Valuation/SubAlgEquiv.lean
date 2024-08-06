@@ -1,4 +1,4 @@
-import Mathlib.RingTheory.IntegrallyClosed
+import Mathlib.RingTheory.Adjoin.Basic
 import Mathlib.Algebra.Polynomial.Induction
 
 section semiring

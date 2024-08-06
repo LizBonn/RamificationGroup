@@ -1,5 +1,3 @@
-/-
--/
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import Mathlib.FieldTheory.PrimitiveElement
 import RamificationGroup.ForMathlib.DiscreteValuationRing.Basic
@@ -15,7 +13,7 @@ namespace ExtDVR
 variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
 variable {B : Type*} [CommRing B] [IsDomain B] [DiscreteValuationRing B]
 variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
-variable [IsSeparable (ResidueField A) (ResidueField B)]
+variable [Algebra.IsSeparable (ResidueField A) (ResidueField B)]
 variable [Module.Finite A B]
 
 instance : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
@@ -152,7 +150,7 @@ theorem irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_ae
   rw [hom_eval₂, algebraMap_residue_compat, ← eval₂_map, ← derivative_map]
   apply Separable.eval₂_derivative_ne_zero
   · rw [h_red]
-    apply IsSeparable.separable
+    apply Algebra.IsSeparable.isSeparable
   · rw [← aeval_def, h_red, minpoly.aeval]
 
 end x_and_f

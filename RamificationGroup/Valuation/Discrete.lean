@@ -5,7 +5,7 @@
 import LocalClassFieldTheory.DiscreteValuationRing.Complete
 import LocalClassFieldTheory.DiscreteValuationRing.DiscreteNorm
 import RamificationGroup.ForMathlib.Henselian
-import RamificationGroup.Valued.Defs
+import Mathlib.Topology.Algebra.Valued.ValuedField
 import LocalClassFieldTheory.ForMathlib.RankOneValuation
 
 open Valuation Valued DiscreteValuation Multiplicative
@@ -111,7 +111,7 @@ theorem pow_Uniformizer_all {x : K} (hx : x ≠ 0) (π : Uniformizer v) :
     rcases pow_Uniformizer v this π with ⟨n, u, hnu⟩
     use n, u
     rw [show x = r.1 by rfl, hnu]
-    simp only [SubmonoidClass.coe_pow, zpow_coe_nat]
+    simp only [SubmonoidClass.coe_pow, zpow_natCast]
   · let r : v.valuationSubring := ⟨x⁻¹, h⟩
     have : r ≠ 0 := by simp only [ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, inv_eq_zero, hx, not_false_eq_true]
     rcases pow_Uniformizer v this π with ⟨n, u, hnu⟩

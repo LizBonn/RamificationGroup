@@ -3,7 +3,7 @@ Copyright (c) 2024 Patrick Massot. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jiedong Jiang, Bichang Lei
 -/
-import RamificationGroup.Valued.Defs
+import Mathlib.Topology.Algebra.Valued.ValuedField
 -- import Mathlib.Topology.Algebra.Valued.ValuedField
 
 /-!
@@ -137,8 +137,7 @@ def ofValuationSubringComap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [
     [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
     (h : 𝒪[A].comap (algebraMap R A) = 𝒪[R]) : IsValExtension R A := by
   apply ofIntegerComap
-  rw [show vR.v.integer = 𝒪[R].toSubring by rfl, ← h]
-  rfl
+  rw [show vR.v.integer = 𝒪[R] by rfl, ← h]
 
 end mk'
 
@@ -212,13 +211,14 @@ instance : Algebra 𝒪[R] 𝒪[A] := inferInstanceAs (Algebra vR.v.integer vA.v
 theorem coe_algebraMap_valuationSubring (r : 𝒪[R]) :
     ((algebraMap 𝒪[R] 𝒪[A]) r : A) = (algebraMap R A) (r : R) := rfl
 
+#synth Algebra 𝒪[R] R
 instance : IsLocalRingHom (algebraMap 𝒪[R] 𝒪[A]) where
     map_nonunit r hr := by
       by_cases h : r = 0
       · simp [h] at hr
       · apply Valuation.Integers.isUnit_of_one (v := vR.v)
         · exact Valuation.integer.integers (v := vR.v)
-        · simpa only [ValuationSubring.algebraMap_apply, isUnit_iff_ne_zero, ne_eq,
+        · simpa only [Algebra.algebraMap_ofSubring_apply, isUnit_iff_ne_zero, ne_eq,
           ZeroMemClass.coe_eq_zero]
         · apply Valuation.Integers.one_of_isUnit (Valuation.integer.integers (v := vA.v)) at hr
           change v (((algebraMap ↥𝒪[R] ↥𝒪[A]) r) : A) = 1 at hr
