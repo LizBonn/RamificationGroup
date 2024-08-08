@@ -20,7 +20,7 @@ theorem ringHomClass_eq_iff_valuationSubring (f g : F) :
   · simp only [heq, Subtype.forall, mem_valuationSubring_iff, implies_true, forall_const]
   · apply DFunLike.ext
     intro x
-    rcases ValuationSubring.mem_or_inv_mem 𝒪[K] x with h | h
+    rcases ValuationSubring.mem_or_inv_mem vK.v.valuationSubring x with h | h
     · exact heq ⟨x, h⟩
     · calc
         _ = (f x⁻¹)⁻¹ := by

@@ -1,7 +1,3 @@
-/-
-GOAL:
-1. one order taylor expansion
--/
 import Mathlib.Algebra.Polynomial.Taylor
 
 namespace Polynomial

@@ -1,11 +1,9 @@
 import RamificationGroup.Valued.Hom.Lift
-import RamificationGroup.Valuation.Extension
 import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import Mathlib.FieldTheory.Galois
 import LocalClassFieldTheory.LocalField.Basic
 import RamificationGroup.ForMathlib.Algebra.Algebra.PowerBasis
-import RamificationGroup.Valued.Hom.ValExtension'
-
+import RamificationGroup.Valued.AlgebraicInstances
 /-
 # Lower Numbering Ramification Group
 
@@ -118,10 +116,8 @@ end autCongr
 section WithBot
 -- this should be put into a suitable place, Also add `WithOne`? `WithTop`, `WithBot`, `WithOne`, `Multiplicative`, `Additive`
 open Classical
-#check WithBot.instSupSet
-#check WithTop.conditionallyCompleteLattice
 -- there is no `ConditionallyCompleteLinearOrderTop` in mathlib ...
--- # The definition of `WithTop.instInfSet` have to be changed
+-- # The definition of `WithTop.instInfSet` have to be changed （done in latest version）
 #check WithBot.linearOrder
 noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithBot α) where
   toConditionallyCompleteLattice := WithBot.conditionallyCompleteLattice
@@ -130,15 +126,20 @@ noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : Conditionall
   decidableEq := WithBot.decidableEq
   decidableLT := WithBot.decidableLT
   csSup_of_not_bddAbove s h := by
-    rw [WithBot.csSup_empty]
+    rw [WithBot.sSup_empty]
     simp only [sSup, sInf, Set.subset_singleton_iff]
     by_cases hs : ∀ y ∈ s, y = (⊤ : WithTop αᵒᵈ)
-    · rw [if_pos hs]; rfl
-    · rw [if_neg hs]
-      sorry
-  csInf_of_not_bddBelow := sorry
+    · rw [if_pos (Or.inl hs)]; rfl
+    · rw [show (⊤ : WithTop αᵒᵈ) = (⊥ : WithBot α) by rfl, ite_eq_left_iff]
+      intro h1
+      push_neg at h1
+      exfalso
+      exact h h1.2
+  csInf_of_not_bddBelow s h := by
+    exfalso
+    exact h (OrderBot.bddBelow s)
   bot_le := WithBot.orderBot.bot_le
-  csSup_empty := by simp only [WithBot.csSup_empty]
+  csSup_empty := by simp only [WithBot.sSup_empty]
 
 noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithZero α) := inferInstanceAs (ConditionallyCompleteLinearOrderBot (WithBot α))
 
@@ -256,11 +257,11 @@ variable {R : Type*} {R' S: Type*} {ΓR ΓS ΓA ΓB : outParam Type*} [CommRing 
 @[simp]
 theorem lowerIndex_refl : (i_[S/R] .refl) = ⊤ := by
   simp only [AlgEquiv.lowerIndex, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ciSup_const,
-    ↓reduceDite]
+    ↓reduceDIte]
 
 @[simp]
 theorem truncatedLowerIndex_refl (u : ℚ) : AlgEquiv.truncatedLowerIndex R S u .refl = u := by
-  simp only [AlgEquiv.truncatedLowerIndex, lowerIndex_refl, ↓reduceDite]
+  simp only [AlgEquiv.truncatedLowerIndex, lowerIndex_refl, ↓reduceDIte]
 
 section lowerIndex_inequality
 
@@ -287,7 +288,7 @@ theorem lowerIndex_ne_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K 
     exact sub_self_mem_integer hs' _
   apply hs
   ext x
-  rcases ValuationSubring.mem_or_inv_mem 𝒪[L] x with h | h
+  rcases ValuationSubring.mem_or_inv_mem vL.v.valuationSubring x with h | h
   · exact hL ⟨x, h⟩
   · calc
     _ = (s x⁻¹)⁻¹ := by simp only [inv_inv, map_inv₀]
@@ -325,13 +326,13 @@ theorem mem_lowerRamificationGroup_iff_of_generator
     Set.mem_setOf_eq, AlgEquiv.lowerIndex]
   by_cases hrefl : s = .refl
   · simp only [hrefl, AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, ofAdd_sub, ofAdd_neg,
-    zero_le', implies_true, and_true, ciSup_const, ↓reduceDite, le_top, iff_true]
+    zero_le', implies_true, and_true, ciSup_const, ↓reduceDIte, le_top, iff_true]
     exact refl_mem_decompositionGroup K L
   · have hne0 : ¬ ⨆ x : vL.v.integer, vL.v (s x - x) = 0 := by
       rw [iSup_val_map_sub_eq_zero_iff_eq_refl hs']; exact hrefl
     constructor
     · intro ⟨_, hs⟩
-      simp only [hne0, ↓reduceDite, ge_iff_le]
+      simp only [hne0, ↓reduceDIte, ge_iff_le]
       rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe,
         Int.le_toNat (by simp only [Left.nonneg_neg_iff, toAdd_iSup_val_map_sub_le_zero_of_ne_zero hs']),
         le_neg]
@@ -349,7 +350,7 @@ theorem mem_lowerRamificationGroup_iff_of_generator
       exact hs x.1 x.2
     · intro h
       simp only [hs', true_and]
-      simp only [hne0, ↓reduceDite] at h
+      simp only [hne0, ↓reduceDIte] at h
       rw [show (n : ℕ∞) + 1 = (n + 1 : ℕ) by rfl, ← ENat.some_eq_coe, WithTop.coe_le_coe,
         Int.le_toNat (by simp only [Left.nonneg_neg_iff, toAdd_iSup_val_map_sub_le_zero_of_ne_zero hs']),
         le_neg] at h
@@ -443,72 +444,6 @@ open ExtDVR IsValExtension Polynomial
 -- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
 variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
 
-section algebra_instances
-
-/-- 1. The conditions might be too strong.
-2. The proof is almost the SAME with `Valuation.mem_integer_of_mem_integral_closure`. -/
-instance instIsIntegrallyClosedToValuationSubring : IsIntegrallyClosed 𝒪[K] := by
-  rw [isIntegrallyClosed_iff K]
-  intro x ⟨p, hp⟩
-  by_cases xne0 : x = 0
-  · subst xne0; use 0; simp only [ValuationSubring.algebraMap_def, _root_.map_zero]
-  by_cases vxgt1 : v x ≤ 1
-  · use ⟨x, vxgt1⟩; rfl
-  · exfalso
-    push_neg at vxgt1
-    letI : Invertible x := invertibleOfNonzero xne0
-    have : v (aeval x⁻¹ (p.reverse - 1)) < 1 := by
-      apply aeval_valuationSubring_lt_one_of_lt_one_self
-      · simp only [coeff_sub, coeff_zero_reverse, hp.1, Monic.leadingCoeff, coeff_one_zero, sub_self]
-      · apply (one_lt_val_iff v xne0).mp vxgt1
-    apply ne_of_lt this
-    have : aeval x⁻¹ (p.reverse - 1) = -1 := by
-      rw [← add_neg_eq_zero]
-      ring_nf
-      simp only [_root_.map_add, _root_.map_neg, _root_.map_one, add_neg_cancel_left]
-      rw [← invOf_eq_inv x, aeval_def, Polynomial.eval₂_reverse_eq_zero_iff, hp.2]
-    rw [this, Valuation.map_neg, Valuation.map_one]
-
-attribute [local instance 1001] Algebra.toSMul
-
-instance : IsScalarTower 𝒪[K] 𝒪[L] L := inferInstanceAs (IsScalarTower vK.v.integer vL.v.integer L)
-
-instance [CompleteSpace K] : Algebra.IsIntegral 𝒪[K] 𝒪[L] where
-  isIntegral := by
-    intro ⟨x, hx⟩
-    rw [show 𝒪[L] = valuationSubring vL.v by rfl,
-      (Valuation.isEquiv_iff_valuationSubring _ _).mp
-        (extension_valuation_equiv_extendedValuation_of_discrete (IsValExtension.val_isEquiv_comap (R := K) (A := L))),
-      ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, Subalgebra.mem_toSubring] at hx
-    rcases hx with ⟨p, hp⟩
-    refine ⟨p, hp.1, ?_⟩
-    ext
-    rw [show (0 : 𝒪[L]).val = 0 by rfl, ← hp.2]
-    calc
-      _ = 𝒪[L].subtype (eval₂ (algebraMap 𝒪[K] 𝒪[L]) ⟨x, hx⟩ p) := rfl
-      _ = _ := by
-        rw [Polynomial.hom_eval₂]
-        simp only [ValuationSubring.algebraMap_def]
-        congr
-
-instance [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L := by
-  apply IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
-
-/-- Can't be inferred within 20000 heartbeats. -/
-instance : IsNoetherianRing 𝒪[K] := PrincipalIdealRing.isNoetherianRing
-
-instance [CompleteSpace K] [IsSeparable K L] : IsNoetherian 𝒪[K] 𝒪[L] :=
-  IsIntegralClosure.isNoetherian 𝒪[K] K L 𝒪[L]
-
-noncomputable def PowerBasisValExtension [CompleteSpace K] [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : PowerBasis 𝒪[K] 𝒪[L] :=
-  letI : Nontrivial vL.v := nontrivial_of_valExtension K L
-  PowerBasisExtDVR (integerAlgebra_injective K L)
-
-example [CompleteSpace K] [IsSeparable K L] :
-  Algebra.FiniteType 𝒪[K] 𝒪[L] := inferInstance
-
-end algebra_instances
-
 variable {K L}
 variable [CompleteSpace K]
 
@@ -575,9 +510,9 @@ theorem lowerIndex_of_powerBasis (pb : PowerBasis 𝒪[K] 𝒪[L]) (s : L ≃ₐ
   i_[L/K] s = if h : s = .refl then (⊤ : ℕ∞)
     else (- Multiplicative.toAdd (WithZero.unzero (AlgEquiv.val_map_powerBasis_sub_ne_zero pb h))).toNat := by
   by_cases h : s = .refl
-  · simp only [h, lowerIndex_refl, ↓reduceDite]
+  · simp only [h, lowerIndex_refl, ↓reduceDIte]
   · unfold AlgEquiv.lowerIndex
-    simp only [h, AlgEquiv.iSup_val_map_sub_eq_powerBasis pb, AlgEquiv.val_map_powerBasis_sub_ne_zero pb h, ↓reduceDite]
+    simp only [h, AlgEquiv.iSup_val_map_sub_eq_powerBasis pb, AlgEquiv.val_map_powerBasis_sub_ne_zero pb h, ↓reduceDIte]
 
 theorem lowerIndex_ne_refl {s : L ≃ₐ[K] L} (hs : s ≠ .refl) : i_[L/K] s ≠ ⊤ := by
   apply lowerIndex_ne_one
@@ -602,7 +537,7 @@ theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
       rw [← ENat.some_eq_coe, WithTop.coe_untop]
     simp only [ne_eq, this, Nat.cast_le, ha]
 
-theorem aux0 [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
+theorem aux0 [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
   {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
   {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
   apply (mem_lowerRamificationGroup_iff_of_generator (PowerBasis.adjoin_gen_eq_top (PowerBasisValExtension K L)) s.mem_decompositionGroup n).mp at hs
@@ -615,8 +550,8 @@ theorem aux0 [IsSeparable K L] [IsSeparable (LocalRing.ResidueField 𝒪[K]) (Lo
   apply lt_asymm hs this
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [IsSeparable K L]
-  [IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] :
+theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparable K L]
+  [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] :
     ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
   by_cases h : Nontrivial (L ≃ₐ[K] L)
   · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1
@@ -637,7 +572,7 @@ theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [IsSeparable K L]
     letI : Subsingleton (L ≃ₐ[K] L) := not_nontrivial_iff_subsingleton.mp h
     apply Subsingleton.allEq
 
-variable [LocalField K] [LocalField L] [IsSeparable K L]
+variable [LocalField K] [LocalField L] [Algebra.IsSeparable K L]
 
 end eq_bot
 
@@ -674,19 +609,6 @@ variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 #check aux2 K L
 
 #check Eq.subst
-
-open Finset in
-@[deprecated WithTop.sum_eq_top_iff]
-theorem ENat.sum_eq_top_of_map_eq_top {α : Type*} [DecidableEq α] {f : α → ℕ∞} {s : Finset α}
-  {a : α} (has : a ∈ s) (hfa : f a = ⊤) :
-    ∑ x ∈ s, f x = ⊤ := by
-  induction s using Finset.induction with
-  | empty => contradiction
-  | @insert b t hb ht =>
-    rcases mem_insert.mp has with h | h <;> rw [sum_insert hb]
-    · subst h
-      rw [hfa, WithTop.top_add]
-    · rw [ht h, WithTop.add_top]
 
 open Classical AlgEquiv in
 theorem prop3

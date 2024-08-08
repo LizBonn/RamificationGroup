@@ -66,7 +66,7 @@ theorem aeval_valuationSubring_lt_one_of_lt_one_self
   · simp only [coeff_map, h0, _root_.map_zero]
 
 theorem mem_integer_of_mem_integral_closure (h : vK.v.IsEquiv <| v.comap (algebraMap K L))
-    {x : L} (hx : x ∈ integralClosure vK.valuationSubring L) :
+    {x : L} (hx : x ∈ integralClosure 𝒪[K] L) :
   x ∈ v.integer := by
   rcases hx with ⟨p, hp⟩
   rw [mem_integer_iff]
@@ -128,8 +128,9 @@ theorem extension_integer_eq_extendedValuation_of_discrete (h : vK.v.IsEquiv <| 
 
 theorem integral_closure_eq_integer_of_complete_discrete
     (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :
-  (integralClosure vK.valuationSubring L).toSubring = vL.integer := by
-  rw [Extension.integralClosure_eq_integer, extension_integer_eq_extendedValuation_of_discrete h]
+  (integralClosure 𝒪[K] L).toSubring = vL.integer := by
+  rw [show integralClosure 𝒪[K] L = integralClosure vK.v.valuationSubring L by rfl,
+    Extension.integralClosure_eq_integer, extension_integer_eq_extendedValuation_of_discrete h]
   ext
   rw [ValuationSubring.mem_toSubring, mem_valuationSubring_iff, mem_integer_iff]
 

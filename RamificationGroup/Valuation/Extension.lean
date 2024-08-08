@@ -1,5 +1,3 @@
-/-
--/
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import Mathlib.FieldTheory.PrimitiveElement
 import RamificationGroup.ForMathlib.DiscreteValuationRing.Basic
@@ -15,7 +13,7 @@ namespace ExtDVR
 variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
 variable {B : Type*} [CommRing B] [IsDomain B] [DiscreteValuationRing B]
 variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
-variable [IsSeparable (ResidueField A) (ResidueField B)]
+variable [Algebra.IsSeparable (ResidueField A) (ResidueField B)]
 variable [Module.Finite A B]
 
 instance : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
@@ -152,7 +150,7 @@ theorem irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_ae
   rw [hom_eval₂, algebraMap_residue_compat, ← eval₂_map, ← derivative_map]
   apply Separable.eval₂_derivative_ne_zero
   · rw [h_red]
-    apply IsSeparable.separable
+    apply Algebra.IsSeparable.isSeparable
   · rw [← aeval_def, h_red, minpoly.aeval]
 
 end x_and_f
@@ -188,5 +186,47 @@ noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : P
   letI := NoZeroSMulDivisors.of_algebraMap_injective h;
   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
     (AlgEquiv.ofTop (exists_primitive h).choose_spec)
+
+section ramiIdx
+
+#synth Algebra A B
+
+theorem aux4 (h_inj : Function.Injective (algebraMap A B)) :
+  (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^
+    (Ideal.ramificationIdx (algebraMap A B)
+      (maximalIdeal A) (maximalIdeal B)) := by
+  rcases exists_irreducible B with ⟨πB, hπB⟩
+  nth_rw 1 [Irreducible.maximalIdeal_eq hπB]
+  rcases ideal_eq_span_pow_irreducible (maximalIdeal_map_ne_bot_of_injective h_inj) hπB with ⟨e, he⟩
+  rw [Ideal.span_singleton_pow]
+  convert he
+  have : ∀k : ℕ,
+    (maximalIdeal A).map (algebraMap A B) ≤ maximalIdeal B ^ k
+      → k ≤ e := by
+    intro k
+    rw [he, Irreducible.maximalIdeal_eq hπB, Ideal.span_singleton_pow]
+    exact (ideal_le_iff hπB).mp
+  rw [Ideal.ramificationIdx_eq_find ⟨e, this⟩, Nat.find_eq_iff]
+  constructor
+  · exact this
+  · intro n hne h
+    replace h := h e
+    rw [he, Irreducible.maximalIdeal_eq hπB, Ideal.span_singleton_pow] at h
+    simp only [le_refl, true_implies] at h
+    omega
+
+theorem aux5 (h_inj : Function.Injective (algebraMap A B))
+  (h_int : (algebraMap A B).IsIntegral) :
+    Ideal.ramificationIdx (algebraMap A B)
+      (maximalIdeal A) (maximalIdeal B) ≠ 0 := by
+  intro h
+  suffices (maximalIdeal A).map (algebraMap A B) ≠ ⊤ by
+    apply this
+    simp only [aux4 h_inj, h, pow_zero, Ideal.one_eq_top]
+  intro h
+  rw [Ideal.map_eq_top_iff _ h_inj h_int] at h
+  apply LocalRing.maximalIdeal_ne_top A h
+
+end ramiIdx
 
 end ExtDVR
