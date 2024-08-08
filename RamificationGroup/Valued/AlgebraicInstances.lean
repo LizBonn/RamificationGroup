@@ -1,6 +1,7 @@
 import RamificationGroup.Valued.Hom.ValExtension'
 import RamificationGroup.Valuation.Extension
 import RamificationGroup.Valued.Hom.Discrete
+import RamificationGroup.ForMathlib.Algebra.Algebra.Basic
 
 
 open DiscreteValuation Valuation Valued ExtDVR IsValExtension Polynomial
@@ -81,3 +82,47 @@ example [CompleteSpace K] [Algebra.IsSeparable K L] :
   Algebra.FiniteType 𝒪[K] 𝒪[L] := inferInstance
 
 end algebra_instances
+
+section ramification
+
+section general
+
+variable (K L : Type*) {ΓK ΓL : outParam Type*} [Field K] [Field L]
+    [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
+    [Algebra K L] [vK : Valued K ΓK] [vL : Valued L ΓL] [IsValExtension K L]
+
+/-- Should be renamed -/
+noncomputable def LocalField.ramificationIdx : ℕ :=
+  LocalRing.ramificationIdx 𝒪[K] 𝒪[L]
+
+end general
+
+section discrete
+
+variable (K L : Type*) {ΓK ΓL : outParam Type*} [Field K] [Field L]
+    [Algebra K L] [FiniteDimensional K L]
+    [vK : Valued K ℤₘ₀] [IsDiscrete vK.v]
+    [vL : Valued L ℤₘ₀] [IsValExtension K L]
+
+open LocalField ExtDVR
+
+-- theorem integerAlgebra_integral_of_integral
+
+#check exists_Uniformizer_ofDiscrete
+theorem ramificationIdx_ne_zero [CompleteSpace K] [FiniteDimensional K L] : ramificationIdx K L ≠ 0 := by
+  letI : DiscreteValuationRing 𝒪[L] := aux6 K L
+  apply ramificationIdx_ne_zero_of_injective_of_integral (integerAlgebra_injective K L)
+  rw [← Algebra.isIntegral_iff_isIntegral]
+  infer_instance
+
+variable {L} in
+theorem aux3 [FiniteDimensional K L] [IsDiscrete vK.v] [IsDiscrete vL.v]
+  (x : K) : vL.v (algebraMap K L x) = (vK.v x) ^ (ramificationIdx K L) := by
+  sorry
+
+
+end discrete
+
+#check Ideal.ramificationIdx
+
+end ramification

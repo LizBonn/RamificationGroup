@@ -189,9 +189,7 @@ noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : P
 
 section ramiIdx
 
-#synth Algebra A B
-
-theorem aux4 (h_inj : Function.Injective (algebraMap A B)) :
+theorem maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (h_inj : Function.Injective (algebraMap A B)) :
   (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^
     (Ideal.ramificationIdx (algebraMap A B)
       (maximalIdeal A) (maximalIdeal B)) := by
@@ -215,14 +213,14 @@ theorem aux4 (h_inj : Function.Injective (algebraMap A B)) :
     simp only [le_refl, true_implies] at h
     omega
 
-theorem aux5 (h_inj : Function.Injective (algebraMap A B))
+theorem ramificationIdx_ne_zero_of_injective_of_integral (h_inj : Function.Injective (algebraMap A B))
   (h_int : (algebraMap A B).IsIntegral) :
     Ideal.ramificationIdx (algebraMap A B)
       (maximalIdeal A) (maximalIdeal B) ≠ 0 := by
   intro h
   suffices (maximalIdeal A).map (algebraMap A B) ≠ ⊤ by
     apply this
-    simp only [aux4 h_inj, h, pow_zero, Ideal.one_eq_top]
+    simp only [maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx h_inj, h, pow_zero, Ideal.one_eq_top]
   intro h
   rw [Ideal.map_eq_top_iff _ h_inj h_int] at h
   apply LocalRing.maximalIdeal_ne_top A h

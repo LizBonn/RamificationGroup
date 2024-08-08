@@ -1,6 +1,7 @@
 import RamificationGroup.Valued.Hom.ValExtension
 import RamificationGroup.ForMathlib.LocalRing.Basic
 import RamificationGroup.Valuation.Discrete
+import RamificationGroup.Valuation.Extension
 
 /-!
 This file is a continuation of the file ValExtension.
@@ -26,43 +27,3 @@ theorem nontrivial_of_valExtension : Nontrivial vA.v where
     simp only [_root_.map_zero, h0, not_false_eq_true]
 
 end nontrivial
-
-section ramification
-
-section general
-
-variable (K L : Type*) {ΓK ΓL : outParam Type*} [Field K] [Field L]
-    [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
-    [Algebra K L] [vK : Valued K ΓK] [vL : Valued L ΓL] [IsValExtension K L]
-
-/-- Should be renamed -/
-noncomputable def LocalField.ramificationIdx : ℕ :=
-  LocalRing.ramificationIdx 𝒪[K] 𝒪[L]
-
-open LocalField
-
-#check exists_Uniformizer_ofDiscrete
-theorem aux2 [FiniteDimensional K L] : ramificationIdx K L ≠ 0 := by
-  /- `e` should be the number s.t. `π[K] = π[L] ^ e` -/
-  /- should prove a version for DVR's first -/
-  sorry
-
-end general
-
-open LocalField
-
-section discrete
-
-variable (K L : Type*) {ΓK ΓL : outParam Type*} [Field K] [Field L]
-    [Algebra K L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [IsValExtension K L]
-
-theorem aux3 [FiniteDimensional K L] [IsDiscrete vK.v] [IsDiscrete vL.v]
-  (x : K) : vL.v (algebraMap K L x) = (vK.v x) ^ (ramificationIdx K L) := by
-  sorry
-
-
-end discrete
-
-#check Ideal.ramificationIdx
-
-end ramification
