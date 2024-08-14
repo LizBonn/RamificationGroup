@@ -60,16 +60,15 @@ instance [CompleteSpace K] : Algebra.IsIntegral 𝒪[K] 𝒪[L] where
 instance [CompleteSpace K] : IsIntegralClosure 𝒪[L] 𝒪[K] L :=
   IsIntegralClosure.of_isIntegrallyClosed 𝒪[L] 𝒪[K] L
 
-instance : DiscreteValuationRing 𝒪[K] := by
-  rw [show 𝒪[K] = vK.v.valuationSubring.toSubring by rfl]
-  infer_instance
+instance : DiscreteValuationRing 𝒪[K] :=
+  inferInstanceAs (DiscreteValuationRing vK.v.valuationSubring)
 
 theorem aux6 [CompleteSpace K] : DiscreteValuationRing 𝒪[L] :=
   valuationSubring_DVR_of_equiv_discrete
     (extension_valuation_equiv_extendedValuation_of_discrete
       (IsValExtension.val_isEquiv_comap (R := K) (A := L)))
 
-
+/-- Can't be inferred automatically. -/
 instance [CompleteSpace K] [Algebra.IsSeparable K L] : IsNoetherian 𝒪[K] 𝒪[L] :=
   IsIntegralClosure.isNoetherian 𝒪[K] K L 𝒪[L]
 
@@ -109,14 +108,18 @@ open LocalField ExtDVR
 -- theorem integerAlgebra_integral_of_integral
 
 #check exists_Uniformizer_ofDiscrete
-theorem ramificationIdx_ne_zero [CompleteSpace K] [FiniteDimensional K L] : ramificationIdx K L ≠ 0 := by
+theorem ramificationIdx_ne_zero [CompleteSpace K] : ramificationIdx K L ≠ 0 := by
   letI : DiscreteValuationRing 𝒪[L] := aux6 K L
   apply ramificationIdx_ne_zero_of_injective_of_integral (integerAlgebra_injective K L)
   rw [← Algebra.isIntegral_iff_isIntegral]
   infer_instance
 
+theorem aux0 [CompleteSpace K] [IsDiscrete vL.v] : vL.v = extendedValuation K L := by
+  rw [← isEquiv_iff_eq]
+  apply extension_valuation_equiv_extendedValuation_of_discrete val_isEquiv_comap
+
 variable {L} in
-theorem aux3 [FiniteDimensional K L] [IsDiscrete vK.v] [IsDiscrete vL.v]
+theorem aux3 [IsDiscrete vK.v] [IsDiscrete vL.v]
   (x : K) : vL.v (algebraMap K L x) = (vK.v x) ^ (ramificationIdx K L) := by
   sorry
 

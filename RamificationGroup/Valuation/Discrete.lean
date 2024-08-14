@@ -28,7 +28,7 @@ theorem ofAdd_eq_neg_one_of_pow_eq_neg_one {x : ℤₘ₀} (h1 : x ≤ 1) {n : �
       contradiction
     | .coe (.ofAdd a)  =>
       change ((ofAdd (n * a) : Multiplicative ℤ) : ℤₘ₀) = (ofAdd (-1 : ℤ)) at hn
-      change ↑(ofAdd a) ≤ (((ofAdd (0 : ℤ)): Multiplicative ℤ) : ℤₘ₀) at h1
+      change (ofAdd a) ≤ (((ofAdd (0 : ℤ)): Multiplicative ℤ) : ℤₘ₀) at h1
       rw [coe_le_coe, Multiplicative.ofAdd_le] at h1
       rw [coe_inj] at *
       show a = -1
@@ -204,11 +204,11 @@ theorem isEquiv_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) :
   · simp only [xne0, _root_.map_zero, zero_le', forall_true_left]
   intro v'xle
   by_contra! vxgt
-  have : v' x⁻¹ < 1 := lt_one_lt_one_of_le_one_le_one h <| (one_lt_val_iff _ xne0).mp vxgt
   have : (1 : ℤₘ₀) < 1 := by
     nth_rw 1 [← Valuation.map_one v']
     rw [show (1 : K) = x * x⁻¹ by simp only [ne_eq, xne0, not_false_eq_true, mul_inv_cancel], Valuation.map_mul, show (1 : ℤₘ₀) = 1 * 1 by rfl]
-    apply mul_lt_mul_of_lt_of_le₀ v'xle (by simp only [ne_eq, one_ne_zero, not_false_eq_true]) this
+    apply mul_lt_mul_of_lt_of_le₀ v'xle (by simp only [ne_eq, one_ne_zero, not_false_eq_true])
+    exact lt_one_lt_one_of_le_one_le_one h <| (one_lt_val_iff _ xne0).mp vxgt
   contradiction
 
 /-- For discrete valuations, being equivalent is the same as being equal. -/

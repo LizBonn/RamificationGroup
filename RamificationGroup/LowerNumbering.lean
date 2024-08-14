@@ -537,7 +537,7 @@ theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
       rw [← ENat.some_eq_coe, WithTop.coe_untop]
     simp only [ne_eq, this, Nat.cast_le, ha]
 
-theorem aux0 [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
+theorem aux7 [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
   {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
   {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
   apply (mem_lowerRamificationGroup_iff_of_generator (PowerBasis.adjoin_gen_eq_top (PowerBasisValExtension K L)) s.mem_decompositionGroup n).mp at hs
@@ -557,7 +557,7 @@ theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparab
   · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1
     rw [eq_bot_iff]
     intro s hs
-    rw [Subgroup.mem_bot, AlgEquiv.aut_one, aux0 _ hs]
+    rw [Subgroup.mem_bot, AlgEquiv.aut_one, aux7 _ hs]
     rw [← ENat.some_eq_coe]
     simp only [WithTop.coe_add, WithTop.coe_untop, WithTop.coe_one, gt_iff_lt]
     nth_rw 1 [← add_zero (⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)]
@@ -607,8 +607,6 @@ variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 
 #check LocalField
 
-#check aux2 K L
-
 #check Eq.subst
 
 open Classical AlgEquiv in
@@ -627,7 +625,7 @@ theorem prop3
       exact ⟨.refl, Set.mem_toFinset.mpr this, lowerIndex_refl⟩
     · intro h
       rw [← ENat.coe_zero, ← ENat.some_eq_coe, WithTop.coe_eq_coe] at h
-      exact aux2 K L h
+      exact ramificationIdx_ne_zero K L h
   ·
     /- Need:
     1. properties about `e` are in `RamificationGroup\Valuation\Extension.lean`
