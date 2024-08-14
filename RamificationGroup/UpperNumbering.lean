@@ -2,6 +2,7 @@ import RamificationGroup.LowerNumbering
 import Mathlib.RingTheory.Valuation.Basic
 import Mathlib.FieldTheory.KrullTopology
 import RamificationGroup.HerbrandFunction
+import Mathlib.Algebra.Algebra.Tower
 -- import RamificationGroup.Valued.Hom.Discrete'
 
 /-!
@@ -52,7 +53,7 @@ section
 
 open DiscreteValuation
 
-variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
 
 variable (σ : K' ≃ₐ[K] K')
 
@@ -86,9 +87,24 @@ theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K')
 variable {σ : K' ≃ₐ[K] K'}
 
 #check exist_truncatedLowerIndex_eq_truncatedJ 1 σ
+--they should in lower
+theorem prop2_aux {t : L ≃ₐ[K'] L} : i_[L/K] (t.restrictScalars K) = i_[L/K'] t := by sorry
 
-theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) - 1:= by
+theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) = (LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ) (AlgEquiv.restrictScalars K s))) := by sorry
+
+theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) + 1 = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) := by
   obtain ⟨s, hs1, hs2⟩ :=  exist_truncatedLowerIndex_eq_truncatedJ (K := K) (K' := K') (L := L) u σ
+  calc
+  _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L u σ) ·))) := by
+    rw [phi_eq_sum_inf]
+    simp
+  _ = (LocalField.ramificationIdx K' L) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L u σ) ·))) := by
+    congr
+    sorry
+  _ = (LocalField.ramificationIdx K' L) * ((∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ) (AlgEquiv.restrictScalars K s)))) := by
+    congr
+  _ = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) := by
+    rw [lemma3_aux]
 
 
 #check FiniteDimensional K L
