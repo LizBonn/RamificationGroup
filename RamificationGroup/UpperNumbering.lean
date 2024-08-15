@@ -234,17 +234,22 @@ variable [IsValExtension K K']
 @[simp]
 theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
   ext σ
+  #check truncatedJ L (u + 1) σ ≥ (u + 1)
   calc
   _ ↔ truncatedJ L u σ ≥ u :=
     sorry--(le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
   _ ↔ phi K' L (truncatedJ L u σ) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
   _ ↔ σ.truncatedLowerIndex K K' ((phi K' L u) + 1) - 1 ≥ phi K' L u := by
     simp [phi_truncatedJ_sub_one]
-    sorry
+    have heq : phi K' L (truncatedJ L (u + 1) σ) = i_[K'/K]ₜ (phi K' L u + 1) σ - 1 := by
+      have heq' : phi K' L (truncatedJ L (u + 1) σ - 1) + 1 = i_[K'/K]ₜ (phi K' L u + 1) σ  := by
+        simp only [phi_truncatedJ_sub_one, add_sub_cancel_right u 1]
+      rw [← heq', add_sub_cancel_right _ 1]
+      sorry
+    rw [heq]
   _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := by
     apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup σ (phi K' L u) _
-    linarith
-
+    rw [add_le_add_iff_right]
 
 @[simp]
 theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
@@ -376,6 +381,7 @@ theorem restrictNormal_eq_self {F E : Type*}  [Field F] [Field E] [Algebra F E] 
 
 theorem restrictNormal_restrictNormal {F K₁ K₂ : Type*} [Field F] [Field K₁] [Field K₂] [Algebra F K₁] [Algebra F K₂]  (s : K₁ ≃ₐ[F] K₂) (E M: Type*) [Field E] [Field M] [Algebra F M] [Algebra F E] [Algebra M E] [Algebra M K₁] [Algebra M K₂] [Algebra E K₁] [Algebra E K₂] [IsScalarTower F M K₁] [IsScalarTower F M K₂] [IsScalarTower F E K₁] [IsScalarTower F E K₂]  [Normal F E] [Normal F M] [IsScalarTower F M E] : (s.restrictNormal E).restrictNormal M = s.restrictNormal M := by sorry
 
+
 -- theorem relation with aux
 theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
   ext s
@@ -388,11 +394,12 @@ theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v
       assumption
     ext s a
     simp [restrictNormalHom]
-  · intro h F
-    intros
-    rw [← herbrand' (L := L)]
-    apply Subgroup.mem_map_of_mem
-    exact h
+  · sorry
+  -- · intro h F
+  --   intros
+  --   rw [← herbrand' (L := L)]
+  --   apply Subgroup.mem_map_of_mem
+  --   exact h
 
 -- universe problem here. `∀ (F : Type u_2)`
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : Type u_2) [Field F] [vF : Valued F ℤₘ₀] [IsDiscrete vF.v] [Algebra K F] [IsValExtension K F] [Algebra F L] [IsScalarTower K F L] [Normal K F] [FiniteDimensional K F],
