@@ -366,18 +366,21 @@ theorem phi_eq_sum_card {u : ℚ} : phi K L u = (1 / Nat.card G(L/K)_[0]) * ((�
       rw [relindex_aux, div_mul_eq_mul_div, one_mul, Nat.cast_div, one_div_div]
       simp
       · simp
-        apply Subgroup.card_dvd_of_le
-        apply lowerRamificationGroup.antitone
+        rw [← Nat.card_eq_fintype_card]
         sorry
+        -- apply Subgroup.card_dvd_of_le
+        --sorry
+        --apply lowerRamificationGroup.antitone
+        --sorry
       · sorry
     _ = ((1 : ℚ) / Nat.card G(L/K)_[0]) * (∑ x in Finset.Icc 1 (⌈u⌉ - 1), Nat.card G(L/K)_[x]) + (u - (max 0 (⌈u⌉ - 1))) * (1 / ↑(relindex G(L/K)_[⌈u⌉] G(L/K)_[0])) := by
       rw [(Finset.mul_sum (Finset.Icc 1 (⌈u⌉ - 1)) (fun i => (Nat.card (lowerRamificationGroup K L i) : ℚ)) ((1 : ℚ) / Nat.card G(L/K)_[0])).symm]
       simp
     _ = (1 / Nat.card G(L/K)_[0]) * ((∑ x in Finset.Icc 1 (⌈u⌉ - 1), Nat.card G(L/K)_[x]) + (u - (max 0 (⌈u⌉ - 1))) * (Nat.card G(L/K)_[⌈u⌉])) := by
-      simp [relindex_aux, mul_add]
-      rw [Nat.cast_div, inv_div, div_eq_mul_inv]
-      ring
-      sorry; sorry
+      --simp [relindex_aux, mul_add]
+      -- rw [Nat.cast_div, inv_div, div_eq_mul_inv]
+      -- ring
+      sorry--; sorry
 
 theorem insert_Icc_left (a b : ℤ) (ha : a ≤ b): Finset.Icc a b = insert a (Finset.Icc (a + 1) b) := by
   ext x
@@ -598,7 +601,7 @@ theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((F
         intro x hx
         simp [truncatedLowerindex_eq_if K L (by linarith [huc'']) hx]
       simp [huc', huc'', hsum, mul_comm, mul_assoc, mul_inv_self]
-      sorry
+      --sorry
   · have hu' : 0 ≤ ⌈u⌉ - 1 := by
       push_neg at hu
       simp [add_one_le_ceil_iff.2 hu, hu]

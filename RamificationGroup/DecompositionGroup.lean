@@ -15,6 +15,9 @@ theorem Valuation.IsEquiv_comap_symm {s : S ≃+* S} (h : vS.v.IsEquiv (vS.v.com
 
 namespace Valued
 
+variable {s : S ≃ₐ[R] S}
+#check vS.v.IsEquiv <| vS.v.comap s
+
 def decompositionGroup : Subgroup (S ≃ₐ[R] S) where
   carrier := {s | vS.v.IsEquiv <| vS.v.comap s}
   mul_mem' {s} {s'} hs hs' x y := by
