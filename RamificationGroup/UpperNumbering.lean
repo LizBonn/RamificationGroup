@@ -71,8 +71,8 @@ def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset
 theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (AlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  AlgEquiv.truncatedLowerIndex K L u s - 1 = HerbrandFunction.truncatedJ L u σ := by
   have hnem : ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}).Nonempty := by
     have h1 : Set.SurjOn (AlgEquiv.restrictNormalHom K' (K₁ := L)) ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) {σ} := by
-      simp
-      sorry
+      simp only [Set.surjOn_singleton, Set.mem_image, Set.mem_preimage, Set.mem_singleton_iff, and_self]
+      apply AlgEquiv.restrictNormalHom_surjective
     apply Set.SurjOn.comap_nonempty h1 (by simp)
   --i'm not sure this condition below is satisfy in our sugestion.If the extension is finite, this proof make sense.
   have hfin : Finite ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) := by sorry
@@ -109,24 +109,25 @@ variable {σ : K' ≃ₐ[K] K'}
 --theorem prop2_aux {t : L ≃ₐ[K'] L} : i_[L/K] (t.restrictScalars K) = i_[L/K'] t := by
   --sorry
 
-theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ) (AlgEquiv.restrictScalars K s))) := by
+theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ) (AlgEquiv.restrictScalars K s))) := by
   sorry
 
 theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (LocalField.ramificationIdx K' L) := by
   sorry
 
-theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L ((truncatedJ L u σ) - 1) + 1 = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) := by
+theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L (truncatedJ L u σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
   obtain ⟨s, hs1, hs2⟩ :=  exist_truncatedLowerIndex_eq_truncatedJ (K := K) (K' := K') (L := L) u σ
   calc
   _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L u σ) ·))) := by
     rw [phi_eq_sum_inf]
     simp
+    sorry
   _ = (1 / LocalField.ramificationIdx K' L) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L u σ) ·))) := by
     congr
     apply RamificationIdx_eq_card_of_inertia_group
   _ = (1 / LocalField.ramificationIdx K' L) * ((∑ x in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ) (AlgEquiv.restrictScalars K x)))) := by
     congr
-  _ = σ.truncatedLowerIndex K K' ((phi K' L (u-1)) + 1) := by
+  _ = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
     rw [lemma3_aux]
 
 
@@ -146,9 +147,10 @@ theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u �
 
 #check AlgEquiv
 
-theorem resNormal_resScalar_aux {x : L ≃ₐ[K'] L} : (AlgEquiv.restrictNormalHom K') (AlgEquiv.restrictScalars K x) = 1 := by sorry
-
 #check restrictScalars_injective
+#check AlgEquiv.restrictNormal_commutes
+
+theorem restrictNormal_restrictNormalHom (s : L ≃ₐ[K] L) : s.restrictNormal K' = AlgEquiv.restrictNormalHom K' s := by rfl
 
 theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ L r σ ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
   constructor
@@ -157,27 +159,55 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
     rintro hx
     obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ (L := L) r σ
     simp at s_in
-    let f : (L ≃ₐ[K'] L) → (AlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
-      fun x => ⟨s * (x.restrictScalars K), by
-        rw [Set.mem_preimage, MonoidHom.map_mul, s_in, Set.mem_singleton_iff, resNormal_resScalar_aux, mul_one]⟩
-    have hbij : Function.Bijective f := by
-      constructor
-      · rintro a1 a2 h
-        dsimp [f] at h
-        have h' : s * AlgEquiv.restrictScalars K a1 = s * AlgEquiv.restrictScalars K a2 := by
-          apply Subtype.val_inj.2 h
-        apply mul_left_cancel at h'
-        apply (AlgEquiv.restrictScalars_injective K) h'
-      · rintro b
-        dsimp [f]
-        have h : ∃ (a : L ≃ₐ[K'] L), AlgEquiv.restrictScalars K a = s⁻¹ * b.val := by
-          sorry
-        obtain ⟨a, ha⟩ := h
-        use a
-        rw [Subtype.mk.injEq, ha, ← mul_assoc, mul_inv_self, one_mul]
-    have hi : ∀ x : (L ≃ₐ[K'] L), AlgEquiv.truncatedLowerIndex K' L u x = AlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
+    -- let f : (L ≃ₐ[K'] L) → (AlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
+    --   fun x => ⟨s * (x.restrictScalars K), by
+    --     rw [Set.mem_preimage, MonoidHom.map_mul, s_in, Set.mem_singleton_iff, resNormal_resScalar_aux, mul_one]⟩
+    -- have hbij : Function.Bijective f := by
+    --   constructor
+    --   · rintro a1 a2 h
+    --     dsimp [f] at h
+    --     have h' : s * AlgEquiv.restrictScalars K a1 = s * AlgEquiv.restrictScalars K a2 := by
+    --       apply Subtype.val_inj.2 h
+    --     apply mul_left_cancel at h'
+    --     apply (AlgEquiv.restrictScalars_injective K) h'
+    --   · rintro ⟨b, hb⟩
+    --     dsimp [f]
+    --     let a₀ : L ≃ₐ[K'] L :=
+    --     {
+    --       s⁻¹ * b with
+    --       commutes' := by
+    --         dsimp
+    --         intro r
+    --         apply (EquivLike.apply_eq_iff_eq s).1
+    --         have : s⁻¹ = s.invFun := by exact rfl
+    --         rw [this, ← Function.comp_apply (f := s) (g := s.invFun)]
+    --         simp only [AlgEquiv.toEquiv_eq_coe, Equiv.invFun_as_coe, AlgEquiv.symm_toEquiv_eq_symm, EquivLike.coe_coe, Function.comp_apply, AlgEquiv.apply_symm_apply]
+    --         rw [Set.mem_preimage, Set.mem_singleton_iff] at hb
+    --         rw [← AlgEquiv.restrictNormal_commutes, ← AlgEquiv.restrictNormal_commutes, restrictNormal_restrictNormalHom s, restrictNormal_restrictNormalHom b, s_in, hb]
+    --     }
+    --     have h : AlgEquiv.restrictScalars K a₀ = s⁻¹ * b := rfl
+    --     use a₀
+    --     rw [Subtype.mk.injEq, h, ← mul_assoc, mul_inv_self, one_mul]
+    --have hi : ∀ x : (L ≃ₐ[K'] L), AlgEquiv.truncatedLowerIndex K' L u x = AlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
     have hs' : s ∈ G(L/K)_[⌈u⌉] := by
-      sorry
+      obtain ⟨k, hk1, hk2⟩ := Subgroup.mem_map.1 hx
+      have h1 : i_[L/K]ₜ r k - 1 ≤ i_[L/K]ₜ r s - 1 := by
+        have h1' : k ∈ (⇑(AlgEquiv.restrictNormalHom K') ⁻¹' {σ}) := by simp only [Set.mem_preimage,
+          hk2, Set.mem_singleton_iff]
+        rw [hs]
+        unfold truncatedJ
+        apply Finset.le_max'
+        rw [Finset.mem_image]
+        use k
+        constructor
+        · simp only [Set.mem_toFinset, h1']
+        · rfl
+      have h2 : u ≤ i_[L/K]ₜ r k - 1 := by
+        apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup _ _ _ h).2 hk1
+      have h3 : u ≤ i_[L/K]ₜ r s - 1 := by linarith [h1, h2]
+      apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one ?_ h3
+      rw [decompositionGroup_eq_top]
+      apply Subgroup.mem_top
     rw [← hs]
     apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
 
@@ -234,22 +264,22 @@ variable [IsValExtension K K']
 @[simp]
 theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
   ext σ
-  #check truncatedJ L (u + 1) σ ≥ (u + 1)
   calc
-  _ ↔ truncatedJ L u σ ≥ u :=
-    sorry--(le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
-  _ ↔ phi K' L (truncatedJ L u σ) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
-  _ ↔ σ.truncatedLowerIndex K K' ((phi K' L u) + 1) - 1 ≥ phi K' L u := by
-    simp [phi_truncatedJ_sub_one]
-    have heq : phi K' L (truncatedJ L (u + 1) σ) = i_[K'/K]ₜ (phi K' L u + 1) σ - 1 := by
-      have heq' : phi K' L (truncatedJ L (u + 1) σ - 1) + 1 = i_[K'/K]ₜ (phi K' L u + 1) σ  := by
-        simp only [phi_truncatedJ_sub_one, add_sub_cancel_right u 1]
-      rw [← heq', add_sub_cancel_right _ 1]
-      sorry
-    rw [heq]
+  _ ↔ truncatedJ L (u + 1) σ ≥ u :=
+    (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
+  _ ↔ phi K' L (truncatedJ L (u + 1) σ) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
+  _ ↔ σ.truncatedLowerIndex K K' ((phi K' L (u + 1)) + 1) - 1 ≥ phi K' L u := by
+    have heq : phi K' L (truncatedJ L (u + 1) σ) + 1 = i_[K'/K]ₜ (phi K' L (u + 1) + 1) σ := by
+      simp only [phi_truncatedJ_sub_one]
+    have heq' : phi K' L (truncatedJ L (u + 1) σ) = i_[K'/K]ₜ (phi K' L (u + 1) + 1) σ - 1 := by
+      linarith [heq]
+    rw [heq']
   _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := by
     apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup σ (phi K' L u) _
     rw [add_le_add_iff_right]
+    apply le_of_lt
+    apply (phi_strictMono K' L)
+    linarith
 
 @[simp]
 theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
@@ -289,16 +319,18 @@ end
 
 section
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L] [IsValExtension K L] [CompleteSpace K]
+[Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
 
+theorem psi_phi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := sorry
 
 -- this uses local fields and bichang's work, check if the condition is too strong...
 theorem UpperRamificationGroup_aux.exist_eq_bot [LocalField K] [LocalField L] [IsValExtension K L] : ∃ v : ℚ, G(L/K)^[v] = ⊥ := by
-  -- obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
-  -- use ⌈phi K L u⌉
-  -- simp [upperRamificationGroup_aux]
-  sorry
-
+  obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
+  use (phi K L u)
+  simp [upperRamificationGroup_aux]
+  rw [psi_phi_eq_self, Int.ceil_intCast u]
+  exact hu
 
 end
 
