@@ -586,7 +586,7 @@ open LocalField
 
 variable {K M L : Type*} [Field K] [Field M] [Field L]
 [Algebra K L] [Algebra K M] [Algebra M L] [IsScalarTower K M L]
-[FiniteDimensional K L]
+[FiniteDimensional K L] [FiniteDimensional K M] [FiniteDimensional M L]
 [Normal K M]
 [vK : Valued K ℤₘ₀] [IsDiscrete vK.v]
 [vM : Valued M ℤₘ₀] [IsDiscrete vM.v]
@@ -594,8 +594,7 @@ variable {K M L : Type*} [Field K] [Field M] [Field L]
 [IsValExtension K L] [IsValExtension M L]
 [CompleteSpace K]
 
-#check FiniteDimensional.left K M L
-open Classical
+-- #synth FiniteDimensional M L
 
 #check AlgEquiv.restrictNormalHom_surjective
 
@@ -606,6 +605,8 @@ variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 #check Finset.sum
 
 #check LocalField
+
+--#check aux2 K L
 
 #check Eq.subst
 
@@ -618,8 +619,7 @@ theorem prop3
   · subst hσ
     rw [lowerIndex_refl, ENat.mul_top]
     · have : (.refl : L ≃ₐ[K] L) ∈ (restrictNormalHom M)⁻¹' {.refl} := by
-        rw [Set.mem_preimage, Set.mem_singleton_iff,
-          ← AlgEquiv.aut_one, ← AlgEquiv.aut_one,
+        rw [Set.mem_preimage, Set.mem_singleton_iff, ← AlgEquiv.aut_one, ← AlgEquiv.aut_one,
           _root_.map_one]
       rw [WithTop.sum_eq_top_iff]
       exact ⟨.refl, Set.mem_toFinset.mpr this, lowerIndex_refl⟩
@@ -628,9 +628,8 @@ theorem prop3
       exact ramificationIdx_ne_zero K L h
   ·
     /- Need:
-    1. properties about `e` are in `RamificationGroup\Valuation\Extension.lean`
     2. all valuations are discrete
-    3(`y`). 𝒪[L] / 𝒪[M] admits a power basis b, so that the minpoly of b over M has coeff in 𝒪[M]
+    3. 𝒪[L] / 𝒪[M] admits a power basis b, so that the minpoly of b over M has coeff in 𝒪[M]
     -/
     sorry
 
@@ -640,5 +639,3 @@ end sum_lowerIndex
 section aux
 
 variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']
-
-end aux
