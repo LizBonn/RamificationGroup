@@ -384,10 +384,33 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
     convert (mem_lowerRamificationGroup_iff_of_generator sorry hs' ⌈u⌉.toNat).2 this
     sorry; sorry
 
-theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐ[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
+variable [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension K L] [CompleteSpace K] [FiniteDimensional K L]
+
+theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐ[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
   constructor
-  apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
-  sorry; sorry
+  · apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
+    rw [decompositionGroup_eq_top]
+    apply Subgroup.mem_top
+  · intro hs
+    have h1 : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
+      apply (mem_lowerRamificationGroup_iff_of_generator hgen ?_ ⌈u⌉.toNat).1
+      --the type of N and Z make some truble
+      sorry
+      rw [decompositionGroup_eq_top]
+      apply Subgroup.mem_top
+    unfold AlgEquiv.truncatedLowerIndex
+    by_cases hc : i_[L/K] s = ⊤
+    · simp [hc]
+      linarith [h]
+    · simp [hc]
+      have hle : u + 1 ≤ min r ↑(WithTop.untop ( i_[L/K] s) (of_eq_false (eq_false hc) : ¬ i_[L/K] s = ⊤)) := by
+        apply le_min_iff.2
+        constructor
+        · exact h
+        · sorry
+      linarith [hle]
+
+
 
 end K_is_field
 
