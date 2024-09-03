@@ -12,7 +12,17 @@ variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrder
 
 theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : phi K L x = phi K L n + (phi K L (n + 1) - phi K L n) * (x - n) := by
   by_cases hc : 0 < x
-  · have hn : (0 : ℚ) ≤ n := by sorry
+  · have hn : (0 : ℚ) ≤ n := by
+      by_contra hcon
+      push_neg at hcon
+      rw [← add_lt_add_iff_right 1, zero_add, ← Int.cast_one, ← cast_add, cast_lt] at hcon
+      have hcon' : n + 1 ≤ 0 := by
+        apply Int.le_sub_one_of_lt hcon
+      have hx : x < 0 := by
+        apply lt_of_lt_of_le hx.2
+        rw [← Int.cast_one (R := ℚ), ← cast_add, ← cast_zero, cast_le]
+        exact hcon'
+      absurd hc; linarith [hx]
     by_cases hc' : (0 : ℚ) < n
     · rw [phi_eq_sum_card K L hc]
       nth_rw 1 [phi_eq_sum_card K L hc']
@@ -21,7 +31,11 @@ theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) 
         simp only [Nat.card_eq_fintype_card, one_div, ceil_intCast, Nat.cast_sum, cast_max, cast_zero, cast_sub, cast_one, add_right_inj]
         sorry
       · sorry
-    · have hn' : n = 0 := by sorry
+    · have hn' : n = 0 := by
+        symm
+        apply eq_of_le_of_not_lt
+        apply_mod_cast hn
+        apply_mod_cast hc'
       simp only [hn', cast_zero, zero_add, sub_zero]
       rw [phi_zero_eq_zero]; ring
       simp only [hn', cast_zero, zero_add] at hx
@@ -36,10 +50,26 @@ theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) 
   · push_neg at hc
     rw [phi_eq_self_of_le_zero K L hc]
     by_cases hc' : x = 0
-    · have hn : n = 0 := by sorry
+    · have hn : n = 0 := by
+        apply eq_of_le_of_not_lt
+        · rw [hc'] at hx
+          apply_mod_cast hx.1
+        · rw [hc'] at hx; push_neg
+          rw [← add_zero n]
+          nth_rw 2 [← sub_self 1]
+          rw [add_sub]
+          apply Int.le_sub_one_of_lt (a := 0) (b := n + 1)
+          apply_mod_cast hx.2
       rw [hn, cast_zero, phi_zero_eq_zero K L, zero_add, zero_add, hc']; ring
-    · have hn : ((n : ℚ) + 1) ≤ 0 := by sorry
-      have hn' : (n : ℚ) ≤ 0 := by sorry
+    · have hn : ((n : ℚ) + 1) ≤ 0 := by
+        rw [← cast_one, ← cast_add, ← cast_zero, cast_le, ← sub_self 1]
+        apply Int.le_sub_one_of_lt
+        simp only [add_lt_iff_neg_right]
+        rw [← cast_lt (R := ℚ)]
+        apply lt_of_le_of_lt (b := x)
+        exact hx.1
+        apply lt_of_le_of_ne hc hc'
+      have hn' : (n : ℚ) ≤ 0 := by linarith [hn]
       rw [phi_eq_self_of_le_zero K L hn, phi_eq_self_of_le_zero K L hn']; ring
 
 theorem phi_Bijective_section_aux {n : ℤ} {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : ∀ (y : ℚ) , (phi K L n) ≤ y ∧ y < (phi K L (n + 1)) → ∃ (x : ℚ), phi K L x = y := by
