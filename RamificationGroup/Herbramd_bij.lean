@@ -68,8 +68,8 @@ theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) 
             simp only [ceil_intCast, ceil_add_one, add_sub_cancel_right, tsub_le_iff_right,le_add_iff_nonneg_right, zero_le_one]
             intro i hi1 hi2
             apply le_of_lt
-            sorry
-            --apply Ramification_Group_card_pos
+            convert Ramification_Group_card_pos K L (u := i)
+            exact Eq.symm (ceil_intCast i)
           _ = (1 / Nat.card G(L/K)_[0]) * (Nat.card G(L/K)_[(n + 1)]) * (x - n) := by
             simp only [ceil_add_one, ceil_intCast, add_sub_cancel_right, cast_max, cast_zero, cast_sub, cast_one, max_eq_right hn]
             have hn' : 0 ≤ (n : ℚ) - 1 := by
@@ -173,8 +173,8 @@ theorem phi_Bijective_section_aux {n : ℤ} {gen : 𝒪[L]} (hgen : Algebra.adjo
 theorem card_of_Ramigroup_gt_one {n : ℤ} : 1 ≤ Nat.card G(L/K)_[n] := by
   refine Nat.one_le_iff_ne_zero.mpr ?_
   apply ne_of_gt
-  sorry
-  --apply Ramification_Group_card_pos
+  convert Ramification_Group_card_pos K L (u := n)
+  exact Eq.symm (ceil_intCast n)
 
 theorem id_le_phi {x : ℚ} (hx : 0 < x) : (1 / Nat.card G(L/K)_[0]) * x ≤ phi K L x := by
   rw [phi_eq_sum_card K L hx]
@@ -191,8 +191,7 @@ theorem id_le_phi {x : ℚ} (hx : 0 < x) : (1 / Nat.card G(L/K)_[0]) * x ≤ phi
       rw [← Nat.cast_le (α := ℤ), Int.toNat_of_nonneg, Nat.cast_one]
       <;> linarith [hxc]
       simp only [one_div, inv_pos, Nat.cast_pos]
-      --apply Ramification_Group_card_pos
-      sorry
+      apply Ramification_Group_card_pos K L (u := 0)
     · apply (mul_le_mul_left ?_).2
       apply Rat.add_le_add_left.2
       apply (mul_le_mul_left ?_).2
@@ -204,8 +203,7 @@ theorem id_le_phi {x : ℚ} (hx : 0 < x) : (1 / Nat.card G(L/K)_[0]) * x ≤ phi
       · linarith [Int.ceil_lt_add_one x]
       refine one_div_pos.mpr ?_
       simp only [Nat.cast_pos]
-      sorry
-    --apply Ramification_Group_card_pos
+      apply Ramification_Group_card_pos K L (u := 0)
   · apply (mul_le_mul_left ?_).2
     rw [add_le_add_iff_right, Nat.cast_le]
     apply Finset.sum_le_sum
@@ -213,8 +211,7 @@ theorem id_le_phi {x : ℚ} (hx : 0 < x) : (1 / Nat.card G(L/K)_[0]) * x ≤ phi
     apply card_of_Ramigroup_gt_one
     refine one_div_pos.mpr ?_
     simp only [Nat.cast_pos]
-    sorry
-    --apply Ramification_Group_card_pos
+    apply Ramification_Group_card_pos K L (u := 0)
 
 theorem phi_infty_up_aux {x : ℚ} : ∃ y, x ≤ phi K L y := by
   by_cases hc : 0 < x
@@ -294,8 +291,12 @@ theorem phi_infty_aux (y : ℚ) : ∃ n : ℤ, phi K L n ≤ y ∧ y < phi K L (
         apply lt_of_le_of_ne; apply Int.le_ceil; exact hc
     · apply hz ⌈n⌉
   absurd hq; push_neg;
-  sorry
-  --apply phi_infty_up_aux
+  obtain ⟨n, hn⟩ := phi_infty_up_aux K L (x := y)
+  use n + 1
+  apply lt_of_le_of_lt (b := phi K L n)
+  exact hn
+  apply phi_strictMono
+  linarith
 
 theorem phi_Bijective_aux {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : Function.Bijective (phi K L) := by
   constructor
