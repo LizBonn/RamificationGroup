@@ -117,8 +117,12 @@ variable {σ : K' ≃ₐ[K] K'}
 theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ + 1) (AlgEquiv.restrictScalars K s))) := by
   sorry
 
+set_option synthInstance.maxHeartbeats 10000000
+
 theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (LocalField.ramificationIdx K' L) := by
   sorry
+
+variable  [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
 
 theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L (truncatedJ L u σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
   calc
@@ -155,7 +159,7 @@ theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u �
 
 theorem restrictNormal_restrictNormalHom (s : L ≃ₐ[K] L) : s.restrictNormal K' = AlgEquiv.restrictNormalHom K' s := by rfl
 
-theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) : u ≤ truncatedJ L r σ ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
+theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ truncatedJ L r σ ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
   constructor
   · apply mem_lowerRamificationGroup_of_le_truncatedJ_sub_one
   · --simp only [Subgroup.mem_map]
@@ -206,13 +210,13 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
         · simp only [Set.mem_toFinset, h1']
         · rfl
       have h2 : u ≤ i_[L/K]ₜ r k - 1 := by
-        apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup _ _ _ h).2 hk1
+        apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup _ _ _ h hgen).2 hk1
       have h3 : u ≤ i_[L/K]ₜ r s - 1 := by linarith [h1, h2]
       apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one ?_ h3
       rw [decompositionGroup_eq_top]
       apply Subgroup.mem_top
     rw [← hs]
-    apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h).2 hs'
+    apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h hgen).2 hs'
 
 namespace HerbrandFunction
 
@@ -263,13 +267,15 @@ end HerbrandFunction
 
 variable [IsValExtension K K']
 
+set_option maxHeartbeats 0
+
 -- Lemma 5
 @[simp]
-theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
+theorem herbrand (u : ℚ) {gen : 𝒪[K']} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K] {gen'} = ⊤) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
   ext σ
   calc
   _ ↔ truncatedJ L (u + 1) σ ≥ u :=
-    (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith)).symm
+    (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith) hgen').symm
   _ ↔ phi K' L (truncatedJ L (u + 1) σ) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
   _ ↔ σ.truncatedLowerIndex K K' ((phi K' L (u + 1)) + 1) - 1 ≥ phi K' L u := by
     have heq : phi K' L (truncatedJ L (u + 1) σ) + 1 = i_[K'/K]ₜ (phi K' L (u + 1) + 1) σ := by
@@ -278,17 +284,18 @@ theorem herbrand (u : ℚ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K'
       linarith [heq]
     rw [heq']
   _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := by
-    apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup σ (phi K' L u) _
+    apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (K := K) (L := K') σ (phi K' L u) _ ?_ hgen
     rw [add_le_add_iff_right]
     apply le_of_lt
     apply (phi_strictMono K' L)
     linarith
 
+
 @[simp]
-theorem herbrand' (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+theorem herbrand' (v : ℚ) {gen : 𝒪[K']} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K] {gen'} = ⊤): G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
   calc
     _ = G(L/K)_[⌈psi K L v⌉].map (AlgEquiv.restrictNormalHom K') := rfl
-    _ = G(K'/K)_[⌈phi K' L (psi K L v)⌉] := herbrand _
+    _ = G(K'/K)_[⌈phi K' L (psi K L v)⌉] := herbrand _ hgen hgen'
     _ = G(K'/K)^[v] := by
       rw [← psi_comp_of_isValExtension (K' := K') (L := L)]
       simp only [Function.comp_apply, phi_psi_eq_self]
@@ -337,7 +344,7 @@ theorem UpperRamificationGroup_aux.exist_eq_bot [LocalField K] [LocalField L] [I
   obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
   use (phi K L u)
   simp [upperRamificationGroup_aux]
-  rw [psi_phi_eq_self, Int.ceil_intCast u]
+  --rw [psi_phi_eq_self K L, Int.ceil_intCast u]
   exact hu
 
 end
@@ -440,7 +447,7 @@ theorem restrictNormal_restrictNormal {F K₁ K₂ : Type*} [Field F] [Field K�
   rw [h, RingHom.comp_apply, AlgEquiv.restrictNormal_commutes, AlgEquiv.restrictNormal_commutes, ← RingHom.comp_apply, ← h']
 
 -- theorem relation with aux
-theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
+theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : upperRamificationGroup K L v = upperRamificationGroup_aux K L v := by
   ext s
   simp only [upperRamificationGroup, Subgroup.mem_mk, Set.mem_setOf_eq]
   constructor
@@ -457,7 +464,7 @@ theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v
     rw [← herbrand' (L := L)]
     apply Subgroup.mem_map_of_mem
     exact h
-
+    sorry; sorry
 
 -- universe problem here. `∀ (F : Type u_2)`
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : Type u_2) [Field F] [vF : Valued F ℤₘ₀] [IsDiscrete vF.v] [Algebra K F] [IsValExtension K F] [Algebra F L] [IsScalarTower K F L] [Normal K F] [FiniteDimensional K F] [IsValExtension F L],
