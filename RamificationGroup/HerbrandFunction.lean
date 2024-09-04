@@ -203,6 +203,8 @@ theorem sum_insert_left_aux' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℤ) : (∑ 
 
 theorem sum_insert_right_aux (a b : ℤ) (h : a ≤ b) (f : ℚ → ℚ) : (∑ x in Finset.Icc a b, f x) - f b = (∑ x in Finset.Icc a (b - 1), f x) := by sorry
 
+theorem sum_insert_right_aux'' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℚ) : (∑ x in Finset.Icc a b, f x) - f b = (∑ x in Finset.Icc a (b - 1), f x) := by sorry
+
 
 theorem phi_strictMono_of_gt_one {a b : ℚ} (ha : 0 < a) (hb : 1 < b) (hab : a < b) : phi R S a < phi R S b := by
   unfold phi

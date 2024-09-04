@@ -10,6 +10,19 @@ variable (K L : Type*) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L]
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
+theorem sum_insert_right_aux''' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℕ) : (∑ x in Finset.Icc a b, f x) = (∑ x in Finset.Icc a (b - 1), f x) + f b := by
+  calc
+    _ = ∑ x in insert b (Finset.Icc a (b - 1)), f x := by
+      rw [insert_Icc_right _ _ h]
+    _ = (∑ x in Finset.Icc a (b - 1), f x) + f b := by simp [add_comm]
+
+theorem aux_1 {n : ℤ} (hn : 1 ≤ n): (∑ x ∈ Finset.Icc 1 (⌈(n : ℚ) + 1⌉ - 1), Nat.card G(L/K)_[x]) - (∑ x ∈ Finset.Icc 1 (⌈(n : ℚ)⌉ - 1), Nat.card G(L/K)_[x]) = (Nat.card G(L/K)_[n]) := by
+  simp only [ceil_add_one, ceil_intCast, add_sub_cancel_right]
+  rw [sum_insert_right_aux''' 1 n hn (fun x => (Nat.card G(L/K)_[x]))]
+  simp only [Nat.card_eq_fintype_card, add_tsub_cancel_left]
+
+
+#check Nat.Icc_insert_succ_right
 theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : phi K L x = phi K L n + (phi K L (n + 1) - phi K L n) * (x - n) := by
   by_cases hc : 0 < x
   · have hn : (0 : ℚ) ≤ n := by
@@ -27,10 +40,68 @@ theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) 
     · rw [phi_eq_sum_card K L hc]
       nth_rw 1 [phi_eq_sum_card K L hc']
       by_cases hc'' : ⌈x⌉ = ⌈(n : ℚ)⌉
-      · rw [hc'', mul_add, mul_add, add_assoc]
-        simp only [Nat.card_eq_fintype_card, one_div, ceil_intCast, Nat.cast_sum, cast_max, cast_zero, cast_sub, cast_one, add_right_inj]
-        sorry
-      · sorry
+      -- · rw [hc'', mul_add, mul_add, add_assoc]
+      --   congr
+      · have hx' : x = n := by
+          by_contra hcon
+          rw [ceil_intCast] at hc''
+          have ceil_lt := hc'' ▸ (lt_of_le_of_ne hx.left (fun eq => hcon eq.symm))
+          linarith [Int.le_ceil x]
+        simp only [hx', sub_self, mul_zero, add_zero]
+        --rw [phi_eq_sum_card K L, phi_eq_sum_card K L]
+         -- exact hc'
+        -- linarith [hc']
+      · have hx' : ⌈x⌉ = ⌈(n : ℚ) + 1⌉ := by
+          apply Int.ceil_eq_iff.mpr
+          simp
+          exact ⟨lt_of_le_of_ne hx.left (fun eq => hc'' (by congr; exact eq.symm)), le_of_lt hx.right⟩
+        simp only [hx']
+        rw [← sub_eq_iff_eq_add', ← mul_sub, ← sub_sub, add_comm, ← add_sub, add_comm, ← add_sub]
+        calc
+          _ = (1 / Nat.card G(L/K)_[0]) * ((Nat.card G(L/K)_[n]) +  ((x - (max 0 (⌈(n : ℚ) + 1⌉ - 1))) * (Nat.card G(L/K)_[⌈(n : ℚ) + 1⌉] ) - (n - (max 0 (⌈(n : ℚ)⌉ - 1))) * (Nat.card G(L/K)_[⌈(n : ℚ)⌉] ))) := by
+            rw [← Nat.cast_sub, aux_1 K L (n := n)]
+            apply Int.le_of_sub_one_lt
+            rw [sub_self]
+            apply_mod_cast hc'
+            apply sum_le_sum_of_subset_of_nonneg
+            refine Finset.Icc_subset_Icc (by linarith) ?_
+            simp only [ceil_intCast, ceil_add_one, add_sub_cancel_right, tsub_le_iff_right,le_add_iff_nonneg_right, zero_le_one]
+            intro i hi1 hi2
+            apply le_of_lt
+            sorry
+            --apply Ramification_Group_card_pos
+          _ = (1 / Nat.card G(L/K)_[0]) * (Nat.card G(L/K)_[(n + 1)]) * (x - n) := by
+            simp only [ceil_add_one, ceil_intCast, add_sub_cancel_right, cast_max, cast_zero, cast_sub, cast_one, max_eq_right hn]
+            have hn' : 0 ≤ (n : ℚ) - 1 := by
+              rw [← cast_zero, ← cast_one, ← cast_sub, cast_le]
+              apply Int.le_sub_one_of_lt
+              apply_mod_cast hc'
+            simp only [Nat.card_eq_fintype_card, one_div, max_eq_right hn', sub_sub_cancel, one_mul,add_sub_cancel]
+            ring
+          _ = _ := by
+            congr
+            repeat rw [phi_eq_sum_card K L]
+            simp only [ceil_add_one, ceil_intCast, add_sub_cancel_right, Nat.cast_sum, cast_max, cast_zero, cast_sub, cast_one]
+            rw [← mul_sub]
+            congr
+            have aux₁: max 0 (n : ℚ) = n := by
+              apply max_eq_right
+              apply le_of_lt hc'
+            have aux₂: max 0 (n - 1 : ℚ) = n - 1 := by
+              apply max_eq_right
+              rw [← cast_zero, ← cast_one, ← cast_sub, cast_le]
+              apply Int.le_sub_one_of_lt
+              apply_mod_cast hc'
+            rw [aux₁, aux₂, ← sum_insert_right_aux'' 1 n ?_ (fun x => (Nat.card G(L/K)_[x] : ℚ))]
+            simp only [Nat.card_eq_fintype_card, add_sub_cancel_left, one_mul, sub_sub_cancel, sub_add_cancel]
+            apply Int.le_of_sub_one_lt
+            simp only [sub_self]
+            apply_mod_cast hc'
+            exact hc'
+            linarith [hc']
+            -- conv =>
+            --   enter [2, 1, 1, 1]
+            --   rw [show n = n - 1 + 1 by simp]
     · have hn' : n = 0 := by
         symm
         apply eq_of_le_of_not_lt
