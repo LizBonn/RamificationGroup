@@ -4,6 +4,7 @@ import Mathlib.FieldTheory.KrullTopology
 import RamificationGroup.HerbrandFunction
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.MeasureTheory.Integral.FundThmCalculus
 -- import RamificationGroup.Valued.Hom.Discrete'
 
 /-!
@@ -225,15 +226,41 @@ variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] 
 -- Prop 15
 open Function HerbrandFunction
 
-@[simp]
-theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
-  --this line can be simper
+
+-- variable (K L)
+-- noncomputable def phiDerivReal (u : ℝ) : ℝ :=
+--   (Nat.card G(L/K)_[(max 0 ⌈u⌉)] : ℚ) / (Nat.card G(L/K)_[0] : ℚ)
+
+#check Continuous.deriv_integral
+-- noncomputable def phi (u : ℚ) : ℚ :=
+--   ∑ x in Finset.Icc 1 (⌈u⌉ - 1), (phiDeriv R S x) + (u - (max 0 (⌈u⌉ - 1))) * (phiDeriv R S u)
+
+#check Continuous.integral_hasStrictDerivAt
+
+-- variable (μ : MeasureTheory.Measure ℝ)
+
+-- def phiReal (u : Real) : Real := intervalIntegral (phiDerivReal (K := K) (L := L)) 0 u μ
+
+-- theorem continuous_phiDerivReal : Continuous (phiDerivReal (K := K) (L := L)) := by sorry
+
+-- theorem phiReal_eq_phi {u : ℚ} : phiReal μ (K := K) (L := L) u = phi K L u := by sorry
+
+-- theorem phiReal_comp_of_isValExtension' (u : ℝ) : (phiReal μ (K := K) (L := K')) ∘ (phiReal μ (K := K') (L := L)) = phiReal μ (K := K) (L := L) := by
+--   apply eq_of_fderiv_eq (𝕜 := ℝ)
+--   sorry
+--   sorry
+--   repeat sorry
+
+-- @[simp]
+-- theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
+
   sorry
 
 @[simp]
 theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
-  ext u
-  apply phi_comp_of_isValExtension'
+  sorry
+  -- ext u
+  -- apply phi_comp_of_isValExtension'
 
 #check eq_of_fderiv_eq
 --Prop 15
@@ -458,13 +485,14 @@ theorem eq_UpperRamificationGroup_aux [vL : Valued L ℤₘ₀] [IsDiscrete vL.v
       assumption
     ext s a
     simp [restrictNormalHom]
-  · intro h F
-    intros
-    have : FiniteDimensional F L := by exact Module.Finite.of_restrictScalars_finite K F L
-    rw [← herbrand' (L := L)]
-    apply Subgroup.mem_map_of_mem
-    exact h
-    sorry; sorry
+  · sorry
+  -- · intro h F
+  --   intros
+  --   have : FiniteDimensional F L := by exact Module.Finite.of_restrictScalars_finite K F L
+  --   rw [← herbrand' (L := L)]
+  --   apply Subgroup.mem_map_of_mem
+  --   exact h
+  --   sorry; sorry
 
 -- universe problem here. `∀ (F : Type u_2)`
 theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s ∈ G(L/K)^[v] ↔ ∀ (F : Type u_2) [Field F] [vF : Valued F ℤₘ₀] [IsDiscrete vF.v] [Algebra K F] [IsValExtension K F] [Algebra F L] [IsScalarTower K F L] [Normal K F] [FiniteDimensional K F] [IsValExtension F L],
@@ -493,7 +521,9 @@ theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s
 theorem map_restrictNormalHom {K'} [Field K'] [vK' : Valued K' ℤₘ₀] [IsDiscrete vK'.v] [Algebra K K'] [Algebra K' L] [FiniteDimensional K K'] [IsScalarTower K K' L] [Normal K K'] [Normal K L] [IsValExtension K K'] [IsValExtension K' L] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
   have : FiniteDimensional K' L:= by exact Module.Finite.of_restrictScalars_finite K K' L
   rw [eq_UpperRamificationGroup_aux, eq_UpperRamificationGroup_aux, upperRamificationGroup_aux, upperRamificationGroup_aux]
-  apply herbrand'
+  repeat sorry
+
+  --apply herbrand'
   -- ext s
   -- calc
   -- _ ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
@@ -544,6 +574,7 @@ theorem autCongr_mem_upperRamificationGroup_iff {f : L ≃ₐ[K] L'} (s : L ≃�
   have h1 : ⌈psi K L v⌉ = ⌈psi K L' v⌉ := by sorry
   rw [eq_UpperRamificationGroup_aux, eq_UpperRamificationGroup_aux, upperRamificationGroup_aux, upperRamificationGroup_aux, ←h1]
   apply autCongr_mem_lowerRamificationGroup_iff (s := s) (u := ⌈psi K L v⌉) (f := f) h
+  repeat sorry
 
 end autCongr
 
@@ -553,10 +584,12 @@ theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsVal
 G(L/K)^[v] = decompositionGroup K L := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_decompositionGroup h
+  repeat sorry
 
 theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
   rw [eq_UpperRamificationGroup_aux]
   exact UpperRamificationGroup_aux.eq_top h
+  repeat sorry
 
 end UpperRamificationGroup
 
@@ -568,16 +601,17 @@ set_option synthInstance.maxHeartbeats 0
 #synth Algebra K L
 
 theorem inf_eq_bot (s : L ≃ₐ[K] L) : (∀ v, s ∈ G(L/K)^[v]) ↔ s = 1 := by
-  constructor
-  · intro h
-    obtain ⟨v, hv⟩ := UpperRamificationGroup_aux.exist_eq_bot (K := K) (L := L)
-    rw [← eq_UpperRamificationGroup_aux] at hv
-    have h1 : s ∈ G(L/K)^[v] := h v
-    rw [hv] at h1
-    apply Subgroup.mem_bot.1 h1
-  · intro hs v
-    simp only [hs]
-    apply Subgroup.one_mem
+  sorry
+  -- constructor
+  -- · intro h
+  --   obtain ⟨v, hv⟩ := UpperRamificationGroup_aux.exist_eq_bot (K := K) (L := L)
+  --   rw [← eq_UpperRamificationGroup_aux] at hv
+  --   have h1 : s ∈ G(L/K)^[v] := h v
+  --   rw [hv] at h1
+  --   apply Subgroup.mem_bot.1 h1
+  -- · intro hs v
+  --   simp only [hs]
+  --   apply Subgroup.one_mem
 
 
 /-
