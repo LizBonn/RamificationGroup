@@ -1,4 +1,5 @@
 import RamificationGroup.UpperNumbering
+import Mathlib.Algebra.Order.Pointwise
 
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation HerbrandFunction
 
@@ -40,10 +41,23 @@ theorem phiReal_Defferentiable : Differentiable ℝ (phiReal μ K L) := by sorry
 
 set_option maxHeartbeats 0
 
-theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) : ℝ) * (Nat.card G(L/K')_[⌈x⌉] : ℝ) = (Nat.card G(L/K)_[⌈x⌉] : ℝ) := by sorry
+open Pointwise
+
+theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) : ℝ) * (Nat.card G(L/K')_[⌈x⌉] : ℝ) = (Nat.card G(L/K)_[⌈x⌉] : ℝ) := by
+  rw [← Nat.cast_mul, ← Nat.card_prod]
+  norm_cast
+  apply_mod_cast Nat.card_congr (α := (↥(Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉] ) × ↥ G(L/K')_[⌈x⌉])) (β := G(L/K)_[⌈x⌉])
+  let f : G(L/K)_[⌈x⌉] → ((Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉] ) × G(L/K')_[⌈x⌉]) := (fun y => (⟨AlgEquiv.restrictNormalHom K' (K₁ := L) y, by sorry⟩ , ⟨sorry, by sorry⟩))
+  have hf : f.Bijective := by sorry
+  apply Equiv.symm
+  apply Equiv.ofBijective f hf
+
+theorem RamificationIdx_eq_uniformizer_valuation : LocalField.ramificationIdx K L = 1 := by sorry
 
 theorem RamificationGroup_card_zero_comp_aux : (Nat.card G(K'/K)_[0] : ℝ) * (Nat.card G(L/K')_[0] : ℝ) = (Nat.card G(L/K)_[0] : ℝ) := by
   repeat rw [RamificationIdx_eq_card_of_inertia_group]
+  unfold LocalField.ramificationIdx LocalRing.ramificationIdx Ideal.ramificationIdx
+  norm_cast
   sorry
 
 theorem herbrand_Real (u : ℝ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phiReal μ K' L u⌉] := by sorry
