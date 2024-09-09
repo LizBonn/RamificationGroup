@@ -6,15 +6,14 @@ open QuotientGroup IntermediateField DiscreteValuation Valued Valuation Herbrand
 variable (μ : MeasureTheory.Measure ℝ)
 variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
 
-
 noncomputable def phiDerivReal (u : ℝ) : ℝ :=
   (Nat.card G(L/K)_[(max 0 ⌈u⌉)] : ℚ) / (Nat.card G(L/K)_[0] : ℚ)
 
-noncomputable def phiReal (u : Real) : Real := intervalIntegral (phiDerivReal (K := K) (L := L)) 0 u μ
+noncomputable def phiReal (u : Real) : Real := intervalIntegral (phiDerivReal K L) 0 u μ
 
-theorem continuous_phiDerivReal : Continuous (phiDerivReal (K := K) (L := L)) := by sorry
+--theorem continuous_phiDerivReal_aux : Continuous (phiDerivReal (K := K) (L := L)) := by sorry
 
-theorem phiReal_eq_phi {u : ℚ} : phiReal μ (K := K) (L := L) u = phi K L u := by sorry
+theorem phiReal_eq_phi {u : ℚ} : phiReal μ K L u = phi K L u := by sorry
 
 theorem phiReal_zero_eq_zero : phiReal μ K L 0 = 0 := by sorry
 
@@ -52,13 +51,14 @@ theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (Alg
   apply Equiv.symm
   apply Equiv.ofBijective f hf
 
-theorem RamificationIdx_eq_uniformizer_valuation : LocalField.ramificationIdx K L = 1 := by sorry
+theorem RamificationIdx_eq_uniformizer_valuation {ϖ : K} (h : vK.v ϖ = 1) (h' : vL.v (algebraMap K L ϖ) ≠ 0) : LocalField.ramificationIdx K L = (Multiplicative.toAdd ((vL.v (algebraMap K L ϖ)).unzero h')).toNat := by sorry
 
-theorem RamificationGroup_card_zero_comp_aux : (Nat.card G(K'/K)_[0] : ℝ) * (Nat.card G(L/K')_[0] : ℝ) = (Nat.card G(L/K)_[0] : ℝ) := by
+theorem RamificationGroup_card_zero_comp_aux {ϖ : K} {ϖ' : K'} (h1 : vK'.v ϖ' = 1) (h2 : vK.v ϖ = 1) (h3 : vL.v (algebraMap K L ϖ) ≠ 0) (h4 : vL.v (algebraMap K' L ϖ') ≠ 0) (h5 : vK'.v (algebraMap K K' ϖ) ≠ 0) : (Nat.card G(K'/K)_[0] : ℝ) * (Nat.card G(L/K')_[0] : ℝ) = (Nat.card G(L/K)_[0] : ℝ) := by
   repeat rw [RamificationIdx_eq_card_of_inertia_group]
-  unfold LocalField.ramificationIdx LocalRing.ramificationIdx Ideal.ramificationIdx
   norm_cast
+  rw [RamificationIdx_eq_uniformizer_valuation K L h2 h3,  RamificationIdx_eq_uniformizer_valuation K' L h1 h4, RamificationIdx_eq_uniformizer_valuation K K' h2 h5]
   sorry
+
 
 theorem herbrand_Real (u : ℝ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phiReal μ K' L u⌉] := by sorry
 
