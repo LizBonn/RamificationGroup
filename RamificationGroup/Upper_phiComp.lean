@@ -48,15 +48,17 @@ set_option maxHeartbeats 0
 
 open Pointwise
 
+#check Subgroup.card_mul_index
+#check Subgroup.index_eq_card
+
+#synth Group (L ≃ₐ[K] L)
 
 theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) : ℝ) * (Nat.card G(L/K')_[⌈x⌉] : ℝ) = (Nat.card G(L/K)_[⌈x⌉] : ℝ) := by
-  rw [← Nat.cast_mul, ← Nat.card_prod]
   norm_cast
-  apply_mod_cast Nat.card_congr (α := (↥(Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉] ) × ↥ G(L/K')_[⌈x⌉])) (β := G(L/K)_[⌈x⌉])
-  let f : G(L/K)_[⌈x⌉] → ((Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉] ) × G(L/K')_[⌈x⌉]) := (fun y => (⟨AlgEquiv.restrictNormalHom K' (K₁ := L) y, by sorry⟩ , ⟨sorry, by sorry⟩))
-  have hf : f.Bijective := by sorry
-  apply Equiv.symm
-  apply Equiv.ofBijective f hf
+
+  sorry
+
+
 
 open LocalRing ExtDVR
 
@@ -81,8 +83,14 @@ theorem herbrand_Real (u : ℝ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalH
 
 #check eq_of_has_deriv_right_eq
 
-theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal μ K K') ∘ (phiReal μ K' L)) u = phiReal μ K L u := by sorry
-
+theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal μ K K') ∘ (phiReal μ K' L)) u = phiReal μ K L u := by
+  have hdf : ∀ x ∈ Set.Ico (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ), HasDerivWithinAt (phiReal μ K K' ∘ phiReal μ K' L) (phiDerivReal K L x) (Set.Ici x) x := by sorry
+  have hdg : ∀ x ∈ Set.Ico (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ), HasDerivWithinAt (phiReal μ K L) (phiDerivReal K L x) (Set.Ici x) x := by sorry
+  have hcf : ContinuousOn (phiReal μ K K' ∘ phiReal μ K' L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by sorry
+  have hcg : ContinuousOn (phiReal μ K L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by sorry
+  apply eq_of_has_deriv_right_eq hdf hdg hcf hcg
+  sorry
+  sorry
 
 
 
