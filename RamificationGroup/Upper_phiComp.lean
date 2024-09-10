@@ -79,11 +79,12 @@ theorem RamificationGroup_card_zero_comp_aux : (Nat.card G(K'/K)_[0] : ℝ) * (N
 
 theorem herbrand_Real (u : ℝ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phiReal μ K' L u⌉] := by sorry
 
+#check eq_of_has_deriv_right_eq
 
-theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal μ K K') ∘ (phiReal μ K' L)) u = phiReal μ K L u := by
-  by_cases hc : ∃ n : ℤ, u = n
-  · sorry
-  · sorry
+theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal μ K K') ∘ (phiReal μ K' L)) u = phiReal μ K L u := by sorry
+
+
+
 
 theorem phiReal_comp_of_isValExtension' : (phiReal μ K K') ∘ (phiReal μ K' L) = phiReal μ K L := by
   apply eq_of_fderiv_eq (𝕜 := ℝ) (x := 0)
