@@ -4,7 +4,7 @@ import Mathlib.Algebra.Order.Pointwise
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation HerbrandFunction
 
 variable (μ : MeasureTheory.Measure ℝ)
-variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
+variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
 
 noncomputable def phiDerivReal (u : ℝ) : ℝ :=
   (Nat.card G(L/K)_[(max 0 ⌈u⌉)] : ℚ) / (Nat.card G(L/K)_[0] : ℚ)
@@ -17,15 +17,21 @@ theorem phiReal_eq_phi {u : ℚ} : phiReal μ K L u = phi K L u := by sorry
 
 theorem phiReal_zero_eq_zero : phiReal μ K L 0 = 0 := by sorry
 
--- noncomputable def phiDerivReal_lin : ℝ →L[ℝ] ℝ where
---   toFun := phiDerivReal K L
---   map_add' := sorry
---   map_smul' := sorry
---   cont := sorry
+#check intervalIntegral.differentiableOn_integral_of_continuous
 
-theorem phiReal_hasDeriv {x : ℝ} : HasDerivAt (phiReal μ K L) (phiDerivReal K L x) x := by sorry
+theorem phiReal_hasFDeriv {x : ℝ} :HasFDerivAt (𝕜 := ℝ) (phiReal μ K L) (ContinuousLinearMap.smulRight (S := ℝ) 1 (phiDerivReal K L x)) x:= by
+  apply hasFDerivAt_iff_hasDerivAt.2
+  sorry
 
-theorem phiReal_Defferentiable : Differentiable ℝ (phiReal μ K L) := by sorry
+theorem phiReal_hasDeriv {x : ℝ} : HasDerivAt (phiReal μ K L) (phiDerivReal K L x) x := by
+  apply hasDerivAt_iff_hasFDerivAt.2
+  apply phiReal_hasFDeriv
+
+theorem phiReal_Defferentiable : Differentiable ℝ (phiReal μ K L) := by
+  dsimp [Differentiable, DifferentiableAt]
+  intro x
+  use (ContinuousLinearMap.smulRight (S := ℝ) 1 (phiDerivReal K L x))
+  apply phiReal_hasFDeriv
 
 
 -- theorem aux_2 : ↑(Nat.card ↥ G(K'/K)_[⌈(Nat.card ↥ G(L/K')_[1] : ℝ) / ↑(Nat.card ↥ G(L/K')_[0] : ℝ)⌉] ) / ↑(Nat.card ↥ G(K'/K)_[0] : ℝ) =
@@ -42,6 +48,7 @@ set_option maxHeartbeats 0
 
 open Pointwise
 
+
 theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) : ℝ) * (Nat.card G(L/K')_[⌈x⌉] : ℝ) = (Nat.card G(L/K)_[⌈x⌉] : ℝ) := by
   rw [← Nat.cast_mul, ← Nat.card_prod]
   norm_cast
@@ -51,18 +58,34 @@ theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (Alg
   apply Equiv.symm
   apply Equiv.ofBijective f hf
 
-theorem RamificationIdx_eq_uniformizer_valuation {ϖ : K} (h : vK.v ϖ = 1) (h' : vL.v (algebraMap K L ϖ) ≠ 0) : LocalField.ramificationIdx K L = (Multiplicative.toAdd ((vL.v (algebraMap K L ϖ)).unzero h')).toNat := by sorry
+open LocalRing ExtDVR
 
-theorem RamificationGroup_card_zero_comp_aux {ϖ : K} {ϖ' : K'} (h1 : vK'.v ϖ' = 1) (h2 : vK.v ϖ = 1) (h3 : vL.v (algebraMap K L ϖ) ≠ 0) (h4 : vL.v (algebraMap K' L ϖ') ≠ 0) (h5 : vK'.v (algebraMap K K' ϖ) ≠ 0) : (Nat.card G(K'/K)_[0] : ℝ) * (Nat.card G(L/K')_[0] : ℝ) = (Nat.card G(L/K)_[0] : ℝ) := by
+#check IsScalarTower.algebraMap_eq
+
+--variable [IsScalarTower 𝒪[K] 𝒪[K'] 𝒪[L]]
+theorem RamificationGroup_card_zero_comp_aux : (Nat.card G(K'/K)_[0] : ℝ) * (Nat.card G(L/K')_[0] : ℝ) = (Nat.card G(L/K)_[0] : ℝ) := by
   repeat rw [RamificationIdx_eq_card_of_inertia_group]
   norm_cast
-  rw [RamificationIdx_eq_uniformizer_valuation K L h2 h3,  RamificationIdx_eq_uniformizer_valuation K' L h1 h4, RamificationIdx_eq_uniformizer_valuation K K' h2 h5]
+  unfold LocalField.ramificationIdx LocalRing.ramificationIdx
+  let e_K'K := Ideal.ramificationIdx (algebraMap ↥𝒪[K] ↥𝒪[K']) (LocalRing.maximalIdeal ↥𝒪[K]) (LocalRing.maximalIdeal ↥𝒪[K'])
+  let e_LK' := Ideal.ramificationIdx (algebraMap ↥𝒪[K'] ↥𝒪[L]) (LocalRing.maximalIdeal ↥𝒪[K']) (LocalRing.maximalIdeal ↥𝒪[L])
+  let e_LK := Ideal.ramificationIdx (algebraMap ↥𝒪[K] ↥𝒪[L]) (LocalRing.maximalIdeal ↥𝒪[K]) (LocalRing.maximalIdeal ↥𝒪[L])
+  have h : (LocalRing.maximalIdeal 𝒪[L]) ^ (e_K'K * e_LK') = (LocalRing.maximalIdeal 𝒪[L]) ^ (e_LK) := by
+    dsimp [e_K'K, e_LK', e_LK]
+    haveI : IsScalarTower 𝒪[K] 𝒪[K'] 𝒪[L] := by sorry
+    rw [← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K L), mul_comm, pow_mul, ← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K' L), ← Ideal.map_pow, ← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K K'), Ideal.map_map, ← IsScalarTower.algebraMap_eq]
   sorry
 
 
 theorem herbrand_Real (u : ℝ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phiReal μ K' L u⌉] := by sorry
 
-theorem phiReal_comp_of_isValExtension' (u : ℝ) : (phiReal μ K K') ∘ (phiReal μ K' L) = phiReal μ K L := by
+
+theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal μ K K') ∘ (phiReal μ K' L)) u = phiReal μ K L u := by
+  by_cases hc : ∃ n : ℤ, u = n
+  · sorry
+  · sorry
+
+theorem phiReal_comp_of_isValExtension' : (phiReal μ K K') ∘ (phiReal μ K' L) = phiReal μ K L := by
   apply eq_of_fderiv_eq (𝕜 := ℝ) (x := 0)
   · rw [Function.comp_apply, phiReal_zero_eq_zero, phiReal_zero_eq_zero, phiReal_zero_eq_zero]
   · apply Differentiable.comp (phiReal_Defferentiable μ K K') (phiReal_Defferentiable μ K' L)
@@ -107,5 +130,5 @@ theorem phiReal_comp_of_isValExtension' (u : ℝ) : (phiReal μ K K') ∘ (phiRe
 theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
   have : ((phi K K') ((phi K' L) u) : ℝ) = ((phi K L) u  : ℝ) := by
     rw [← phiReal_eq_phi μ K L, ← phiReal_eq_phi μ K K', ← phiReal_eq_phi μ K' L, ← Function.comp_apply (f := phiReal μ K K')]
-    rw [phiReal_comp_of_isValExtension' μ K K' L u]
+    rw [phiReal_comp_of_isValExtension' μ K K' L]
   apply_mod_cast this
