@@ -145,7 +145,9 @@ theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : A
     rw [← algebraMap]
     exact rfl
   simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, h2, commutes]
-
+  simp only [← h2, toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, Subtype.coe_eta]
+  rw [← h1]
+  simp only [symm_apply_apply]
   -- have h1 : ∀ k : K', (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = algebraMap K' (IsScalarTower.toAlgHom K K' L).range k := by
   --   intro k
   --   unfold algebraMap
@@ -158,26 +160,31 @@ theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : A
   --   intro k
   --   rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one]
   --   sorry
-  simp only [Algebra.algebraMap_eq_smul_one]
-  -- have h3 : (1 : (IsScalarTower.toAlgHom K K' L).range) = (1 : L) := rfl
-  haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
-    refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
-  have h4 : t • (1 : L) ∈ (IsScalarTower.toAlgHom K K' L).range := by
-    simp only [mem_range, IsScalarTower.coe_toAlgHom']
-    use t
-    apply Algebra.algebraMap_eq_smul_one
-  have h5 : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm ⟨t • (1 : L), h4⟩ = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm (t • (1 : (IsScalarTower.toAlgHom K K' L).range)) := by
-    refine AlgEquiv.congr_arg ?_
-    refine SetCoe.ext ?_
-    simp only
-    -- have : (↑(t • (1 : ((IsScalarTower.toAlgHom K K' L).range))) : L) = (t • ↑((1 : ((IsScalarTower.toAlgHom K K' L).range)) : L)) := by
-    sorry
-  have h6 : algebraMap K' _ t = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t := by
-    rw [h1, ← algebraMap]
-    congr
-    sorry
-  rw [h5, ← Algebra.algebraMap_eq_smul_one, h6]
-  exact symm_apply_apply (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t
+
+  -- simp only [Algebra.algebraMap_eq_smul_one]
+
+  -- -- have h3 : (1 : (IsScalarTower.toAlgHom K K' L).range) = (1 : L) :=
+
+  -- haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
+  --   refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
+  -- have h4 : t • (1 : L) ∈ (IsScalarTower.toAlgHom K K' L).range := by
+  --   simp only [mem_range, IsScalarTower.coe_toAlgHom']
+  --   use t
+  --   apply Algebra.algebraMap_eq_smul_one
+  -- have h5 : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm ⟨t • (1 : L), h4⟩ = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm (t • (1 : (IsScalarTower.toAlgHom K K' L).range)) := by
+  --   refine AlgEquiv.congr_arg ?_
+  --   refine SetCoe.ext ?_
+  --   simp only
+
+  --   -- have : (↑(t • (1 : ((IsScalarTower.toAlgHom K K' L).range))) : L) = (t • ↑((1 : ((IsScalarTower.toAlgHom K K' L).range)) : L)) := by
+  --   sorry
+
+  -- have h6 : algebraMap K' _ t = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t := by
+  --   rw [h1, ← algebraMap]
+  --   congr
+  --   sorry
+  -- rw [h5, ← Algebra.algebraMap_eq_smul_one, h6]
+  -- exact symm_apply_apply (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t
 
   --simp only [_root_.map_one, smul_eq_mul, mul_one]
   --rw [map_smul (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm t (1 : L)]
