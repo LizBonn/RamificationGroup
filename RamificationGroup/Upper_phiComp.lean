@@ -125,19 +125,38 @@ theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : A
   -- have h1 : x ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t) = ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t) := by
   --   #check (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toRingHom
   --   #check (IsScalarTower.toAlgHom K K' L).range
-  haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
-    refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
-  have h1 : ∀ k : K', (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = algebraMap K' (IsScalarTower.toAlgHom K K' L).range k := by
-    intro k
-    unfold algebraMap
-    have h : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom k := rfl
-    rw [h, ← algebraMap, ← algebraMap]
-    simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom,
-      Algebra.algebraMap_eq_smul_one]
-    
-  have h2 : ∀ k : K', algebraMap K' (IsScalarTower.toAlgHom K K' L).range k = algebraMap K' L k := by sorry
-  simp only [h1 t, h2 t, x.commutes]
+  -- haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
+  --   refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
+  have h1 : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom t := rfl
+  rw [h1]
+  -- haveI range : Subalgebra K' L := {
+  --   carrier := (IsScalarTower.toAlgHom K K' L).range
+  --   mul_mem' := ?mul_mem'
+  --   one_mem' := ?one_mem'
+  --   add_mem' := ?add_mem'
+  --   zero_mem' := ?zero_mem'
+  --   algebraMap_mem' := ?algebraMap_mem'
+  -- }
+  have h2 : ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom t) = algebraMap K' L t := by
+    rw [← algebraMap]
+    exact rfl
+  simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, h2, commutes]
+
+  -- have h1 : ∀ k : K', (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = algebraMap K' (IsScalarTower.toAlgHom K K' L).range k := by
+  --   intro k
+  --   unfold algebraMap
+  --   have h : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom k := rfl
+  --   rw [h, ← algebraMap, ← algebraMap]
+  --   simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom,
+  --     Algebra.algebraMap_eq_smul_one]
+  --   congr
+  -- have h2 : ∀ k : K', algebraMap K' (IsScalarTower.toAlgHom K K' L).range k = algebraMap K' L k := by
+  --   intro k
+  --   rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one]
+  --   sorry
   simp only [Algebra.algebraMap_eq_smul_one]
+
+  sorry
 
 
 
