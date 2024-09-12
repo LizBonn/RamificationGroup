@@ -51,12 +51,184 @@ open Pointwise
 #check Subgroup.card_mul_index
 #check Subgroup.index_eq_card
 
-#synth Group (L ≃ₐ[K] L)
+#check AlgHom.restrictScalars
+#check QuotientGroup.quotientInfEquivProdNormalQuotient
+
+--for lower
+instance {u : ℤ} : Subgroup.Normal (lowerRamificationGroup K L u) := sorry
+
+#check Subgroup.map_comap_eq
+#check Subgroup.map_comap_eq_self_of_surjective
+#check QuotientGroup.quotientKerEquivOfSurjective
+
+noncomputable def aux_7 {G H : Type*} [Group G] [Group H] {N : Subgroup G} {f : G →* H} (h : Function.Surjective f) : N.map f ≃ N ⧸ (N ⊓ f.ker).subgroupOf N := by
+  symm
+  let φ : N →* (N.map f) := {
+    toFun := fun x => ⟨f x, by
+      simp
+      use x
+      constructor
+      · exact SetLike.coe_mem x
+      · rfl⟩
+    map_one' := by
+      ext
+      apply f.map_one'
+    map_mul' := by
+      intro x y
+      ext
+      apply f.map_mul'
+  }
+  haveI h' : Function.Surjective φ := by
+    intro y
+    dsimp [φ]
+    have hy : y.1 ∈ Subgroup.map f N := by exact SetLike.coe_mem y
+    obtain ⟨t, ht1, ht2⟩ := Subgroup.mem_map.1 hy
+    use ⟨t, ht1⟩
+    exact SetCoe.ext ht2
+  haveI h1 : N ⧸ φ.ker ≃* (Subgroup.map f N) := by
+    apply QuotientGroup.quotientKerEquivOfSurjective (G := N) (H := (N.map f)) (φ := φ) h'
+  have h2 : φ.ker = (N ⊓ f.ker).subgroupOf N := by
+    ext x
+    constructor
+    <;> intro hx
+    · simp only [Subgroup.inf_subgroupOf_left]
+      refine Subgroup.mem_subgroupOf.mpr ?h.mp.a
+      rw [MonoidHom.mem_ker] at *
+      exact (Submonoid.mk_eq_one (Subgroup.map f N).toSubmonoid).mp hx
+    · simp only [Subgroup.inf_subgroupOf_left] at hx
+      rw [Subgroup.mem_subgroupOf] at hx
+      rw [MonoidHom.mem_ker] at *
+      exact OneMemClass.coe_eq_one.mp hx
+  rw [← h2]
+  apply h1.toEquiv
+
+set_option synthInstance.maxHeartbeats 100000000
+#check Function.leftInverse_invFun
+
+#check Subgroup.mem_subgroupOf
+#check Subgroup.card_eq_card_quotient_mul_card_subgroup
+
+open AlgEquiv AlgHom
+#check AlgEquiv.restrictNormal
+#check algebraMap K' L
+#check Algebra.algebraMap_eq_smul_one
+#check ofInjectiveField
+
+theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : AlgEquiv.restrictNormalHom K' (AlgEquiv.restrictScalarsHom K x) = 1 := by
+  unfold restrictNormalHom restrictScalarsHom
+  simp only [MonoidHom.coe_mk, OneHom.coe_mk, MonoidHom.mk'_apply]
+  unfold restrictNormal restrictNormal' AlgHom.restrictNormal restrictNormalAux restrictScalars
+  ext t
+  rw [one_apply]
+  simp only [toAlgHom_eq_coe, RingEquiv.toEquiv_eq_coe, AlgHom.coe_coe, coe_mk, EquivLike.coe_coe, coe_ringEquiv, coe_ofBijective, coe_comp, AlgHom.coe_mk, RingHom.coe_mk, MonoidHom.coe_mk, OneHom.coe_mk, Function.comp_apply]
+  -- #check x.commutes'
+  -- have h1 : x ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t) = ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t) := by
+  --   #check (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toRingHom
+  --   #check (IsScalarTower.toAlgHom K K' L).range
+  haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
+    refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
+  have h1 : ∀ k : K', (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = algebraMap K' (IsScalarTower.toAlgHom K K' L).range k := by
+    intro k
+    unfold algebraMap
+    have h : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom k := rfl
+    rw [h, ← algebraMap, ← algebraMap]
+    simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom,
+      Algebra.algebraMap_eq_smul_one]
+    
+  have h2 : ∀ k : K', algebraMap K' (IsScalarTower.toAlgHom K K' L).range k = algebraMap K' L k := by sorry
+  simp only [h1 t, h2 t, x.commutes]
+  simp only [Algebra.algebraMap_eq_smul_one]
+
+
+
+
+
+  -- dsimp [restrictNormal, restrictNormal', AlgHom.restrictNormal, restrictScalars]
+  -- ext t
+  -- simp only [coe_ofBijective, coe_comp, AlgHom.coe_coe, Function.comp_apply, one_apply]
+
+
+theorem AlgEquiv.restrictNormal_ker_eq : (AlgEquiv.restrictNormalHom K').ker = (⊤ : Subgroup (L ≃ₐ[K'] L)).map (AlgEquiv.restrictScalarsHom K) := by sorry
 
 theorem RamificationGroup_card_comp_aux {x : ℝ} : (Nat.card (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) : ℝ) * (Nat.card G(L/K')_[⌈x⌉] : ℝ) = (Nat.card G(L/K)_[⌈x⌉] : ℝ) := by
   norm_cast
-
-  sorry
+  haveI h1 : G(L/K')_[⌈x⌉] ≃ (G(L/K')_[⌈x⌉].map (AlgEquiv.restrictScalarsHom K)) := by
+    let f : G(L/K')_[⌈x⌉] → (G(L/K')_[⌈x⌉].map (AlgEquiv.restrictScalarsHom K)) := (fun t => ⟨ (AlgEquiv.restrictScalarsHom K) t.1,by exact Subgroup.apply_coe_mem_map (AlgEquiv.restrictScalarsHom K) G(L/K')_[⌈x⌉] t⟩)
+    apply Equiv.ofBijective f
+    constructor
+    · intro x y
+      dsimp [f]
+      rw [Subtype.mk.injEq]
+      intro hx
+      apply_mod_cast AlgEquiv.restrictScalarsHom_injective K hx
+    · intro t
+      have ht : t.1 ∈ (Subgroup.map (AlgEquiv.restrictScalarsHom K) G(L/K')_[⌈x⌉] ) := by exact SetLike.coe_mem t
+      obtain ⟨y, hy1, hy2⟩ := Subgroup.mem_map.1 ht
+      dsimp [f]
+      simp only [Subtype.exists]
+      use y
+      use hy1
+      exact SetCoe.ext hy2
+      -- dsimp [f]
+      -- simp only [Subtype.exists]
+      -- use (AlgEquiv.restrictScalars K).invFun t
+      -- have h : Function.invFun (AlgEquiv.restrictScalars K) ↑t ∈ G(L/K')_[⌈x⌉]:= by sorry
+      -- use h
+      --have h' : (AlgEquiv.restrictScalarsHom K) (Function.invFun (AlgEquiv.restrictScalars K (S := K')) t.1) = ((AlgEquiv.restrictScalarsHom K) ∘ (Function.invFun (AlgEquiv.restrictScalars K (S := K')))) t.1 := by sorry
+  haveI h2: (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) ≃ (G(L/K)_[⌈x⌉] ⧸ (G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉]) := by
+    apply aux_7
+    exact AlgEquiv.restrictNormalHom_surjective L
+  haveI h3 : (G(L/K')_[⌈x⌉].map (AlgEquiv.restrictScalarsHom K)) = (G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker) := by
+    ext t
+    constructor
+    <;> intro ht
+    · apply Subgroup.mem_inf.2
+      constructor
+      · sorry
+      · apply (MonoidHom.mem_ker (AlgEquiv.restrictNormalHom K')).2
+        obtain ⟨y, hy1, hy2⟩ := Subgroup.mem_map.1 ht
+        rw [← hy2]
+        apply AlgEquiv.restrictNormalHom_restrictScalarsHom
+    · apply Subgroup.mem_map.2
+      rw [Subgroup.mem_inf] at ht
+      by_contra hc
+      push_neg at hc
+      sorry
+  rw [Nat.card_congr h1, Nat.card_congr h2, h3]
+  have h4 : Nat.card (↥ G(L/K)_[⌈x⌉] ⧸ ( G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] ) * Nat.card ((G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉])= Nat.card (G(L/K)_[⌈x⌉]) := by
+    -- haveI : Fintype (G(L/K)_[⌈x⌉] ⧸ ( G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] ) := by exact (( G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] ).fintypeQuotientOfFiniteIndex
+    -- haveI : Fintype (( G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] ) := by exact Fintype.ofFinite ↥(( G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] )
+    -- haveI : Fintype G(L/K)_[⌈x⌉] := by exact Fintype.ofFinite ↥ G(L/K)_[⌈x⌉]
+    -- rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    symm
+    apply Subgroup.card_eq_card_quotient_mul_card_subgroup
+  rw [← h4]
+  congr 1
+  rw [Nat.card_congr]
+  -- have h : ∀ t : G(L/K)_[⌈x⌉], (t : (L ≃ₐ[K] L)) ∈ ((AlgEquiv.restrictNormalHom K').ker) ↔ t ∈ ((AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] := by
+  --   intro t
+  --   symm
+  --   apply Subgroup.mem_subgroupOf (H := (AlgEquiv.restrictNormalHom K').ker) (K := G(L/K)_[⌈x⌉]) (h := t)
+  let f : (G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] → (G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker : Subgroup (L ≃ₐ[K] L)) := fun x => ⟨x.1, by
+    apply Subgroup.mem_subgroupOf.1
+    exact SetLike.coe_mem x⟩
+  haveI hf : Function.Bijective f := by
+    constructor
+    · intro x y
+      dsimp [f]
+      simp only [Subtype.mk.injEq, SetLike.coe_eq_coe, imp_self]
+    · intro y
+      dsimp [f]
+      simp only [Subtype.exists]
+      use y
+      have hy1 : y.1 ∈ G(L/K)_[⌈x⌉] := by
+        apply (Subgroup.mem_inf.1 (SetLike.coe_mem y)).1
+      have hy2 : ⟨y.1, hy1⟩ ∈ ( G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉] := by
+        apply Subgroup.mem_subgroupOf.2
+        simp only [SetLike.coe_mem]
+      use hy1; use hy2
+  symm
+  apply Equiv.ofBijective f hf
 
 
 
