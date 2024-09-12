@@ -109,10 +109,14 @@ set_option synthInstance.maxHeartbeats 100000000
 #check Subgroup.card_eq_card_quotient_mul_card_subgroup
 
 open AlgEquiv AlgHom
+#check AlgEquiv
 #check AlgEquiv.restrictNormal
 #check algebraMap K' L
 #check Algebra.algebraMap_eq_smul_one
 #check ofInjectiveField
+#check algebraMap.coe_smul
+#check AlgEquiv.map_smul
+#check algebraMap_smul
 
 theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : AlgEquiv.restrictNormalHom K' (AlgEquiv.restrictScalarsHom K x) = 1 := by
   unfold restrictNormalHom restrictScalarsHom
@@ -155,13 +159,36 @@ theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : A
   --   rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one]
   --   sorry
   simp only [Algebra.algebraMap_eq_smul_one]
+  -- have h3 : (1 : (IsScalarTower.toAlgHom K K' L).range) = (1 : L) := rfl
+  haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
+    refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
+  have h4 : t • (1 : L) ∈ (IsScalarTower.toAlgHom K K' L).range := by
+    simp only [mem_range, IsScalarTower.coe_toAlgHom']
+    use t
+    apply Algebra.algebraMap_eq_smul_one
+  have h5 : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm ⟨t • (1 : L), h4⟩ = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm (t • (1 : (IsScalarTower.toAlgHom K K' L).range)) := by
+    refine AlgEquiv.congr_arg ?_
+    refine SetCoe.ext ?_
+    simp only
+    -- have : (↑(t • (1 : ((IsScalarTower.toAlgHom K K' L).range))) : L) = (t • ↑((1 : ((IsScalarTower.toAlgHom K K' L).range)) : L)) := by
+    sorry
+  have h6 : algebraMap K' _ t = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t := by
+    rw [h1, ← algebraMap]
+    congr
+    sorry
+  rw [h5, ← Algebra.algebraMap_eq_smul_one, h6]
+  exact symm_apply_apply (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t
 
-  sorry
+  --simp only [_root_.map_one, smul_eq_mul, mul_one]
+  --rw [map_smul (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm t (1 : L)]
+  -- have h3 : ∀ k : (IsScalarTower.toAlgHom K K' L).range, (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm k = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).symm.toAlgEquiv k := by
+  --   intro k
+  --   rfl
+  -- rw [h3 _, ← algebraMap]
+  -- simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom]--, Algebra.algebraMap_eq_smul_one, ← SMul.smul_eq_hSMul]
+  --rw [map_smul]
 
-
-
-
-
+  --simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, ← SMul.smul_eq_hSMul, Algebra.smul_def, mul_one]
   -- dsimp [restrictNormal, restrictNormal', AlgHom.restrictNormal, restrictScalars]
   -- ext t
   -- simp only [coe_ofBijective, coe_comp, AlgHom.coe_coe, Function.comp_apply, one_apply]
