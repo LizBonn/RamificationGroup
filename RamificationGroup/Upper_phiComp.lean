@@ -310,12 +310,20 @@ theorem herbrand_Real (u : ℝ) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalH
 
 theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal μ K K') ∘ (phiReal μ K' L)) u = phiReal μ K L u := by
   have hdf : ∀ x ∈ Set.Ico (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ), HasDerivWithinAt (phiReal μ K K' ∘ phiReal μ K' L) (phiDerivReal K L x) (Set.Ici x) x := by sorry
-  have hdg : ∀ x ∈ Set.Ico (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ), HasDerivWithinAt (phiReal μ K L) (phiDerivReal K L x) (Set.Ici x) x := by sorry
+  have hdg : ∀ x ∈ Set.Ico (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ), HasDerivWithinAt (phiReal μ K L) (phiDerivReal K L x) (Set.Ici x) x := by
+    intro x hx
+    unfold HasDerivWithinAt HasDerivAtFilter
+    haveI : HasFDerivAtFilter (𝕜 := ℝ) (phiReal μ K L) (ContinuousLinearMap.smulRight (S := ℝ) 1 (phiDerivReal K L x)) x (nhdsWithin x (Set.Ici x)) := {
+      isLittleO := sorry
+    }
   have hcf : ContinuousOn (phiReal μ K K' ∘ phiReal μ K' L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by sorry
   have hcg : ContinuousOn (phiReal μ K L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by sorry
   apply eq_of_has_deriv_right_eq hdf hdg hcf hcg
-  sorry
-  sorry
+  · sorry
+  simp only [Set.mem_Icc]
+  constructor
+  · exact Int.floor_le u
+  · sorry
 
 
 
