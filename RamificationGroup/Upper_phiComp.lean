@@ -356,8 +356,30 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
         --   right_inv := fun x => by simp only [sub_add_cancel]
         -- }
         -- apply Finset.sum_equiv e
-      rw [h]
-      sorry
+      rw [h, mul_add]
+      congr
+      · let e : ℤ ≃ ℤ := {
+        toFun := fun x => x
+        invFun := fun x => x
+        left_inv := fun x => rfl
+        right_inv := fun x => rfl
+      }
+        rw [Nat.cast_sum, Finset.mul_sum (Finset.Icc 1 (⌈u⌉ - 1)) (fun x => (Nat.card G(L/K)_[x] : ℝ)) (1 / (Nat.card G(L/K)_[0] : ℝ)), Finset.sum_equiv e]
+        · dsimp [e]
+          simp only [Finset.mem_Icc, implies_true]
+        · intro i hi
+          dsimp [e]
+          rw [one_div, inv_mul_eq_div]
+      · have h : ∫ (x : ℝ) in (⌈u⌉ - 1 : ℝ)..u, phiDerivReal K L x ∂μ = ∫ (x : ℝ) in (⌈u⌉ - 1 : ℝ)..u, (Nat.card G(L/K)_[⌈u⌉] : ℝ) / (Nat.card G(L/K)_[0] : ℝ) := by
+          apply integral_congr
+          dsimp [Set.EqOn]
+          intro x hx
+          have h : ⌈x⌉ = ⌈u⌉ := by sorry
+          rw [phiDerivReal, h, max_eq_right]
+          apply Int.ceil_nonneg hu
+        rw [h, integral_const, smul_eq_mul, max_eq_right, one_div, inv_mul_eq_div, Int.cast_sub, Int.cast_one, mul_div]
+        sorry
+
 
   --rw [← intervalIntegral.sum_integral_adjacent_intervals (f := phiDerivReal K L) (μ := μ) (a := 1)]
 
@@ -429,10 +451,16 @@ theorem phiDerivReal_comp {u : ℝ} : (phiDerivReal K' L u) * phiDerivReal K K' 
   congr
   · rw [← Int.ceil_intCast (α := ℝ) (z := (max 0 ⌈u⌉)), ← RamificationGroup_card_comp_aux K K' L, mul_comm]
     congr 1
+    rw [max_eq_right, ← herbrand_Real, max_eq_right]
+    simp only [Subgroup.mem_map, Int.ceil_intCast]
+    sorry
     sorry
   · rw [← Int.ceil_zero (α := ℝ), ← RamificationGroup_card_comp_aux K K' L, mul_comm]
     congr 1
-    sorry
+    rw [herbrand_Real, phiReal_zero_eq_zero]
+
+#check Filter.le_iff_forall_inf_principal_compl
+#check tendsto_nhds_of_eventually_eq
 
 theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal K K') ∘ (phiReal K' L)) u = phiReal K L u := by
   have hdf : ∀ x ∈ Set.Ico (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ), HasDerivWithinAt (phiReal K K' ∘ phiReal K' L) (phiDerivReal K L x) (Set.Ici x) x := by
@@ -506,10 +534,51 @@ theorem phiReal_comp_of_isValExtension {u : ℝ} : ((phiReal K K') ∘ (phiReal 
               exact le_of_lt hcase
     }
     exact h
-  have hcf : ContinuousOn (phiReal K K' ∘ phiReal K' L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by sorry
-  have hcg : ContinuousOn (phiReal K L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by sorry
+  have hcf : ContinuousOn (phiReal K K' ∘ phiReal K' L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by
+    sorry
+  have hcg : ContinuousOn (phiReal K L) (Set.Icc (⌊u⌋) (⌊u⌋ + 1)) := by
+    dsimp [ContinuousOn, ContinuousWithinAt]
+    intro x hx
+    apply tendsto_nhds_of_eventually_eq
+    use {x}
+    constructor
+    · refine mem_nhds_iff.mpr ?h.left.a
+      use {x}
+      constructor
+      · rfl
+      · constructor
+        · sorry
+        · rfl
+    use Set.Icc (⌊u⌋ : ℝ) (⌊u⌋ + 1 : ℝ)
+    constructor
+    · apply mem_principal_self
+    · have h : {x} ∩ Set.Icc (↑⌊u⌋) (↑⌊u⌋ + 1) = {x} := by sorry
+      simp only [h]
+      ext t
+      constructor
+      · intro ht
+        sorry
+      · intro ht
+        sorry
+    -- rw [eventually_iff]
+    -- have h : {x_1 | phiReal K L x_1 = phiReal K L x} = {x} := by
+    --   ext t
+    --   constructor
+    --   · simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+    --     sorry
+    --   · simp only [Set.mem_singleton_iff, Set.mem_setOf_eq]
+    --     intro h
+    --     rw [h]
+    -- rw [h]
+    -- dsimp [nhdsWithin]
+    -- apply mem_inf_of_left
+    -- rw [nhds, Filter.mem_iInf]
+    --apply Filter.le_iff_forall_inf_principal_compl.2
   apply eq_of_has_deriv_right_eq hdf hdg hcf hcg
-  · sorry
+  --------------------------------------------------------------------------------------
+  · rw [Function.comp_apply, phiReal, phiReal, phiReal]
+    
+    sorry
   simp only [Set.mem_Icc]
   constructor
   · exact Int.floor_le u
