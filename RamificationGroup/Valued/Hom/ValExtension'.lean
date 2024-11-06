@@ -18,6 +18,7 @@ variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
   [Algebra R A] [vR : Valued R ΓR] [Nontrivial vR.v] [vA : Valued A ΓA] [IsValExtension R A]
 
 variable (R A) in
+include vR in
 theorem nontrivial_of_valExtension : Nontrivial vA.v where
   nontrivial := by
     rcases vR.v.nontrivial_def with ⟨r, h0, h1⟩

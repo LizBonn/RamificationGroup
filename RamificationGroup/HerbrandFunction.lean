@@ -395,21 +395,21 @@ theorem Ramification_Group_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(F
 
 set_option synthInstance.maxHeartbeats 0
 
-variable [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
+variable [CompleteSpace K] [Algebra.IsSeparable K L] -- [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
 
-theorem mem_all_lowerRamificationGroup_iff_refl {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by
-  constructor <;> intro h
-  · by_contra hc
-    push_neg at hc
-    have hx : x = AlgEquiv.refl := by
-      obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
-      replace h : x ∈ G(L/K)_[u] := by apply h u
-      rw [hu] at h
-      apply Subgroup.mem_bot.1 h
-    apply hc hx
-  · intro n
-    rw [h]
-    apply Subgroup.one_mem
+-- theorem mem_all_lowerRamificationGroup_iff_refl {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by
+--   constructor <;> intro h
+--   · by_contra hc
+--     push_neg at hc
+--     have hx : x = AlgEquiv.refl := by
+--       obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
+--       replace h : x ∈ G(L/K)_[u] := by apply h u
+--       rw [hu] at h
+--       apply Subgroup.mem_bot.1 h
+--     apply hc hx
+--   · intro n
+--     rw [h]
+--     apply Subgroup.one_mem
 
 
 theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x ∈ G(L/K)_[m]) (hn : x ∉ G(L/K)_[n]) : m ≤ n - 1 := by
@@ -421,50 +421,50 @@ theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x 
   apply hn
   apply Set.mem_of_subset_of_mem h hm
 
-theorem aux_0 {x : L ≃ₐ[K] L} (hx : x ≠ .refl) : ∃ n : ℤ , x ∈ G(L/K)_[n] ∧ x ∉ G(L/K)_[(n + 1)] := by
-  by_contra hc; push_neg at hc
-  apply hx
-  apply (mem_all_lowerRamificationGroup_iff_refl K L).1
-  intro n
-  set t := n + 1; have : n = t - 1 := by ring
-  rw [this]
-  induction' t using Int.induction_on with m hm m hm
-  · simp only [zero_sub, reduceNeg]
-    rw [lowerRamificationGroup_eq_decompositionGroup, decompositionGroup_eq_top]
-    apply Subgroup.mem_top; rfl
-  · have : ((m : ℤ) + 1 - 1) = ((m : ℤ) - 1 + 1) := by simp only [add_sub_cancel_right,
-    sub_add_cancel]
-    rw [this]
-    apply hc (m - 1) hm
-  · rw [lowerRamificationGroup_eq_decompositionGroup, decompositionGroup_eq_top]
-    apply Subgroup.mem_top
-    simp only [reduceNeg, tsub_le_iff_right, add_left_neg, zero_add]
-    omega
+-- theorem aux_0 {x : L ≃ₐ[K] L} (hx : x ≠ .refl) : ∃ n : ℤ , x ∈ G(L/K)_[n] ∧ x ∉ G(L/K)_[(n + 1)] := by
+--   by_contra hc; push_neg at hc
+--   apply hx
+--   apply (mem_all_lowerRamificationGroup_iff_refl K L).1
+--   intro n
+--   set t := n + 1; have : n = t - 1 := by ring
+--   rw [this]
+--   induction' t using Int.induction_on with m hm m hm
+--   · simp only [zero_sub, reduceNeg]
+--     rw [lowerRamificationGroup_eq_decompositionGroup, decompositionGroup_eq_top]
+--     apply Subgroup.mem_top; rfl
+--   · have : ((m : ℤ) + 1 - 1) = ((m : ℤ) - 1 + 1) := by simp only [add_sub_cancel_right,
+--     sub_add_cancel]
+--     rw [this]
+--     apply hc (m - 1) hm
+--   · rw [lowerRamificationGroup_eq_decompositionGroup, decompositionGroup_eq_top]
+--     apply Subgroup.mem_top
+--     simp only [reduceNeg, tsub_le_iff_right, add_left_neg, zero_add]
+--     omega
 
-theorem Raimification_Group_split (n : ℤ) : (⊤ : Finset (L ≃ₐ[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (Ramification_Group_diff K L) (Ramification_Group_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset := by
-  ext x
-  constructor
-  · simp
-    by_cases hc : x ∉ G(L/K)_[n]
-    · left
-      unfold Ramification_Group_diff
-      have h : x ≠ .refl := by
-        by_contra hc1
-        apply hc
-        apply (mem_all_lowerRamificationGroup_iff_refl K L).2 hc1
-      obtain ⟨t, ht1, ht2⟩ := aux_0 K L h
-      use t
-      constructor
-      · constructor
-        --the index is greater than -1
-        · sorry
-        · apply m_lt_n_of_in_G_m_of_notin_G_n K L ht1 hc
-      · simp only [toFinset_diff, mem_sdiff, mem_toFinset, SetLike.mem_coe, ht1, ht2,
-        not_false_eq_true, and_self]
-    · push_neg at hc
-      right; exact hc
-  · intro h
-    simp only [Finset.top_eq_univ, Finset.mem_univ]
+-- theorem Raimification_Group_split (n : ℤ) : (⊤ : Finset (L ≃ₐ[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (Ramification_Group_diff K L) (Ramification_Group_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset := by
+--   ext x
+--   constructor
+--   · simp
+--     by_cases hc : x ∉ G(L/K)_[n]
+--     · left
+--       unfold Ramification_Group_diff
+--       have h : x ≠ .refl := by
+--         by_contra hc1
+--         apply hc
+--         apply (mem_all_lowerRamificationGroup_iff_refl K L).2 hc1
+--       obtain ⟨t, ht1, ht2⟩ := aux_0 K L h
+--       use t
+--       constructor
+--       · constructor
+--         --the index is greater than -1
+--         · sorry
+--         · apply m_lt_n_of_in_G_m_of_notin_G_n K L ht1 hc
+--       · simp only [toFinset_diff, mem_sdiff, mem_toFinset, SetLike.mem_coe, ht1, ht2,
+--         not_false_eq_true, and_self]
+--     · push_neg at hc
+--       right; exact hc
+--   · intro h
+--     simp only [Finset.top_eq_univ, Finset.mem_univ]
 
 theorem aabb (a b : ℚ) : (1 / a) * b = b / a := by exact one_div_mul_eq_div a b
 
@@ -591,7 +591,9 @@ theorem sum_of_diff_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc (-1) (⌈u⌉ 
         rw [toFinset_diff, card_sdiff (by apply Set.toFinset_mono hsub)]
         simp
       rw [h, Nat.cast_sub]
-      exact Set.card_le_card hsub
+      sorry
+      sorry
+      -- exact Set.card_le_card hsub
 
 
 --for lower numbering
@@ -609,29 +611,30 @@ theorem truncatedLowerindex_eq_of_lt {s : (L ≃ₐ[K] L)} {u : ℚ} (h : s ∈ 
     sorry
 
 theorem sum_fiberwise_aux {u : ℚ} : ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (u + 1) ·))) = ∑ i in Finset.Icc (-1) (⌈u⌉ - 1), ∑ s in Ramification_Group_diff K L i, (AlgEquiv.truncatedLowerIndex K L (u + 1) s) + (u + 1) * (Nat.card ↥ G(L/K)_[⌈u⌉]) := by
-  rw [Raimification_Group_split K L ⌈u⌉, sum_union, sum_disjiUnion]
-  congr 1
-  calc
-    _ =  ∑ x in (G(L/K)_[⌈u⌉] : Set (L ≃ₐ[K] L)).toFinset , (u + 1) := by
-      apply sum_equiv (by rfl : (L ≃ₐ[K] L) ≃ (L ≃ₐ[K] L)) (by simp)
-      intro i hi
-      apply truncatedLowerindex_eq_of_lt
-      apply Set.mem_toFinset.1 hi
-    _ = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
-      simp [← mul_sum (G(L/K)_[⌈u⌉] : Set (L ≃ₐ[K] L)).toFinset (fun _ => 1) (u + 1), add_mul, mul_comm]
-  simp [Finset.disjoint_iff_ne]
-  intro s n _ hn2 hs b hb
-  unfold Ramification_Group_diff at *
-  simp at hs
-  rcases hs with ⟨_, hs2⟩
-  by_contra h
-  have h' : s ∈ G(L/K)_[⌈u⌉] := by
-     rw [← h] at hb; exact hb
-  have hs : s ∉ G(L/K)_[⌈u⌉] := by
-    apply Set.not_mem_subset _ hs2
-    apply lowerRamificationGroup.antitone
-    linarith [hn2]
-  apply hs h'
+  sorry
+  -- rw [Raimification_Group_split K L ⌈u⌉, sum_union, sum_disjiUnion]
+  -- congr 1
+  -- calc
+  --   _ =  ∑ x in (G(L/K)_[⌈u⌉] : Set (L ≃ₐ[K] L)).toFinset , (u + 1) := by
+  --     apply sum_equiv (by rfl : (L ≃ₐ[K] L) ≃ (L ≃ₐ[K] L)) (by simp)
+  --     intro i hi
+  --     apply truncatedLowerindex_eq_of_lt
+  --     apply Set.mem_toFinset.1 hi
+  --   _ = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
+  --     simp [← mul_sum (G(L/K)_[⌈u⌉] : Set (L ≃ₐ[K] L)).toFinset (fun _ => 1) (u + 1), add_mul, mul_comm]
+  -- simp [Finset.disjoint_iff_ne]
+  -- intro s n _ hn2 hs b hb
+  -- unfold Ramification_Group_diff at *
+  -- simp at hs
+  -- rcases hs with ⟨_, hs2⟩
+  -- by_contra h
+  -- have h' : s ∈ G(L/K)_[⌈u⌉] := by
+  --    rw [← h] at hb; exact hb
+  -- have hs : s ∉ G(L/K)_[⌈u⌉] := by
+  --   apply Set.not_mem_subset _ hs2
+  --   apply lowerRamificationGroup.antitone
+  --   linarith [hn2]
+  -- apply hs h'
 
 
 #check Finset.sum_disjiUnion

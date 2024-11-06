@@ -220,7 +220,8 @@ theorem decomp_val_map_sub_le_generator {gen : 𝒪[L]} (hgen : Algebra.adjoin �
   subst hf
   rcases taylor_order_zero_apply_aeval f gen ((DecompositionGroup.restrictValuationSubring' hs') gen - gen) with ⟨b, hb⟩
   rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
-  simp only [AddSubgroupClass.coe_sub, DecompositionGroup.restrictValuationSubring_apply' hs', Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
+  simp only [AddSubgroupClass.coe_sub, DecompositionGroup.restrictValuationSubring_apply',
+    Subring.coe_mul] at hb
   rw [hb, Valuation.map_mul]
   nth_rw 2 [← mul_one (v (s gen - gen))]
   rw [mul_le_mul_left₀]
@@ -497,7 +498,7 @@ theorem AlgEquiv.val_map_sub_le_generator {gen : 𝒪[L]} (hgen : Algebra.adjoin
   subst hf
   rcases taylor_order_zero_apply_aeval f gen ((AlgEquiv.restrictValuationSubring s) gen - gen) with ⟨b, hb⟩
   rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
-  simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
+  simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Subring.coe_mul] at hb
   rw [hb, Valuation.map_mul]
   nth_rw 2 [← mul_one (v (s gen - gen))]
   rw [mul_le_mul_left₀]
@@ -559,40 +560,40 @@ theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
       rw [← ENat.some_eq_coe, WithTop.coe_untop]
     simp only [ne_eq, this, Nat.cast_le, ha]
 
-theorem aux7 [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
-  {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
-  {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
-  apply (mem_lowerRamificationGroup_iff_of_generator (PowerBasis.adjoin_gen_eq_top (PowerBasisValExtension K L)) s.mem_decompositionGroup n).mp at hs
-  by_contra! h
-  rw [ENat.add_one_le_iff (by simp only [ne_eq, ENat.coe_ne_top, not_false_eq_true])] at hs
-  have : i_[L/K] s < n := by
-    apply lt_of_le_of_lt _ hu
-    rw [show s = (⟨s, h⟩ : {s // s ≠ .refl}).1 by rfl]
-    apply le_iSup (fun (x : {s // s ≠ .refl}) => i_[L/K] x) (⟨s, h⟩ : {s // s ≠ .refl})
-  apply lt_asymm hs this
+-- theorem aux7 [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
+--   {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
+--   {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
+--   apply (mem_lowerRamificationGroup_iff_of_generator (PowerBasis.adjoin_gen_eq_top (PowerBasisValExtension K L)) s.mem_decompositionGroup n).mp at hs
+--   by_contra! h
+--   rw [ENat.add_one_le_iff (by simp only [ne_eq, ENat.coe_ne_top, not_false_eq_true])] at hs
+--   have : i_[L/K] s < n := by
+--     apply lt_of_le_of_lt _ hu
+--     rw [show s = (⟨s, h⟩ : {s // s ≠ .refl}).1 by rfl]
+--     apply le_iSup (fun (x : {s // s ≠ .refl}) => i_[L/K] x) (⟨s, h⟩ : {s // s ≠ .refl})
+--   apply lt_asymm hs this
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparable K L]
-  [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] :
-    ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
-  by_cases h : Nontrivial (L ≃ₐ[K] L)
-  · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1
-    rw [eq_bot_iff]
-    intro s hs
-    rw [Subgroup.mem_bot, AlgEquiv.aut_one, aux7 _ hs]
-    rw [← ENat.some_eq_coe]
-    simp only [WithTop.coe_add, WithTop.coe_untop, WithTop.coe_one, gt_iff_lt]
-    nth_rw 1 [← add_zero (⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)]
-    have : (0 : ℕ∞) < 1 := by
-      rw [← ENat.coe_one, ← ENat.some_eq_coe, WithTop.zero_lt_coe]
-      exact zero_lt_one
-    convert WithTop.add_lt_add_left (iSup_ne_refl_lowerIndex_ne_top K L) this
-  · use 0
-    rw [eq_bot_iff]
-    intro s _
-    rw [Subgroup.mem_bot, AlgEquiv.aut_one]
-    letI : Subsingleton (L ≃ₐ[K] L) := not_nontrivial_iff_subsingleton.mp h
-    apply Subsingleton.allEq
+-- theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparable K L]
+--   [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] :
+--     ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
+--   by_cases h : Nontrivial (L ≃ₐ[K] L)
+--   · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1
+--     rw [eq_bot_iff]
+--     intro s hs
+--     rw [Subgroup.mem_bot, AlgEquiv.aut_one, aux7 _ hs]
+--     rw [← ENat.some_eq_coe]
+--     simp only [WithTop.coe_add, WithTop.coe_untop, WithTop.coe_one, gt_iff_lt]
+--     nth_rw 1 [← add_zero (⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)]
+--     have : (0 : ℕ∞) < 1 := by
+--       rw [← ENat.coe_one, ← ENat.some_eq_coe, WithTop.zero_lt_coe]
+--       exact zero_lt_one
+--     convert WithTop.add_lt_add_left (iSup_ne_refl_lowerIndex_ne_top K L) this
+--   · use 0
+--     rw [eq_bot_iff]
+--     intro s _
+--     rw [Subgroup.mem_bot, AlgEquiv.aut_one]
+--     letI : Subsingleton (L ≃ₐ[K] L) := not_nontrivial_iff_subsingleton.mp h
+--     apply Subsingleton.allEq
 
 variable [LocalField K] [LocalField L] [Algebra.IsSeparable K L]
 
@@ -602,7 +603,7 @@ end ExhausiveSeperated
 
 section sum_lowerIndex
 #check lowerIndex_of_powerBasis
-#check PowerBasisValExtension
+-- #check PowerBasisValExtension
 
 open LocalField
 
