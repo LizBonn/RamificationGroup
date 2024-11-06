@@ -35,16 +35,18 @@ theorem exists_lift_polynomial_of_residue (x : B) : ∃f : A[X], f.map (residue 
   use (this f0).choose
   rw [(this f0).choose_spec]
 
-section x_and_f
 
-open Subalgebra
-
--- `x` : a lift of a primitive element of `k_B/k_A`
 variable {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
 -- `f` : a polynomial with `A`-coeff that reduces to the minpoly of `x : k_B` over `k_A`
 variable {f : A[X]} (h_red : f.map (residue A) = minpoly (ResidueField A) (residue B x))
 -- `ϖ` : a uniformizer `ϖ` of `B`
 variable {ϖ : B} (hϖ : Irreducible ϖ)
+
+section x_and_f
+
+open Subalgebra
+
+-- `x` : a lift of a primitive element of `k_B/k_A`
 
 include hx hϖ h_red
 /-- Auxiliary lemma: `A[x, ϖ] ⊔ m_B = ⊤`. Can be strenthened to `A[x] ⊔ m_B = B`-/
@@ -156,39 +158,50 @@ theorem irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_ae
 
 end x_and_f
 
-/--
-This is the second part of lemma 4:
-`B = A[x]` if `k_B = k_A[x]` and `f x` is a uniformizer.-/
-theorem adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive (h_inj : Function.Injective (algebraMap A B)) {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
-    {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x) )  :
-    Algebra.adjoin A {x} = ⊤ := by
-  apply Algebra.adjoin_eq_of_le
-  · simp only [Algebra.coe_top, Set.subset_univ]
-  let fx := f.eval₂ (algebraMap A B) x
-  rw [← adjoin_lift_residue_primitive_and_irreducible_eq_top hx h_red h_fx h_inj]
-  rw [show ({x, fx} : Set B) = {x} ∪ {fx} by rfl, Algebra.adjoin_union]
-  simp only [sup_le_iff, le_refl, true_and, ge_iff_le]
-  rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
-  apply aeval_mem_adjoin_singleton
+-- include hx h_red hϖ in
+-- /--
+-- This is the second part of lemma 4:
+-- `B = A[x]` if `k_B = k_A[x]` and `f x` is a uniformizer.-/
+-- theorem adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive (h_inj : Function.Injective (algebraMap A B)) (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
+--     {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x) )  :
+--     Algebra.adjoin A {x} = ⊤ := by
+--   apply Algebra.adjoin_eq_of_le
+--   · simp only [Algebra.coe_top, Set.subset_univ]
+--   let fx := f.eval₂ (algebraMap A B) x
+--   rw [← adjoin_lift_residue_primitive_and_irreducible_eq_top hx h_red h_fx h_inj]
+--   rw [show ({x, fx} : Set B) = {x} ∪ {fx} by rfl, Algebra.adjoin_union]
+--   simp only [sup_le_iff, le_refl, true_and, ge_iff_le]
+--   rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]
+--   apply aeval_mem_adjoin_singleton
 
-/-- For a finite extension of DVR `A ↪ B` with seperable residue field extension,
-there exists `x : B` s.t. `B = A[x]`-/
-theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
-  rcases exists_lift_residue_primitive A B with ⟨x, hx⟩
-  rcases exists_lift_polynomial_of_residue A x with ⟨f, h_red⟩
-  exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
-    then ⟨x, (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive h_inj hx h)⟩
-    else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,
-      (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive h_inj (residue_primitive_of_add_uniformizer (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
-        (irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h))⟩
 
-/-- A power basis of finite extension of DVR `A ↪ B` with seperable residue field extension.-/
-noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
-  letI := NoZeroSMulDivisors.of_algebraMap_injective h;
-  (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
-    (AlgEquiv.ofTop (exists_primitive h).choose_spec)
+-- include hx h_red hϖ in
+-- /-- For a finite extension of DVR `A ↪ B` with seperable residue field extension,
+-- there exists `x : B` s.t. `B = A[x]`-/
+-- theorem exists_primitive (h_inj : Function.Injective (algebraMap A B)) : ∃x : B, Algebra.adjoin A {x} = ⊤ := by
+--   rcases exists_lift_residue_primitive A B with ⟨x, hx⟩
+--   rcases exists_lift_polynomial_of_residue A x with ⟨f, h_red⟩
+--   by_cases h : Irreducible (f.eval₂ (algebraMap A B) x)
+--   use x
+--   exact (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive hx h_red hϖ h_inj hx h)
+--   use x + (DiscreteValuationRing.exists_irreducible B).choose
+--   apply adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive
+--   apply (residue_primitive_of_add_uniformizer hx h_red (DiscreteValuationRing.exists_irreducible B).choose_spec hx)
+
+--   -- exact if h : Irreducible (f.eval₂ (algebraMap A B) x)
+--   --   then ⟨x, (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive hx h_red hϖ h_inj hx h)⟩
+--   --   else ⟨x + (DiscreteValuationRing.exists_irreducible B).choose,
+--   --     (adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive (residue_primitive_of_add_uniformizer hx h_red (DiscreteValuationRing.exists_irreducible B).choose_spec hx) (irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve hx h_red (DiscreteValuationRing.exists_irreducible B).choose_spec h) h_inj)⟩
+
+-- /-- A power basis of finite extension of DVR `A ↪ B` with seperable residue field extension.-/
+-- noncomputable def PowerBasisExtDVR (h : Function.Injective (algebraMap A B)) : PowerBasis A B :=
+--   letI := NoZeroSMulDivisors.of_algebraMap_injective h;
+--   (Algebra.adjoin.powerBasis' (IsIntegral.of_finite _ _)).map
+--     (AlgEquiv.ofTop (exists_primitive h).choose_spec)
 
 section ramiIdx
+
+include hx h_red hϖ
 
 theorem maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (h_inj : Function.Injective (algebraMap A B)) :
   (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^
@@ -196,7 +209,7 @@ theorem maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (h_inj : Function.I
       (maximalIdeal A) (maximalIdeal B)) := by
   rcases exists_irreducible B with ⟨πB, hπB⟩
   nth_rw 1 [Irreducible.maximalIdeal_eq hπB]
-  rcases ideal_eq_span_pow_irreducible (maximalIdeal_map_ne_bot_of_injective h_inj) hπB with ⟨e, he⟩
+  rcases ideal_eq_span_pow_irreducible (maximalIdeal_map_ne_bot_of_injective hx h_red hϖ h_inj) hπB with ⟨e, he⟩
   rw [Ideal.span_singleton_pow]
   convert he
   have : ∀k : ℕ,
@@ -221,7 +234,7 @@ theorem ramificationIdx_ne_zero_of_injective_of_integral (h_inj : Function.Injec
   intro h
   suffices (maximalIdeal A).map (algebraMap A B) ≠ ⊤ by
     apply this
-    simp only [maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx h_inj, h, pow_zero, Ideal.one_eq_top]
+    simp only [maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx hx h_red hϖ h_inj, h, pow_zero, Ideal.one_eq_top]
   intro h
   rw [Ideal.map_eq_top_iff _ h_inj h_int] at h
   apply LocalRing.maximalIdeal_ne_top A h
