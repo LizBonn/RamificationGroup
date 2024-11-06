@@ -12,11 +12,11 @@ namespace ExtDVR
 
 variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
 variable {B : Type*} [CommRing B] [IsDomain B] [DiscreteValuationRing B]
-variable [Algebra A B] [IsLocalRingHom (algebraMap A B)]
+variable [Algebra A B] [IsLocalHom (algebraMap A B)]
 variable [Algebra.IsSeparable (ResidueField A) (ResidueField B)]
 variable [Module.Finite A B]
 
-instance : FiniteDimensional (ResidueField A) (ResidueField B) := FiniteDimensional_of_finite
+instance : FiniteDimensional (ResidueField A) (ResidueField B) := ResidueField.finiteDimensional_of_noetherian
 
 variable (A) (B) in
 /-- There exists `x : B` generating `k_B` over `k_A` -/
@@ -46,6 +46,7 @@ variable {f : A[X]} (h_red : f.map (residue A) = minpoly (ResidueField A) (resid
 -- `ϖ` : a uniformizer `ϖ` of `B`
 variable {ϖ : B} (hϖ : Irreducible ϖ)
 
+include hx hϖ h_red
 /-- Auxiliary lemma: `A[x, ϖ] ⊔ m_B = ⊤`. Can be strenthened to `A[x] ⊔ m_B = B`-/
 lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top : toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A = ⊤ := by
   rw [eq_top_iff]
@@ -82,7 +83,7 @@ lemma adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top 
       use c
       rw [← hc, mul_comm]
     have : c ∈ toSubmodule (Algebra.adjoin A {x, ϖ}) ⊔ (maximalIdeal B).restrictScalars A := by
-      rw [adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top hx]
+      rw [adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_eq_top hx h_red hϖ]
       apply Submodule.mem_top
     obtain ⟨u, hu, v, hv, huv⟩ := Submodule.mem_sup.mp this
     obtain ⟨w, hw⟩ : ∃w : B, v = ϖ * w := by
@@ -121,8 +122,8 @@ theorem adjoin_lift_residue_primitive_and_irreducible_eq_top (h_inj : Function.I
     obtain ⟨n, hn⟩ : ∃n : ℕ, (maximalIdeal A).map (algebraMap A B) = maximalIdeal B ^ n := by
       rcases (TFAE B (not_isField B)).out 0 6 with ⟨h, _⟩
       apply h; assumption
-      apply maximalIdeal_map_ne_bot_of_injective h_inj
-    rw [hn, adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top hx hϖ]
+      exact maximalIdeal_map_ne_bot_of_injective hx h_red hϖ h_inj
+    rw [hn, adjoin_lift_residue_primitive_and_irreducible_sup_maximalIdeal_pow_eq_top hx h_red hϖ]
   · apply Module.finite_def.mp
     assumption
 
@@ -142,7 +143,7 @@ If `f x` has valuation ≥ 2, then `f (x + ϖ)` is a uniformizer.
 -/
 theorem irreducible_aeval_lift_redisue_primitive_add_irreducible_of_reducible_aeval_lift_residue_primitve (h_fx : ¬Irreducible (f.eval₂ (algebraMap A B) x)) : Irreducible (f.eval₂ (algebraMap A B) (x + ϖ)) := by
   obtain ⟨b, hb⟩ := taylor_order_one_apply₂ f (algebraMap A B) x ϖ
-  obtain ⟨y, hy⟩ := mul_irreducible_square_of_not_unit_of_not_irreducible hϖ h_fx (not_unit_aeval_lift_residue_primitive h_red)
+  obtain ⟨y, hy⟩ := mul_irreducible_square_of_not_unit_of_not_irreducible hϖ h_fx (not_unit_aeval_lift_residue_primitive hx h_red hϖ)
   rw [hb, hy, mul_comm ϖ, ← mul_comm b, add_comm, ← add_assoc, ← add_mul, add_comm]
   apply irreducible_of_irreducible_add_addVal_ge_two hϖ
   apply (irreducible_isUnit_mul _).mpr hϖ
@@ -159,12 +160,12 @@ end x_and_f
 This is the second part of lemma 4:
 `B = A[x]` if `k_B = k_A[x]` and `f x` is a uniformizer.-/
 theorem adjoin_lift_primitive_eq_top_of_irreducible_aeval_lift_residue_primitive (h_inj : Function.Injective (algebraMap A B)) {x : B} (hx : (ResidueField A)⟮residue B x⟯ = ⊤)
-    {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x)) :
+    {f : A[X]} (h_fx : Irreducible (f.eval₂ (algebraMap A B) x) )  :
     Algebra.adjoin A {x} = ⊤ := by
   apply Algebra.adjoin_eq_of_le
   · simp only [Algebra.coe_top, Set.subset_univ]
   let fx := f.eval₂ (algebraMap A B) x
-  rw [← adjoin_lift_residue_primitive_and_irreducible_eq_top hx h_fx h_inj]
+  rw [← adjoin_lift_residue_primitive_and_irreducible_eq_top hx h_red h_fx h_inj]
   rw [show ({x, fx} : Set B) = {x} ∪ {fx} by rfl, Algebra.adjoin_union]
   simp only [sup_le_iff, le_refl, true_and, ge_iff_le]
   rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff, SetLike.mem_coe]

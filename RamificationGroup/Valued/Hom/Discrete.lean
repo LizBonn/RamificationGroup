@@ -52,7 +52,7 @@ theorem aeval_valuationSubring_lt_one_of_lt_one
   apply eval_lt_one_of_coeff_le_one_of_const_eq_zero_of_lt_one _ _ hx
   · intro n
     rw [coeff_map, show (algebraMap 𝒪[K] L) (f.coeff n) = (algebraMap K L) (f.coeff n) by rfl, ← comap_apply]
-    apply ((isEquiv_iff_val_le_one _ _).mp h).mp (f.coeff n).2
+    apply ((isEquiv_iff_val_le_one).mp h).mp (f.coeff n).2
   · simp only [coeff_map, h0, _root_.map_zero]
 
 theorem aeval_valuationSubring_lt_one_of_lt_one_self
@@ -89,6 +89,12 @@ end Valuation
 
 end non_discrete
 
+/-- Notation for `WithZero (Multiplicative ℕ)` -/
+scoped[DiscreteValuation] notation "ℕₘ₀" => WithZero (Multiplicative ℕ)
+
+/-- Notation for `WithZero (Multiplicative ℤ)` -/
+scoped[DiscreteValuation] notation "ℤₘ₀" => WithZero (Multiplicative ℤ)
+
 variable {K : Type*} [Field K] [vK : Valued K ℤₘ₀]
 variable {L : Type*} [Field L]
 
@@ -108,7 +114,7 @@ theorem nontrivial_of_valuation_extension (h : vK.v.IsEquiv <| vL.comap (algebra
   · rw [← comap_apply, ← IsEquiv.ne_zero h, hp]
     decide
   · apply ne_of_lt
-    rw [← comap_apply, ← (isEquiv_iff_val_lt_one _ _).mp h, hp]
+    rw [← comap_apply, ← (isEquiv_iff_val_lt_one).mp h, hp]
     decide
 
 /-- If a valuation `v : L → ℤₘ₀` extends a discrete valuation on `K`, then `v` is equivalent to `extendedValuation K L`.-/
@@ -118,7 +124,7 @@ theorem extension_valuation_equiv_extendedValuation_of_discrete
   letI : vL.Nontrivial := nontrivial_of_valuation_extension h
   apply IsEquiv.trans (isEquiv_ofNontrivial vL) (isEquiv_of_le_one_le_one _).symm
   intro x
-  rw [← mem_valuationSubring_iff, ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, ← (isEquiv_iff_val_le_one _ _).mp (isEquiv_ofNontrivial vL)]
+  rw [← mem_valuationSubring_iff, ← ValuationSubring.mem_toSubring, ← Extension.integralClosure_eq_integer, ← (isEquiv_iff_val_le_one).mp (isEquiv_ofNontrivial vL)]
   apply mem_integer_of_mem_integral_closure h
 
 theorem extension_integer_eq_extendedValuation_of_discrete (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) :

@@ -1,4 +1,5 @@
 import Mathlib.Algebra.Polynomial.Taylor
+import Mathlib.Algebra.Polynomial.Div
 
 namespace Polynomial
 
