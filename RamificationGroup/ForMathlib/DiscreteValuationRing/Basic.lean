@@ -10,7 +10,7 @@ variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
 section uniformiser
 
 variable {ϖ x : A} (hϖ : Irreducible ϖ)
-
+include hϖ
 theorem unit_mul_irreducible_of_irreducible (hx : Irreducible x) : ∃u : A, IsUnit u ∧ x = u * ϖ := by
   obtain ⟨u, hu⟩ : ∃u : A, x = u * ϖ := by
     refine exists_eq_mul_left_of_dvd <| addVal_le_iff_dvd.mp <| le_of_eq ?_

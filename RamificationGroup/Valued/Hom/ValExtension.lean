@@ -41,6 +41,8 @@ variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
 variable {F : Type*} [FunLike F R S] [RingHomClass F R S] {f : F}
     (hf : vR.v.IsEquiv <| vS.v.comap f)
 
+include hf
+
 theorem val_map_le_iff (x y : R) : v (f x) ≤ v (f y) ↔ v x ≤ v y :=
   (hf x y).symm
 

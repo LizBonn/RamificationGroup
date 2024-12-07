@@ -51,8 +51,8 @@ def RingHom.restrictInteger {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) :
     refine fun ⟨x, hx⟩ ↦ ⟨f x, ?_⟩
     rw [mem_integer_iff, val_map_le_one_iff (f := f) hf]
     exact hx
-  map_one' := by simp only [_root_.map_one, Submonoid.mk_eq_one]
-  map_mul' := by simp only [_root_.map_mul, Submonoid.mk_mul_mk, Subtype.forall, implies_true, forall_const]
+  map_one' := by simp only [_root_.map_one]; rfl
+  map_mul' := by simp only [_root_.map_mul, MulMemClass.mk_mul_mk, implies_true]
   map_zero' := by simp only [_root_.map_zero]; rfl
   map_add' := by simp only [_root_.map_add, AddMemClass.mk_add_mk, Subtype.forall, implies_true, forall_const]
 

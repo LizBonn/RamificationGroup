@@ -4,7 +4,7 @@ import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 namespace LocalRing
 
 variable (A B : Type*) [CommRing A] [CommRing B]
-  [LocalRing A] [LocalRing B] [Algebra A B] [is_local : IsLocalRingHom (algebraMap A B)]
+  [LocalRing A] [LocalRing B] [Algebra A B] [is_local : IsLocalHom (algebraMap A B)]
 
 noncomputable def ramificationIdx : ℕ := Ideal.ramificationIdx (algebraMap A B) (maximalIdeal A) (maximalIdeal B)
 

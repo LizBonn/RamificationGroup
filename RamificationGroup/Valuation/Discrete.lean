@@ -52,7 +52,7 @@ lemma eq_one_of_eq_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 
   · have : v' u ≠ 0 := by
       rw [Valuation.ne_zero_iff, ← Valuation.ne_zero_iff v, hu]
       exact one_ne_zero
-    rw [← inv_le_one₀ this, ← map_inv₀]
+    rw [show 1 ≤ v' u ↔ (v' u)⁻¹ ≤ 1 by sorry, ← map_inv₀]
     apply h <| le_of_eq _
     rw [map_inv₀, hu, inv_one]
 
@@ -76,11 +76,11 @@ variable {K : Type*} [Field K] {ΓK ΓK': outParam Type*}
 
 theorem val_valuationSubring_unit {u : v.valuationSubringˣ} :
   v u = 1 := by
-  rw [(isEquiv_iff_val_eq_one v v.valuationSubring.valuation).mp (isEquiv_valuation_valuationSubring v), ValuationSubring.valuation_unit]
+  rw [(isEquiv_iff_val_eq_one).mp (isEquiv_valuation_valuationSubring v), ValuationSubring.valuation_unit]
 
 theorem isUnit_in_valuationSubring_of_val_eq_one {x : K} (h : v x = 1) :
   IsUnit (⟨x, le_of_eq h⟩ : v.valuationSubring) := by
-  rw [ValuationSubring.valuation_eq_one_iff, ← (isEquiv_iff_val_eq_one v v.valuationSubring.valuation).mp (isEquiv_valuation_valuationSubring v), h]
+  rw [ValuationSubring.valuation_eq_one_iff, ← (isEquiv_iff_val_eq_one).mp (isEquiv_valuation_valuationSubring v), h]
 
 /-- create a term of `v.valuationSubringˣ` from a term `x : K` with `v x = 1`-/
 noncomputable def unitOfValOne {x : K} (h : v x = 1) : v.valuationSubringˣ :=
@@ -164,14 +164,14 @@ lemma isUniformizer_of_uniformizer_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 �
 /--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.-/
 theorem isUniformizer_of_uniformizer_of_equiv (h : v.IsEquiv v')
   (π : Uniformizer v) : IsUniformizer v' π.1 := isUniformizer_of_uniformizer_of_le_one_le_one
-  (fun {_} hx ↦ ((isEquiv_iff_val_le_one v v').mp h).mp hx) π
+  (fun {_} hx ↦ ((isEquiv_iff_val_le_one).mp h).mp hx) π
 
 theorem val_pow_Uniformizer_all_of_equiv (h : v.IsEquiv v') {π : Uniformizer v} {n : ℤ} {u : v.valuationSubringˣ} :
   v' ((π.1 : K) ^ n * u.1) = ofAdd (-n : ℤ) := by
   rw [v'.map_mul, Valuation.map_zpow,
     isUniformizer_of_uniformizer_of_equiv h]
   have : v' (u : K) = 1 := by
-    rw [← (isEquiv_iff_val_eq_one _ _).mp h, val_valuationSubring_unit]
+    rw [← (isEquiv_iff_val_eq_one).mp h, val_valuationSubring_unit]
   simp only [Int.reduceNeg, ofAdd_neg, WithZero.coe_inv, inv_zpow', zpow_neg, this, mul_one, inv_inj,
     ← WithZero.coe_zpow, ← ofAdd_zsmul, smul_eq_mul, mul_one] -- `WithZero.coe_zpow` should be tagged with @[norm_cast], but it is not.
 
@@ -206,7 +206,7 @@ theorem isEquiv_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) :
   by_contra! vxgt
   have : (1 : ℤₘ₀) < 1 := by
     nth_rw 1 [← Valuation.map_one v']
-    rw [show (1 : K) = x * x⁻¹ by simp only [ne_eq, xne0, not_false_eq_true, mul_inv_cancel], Valuation.map_mul, show (1 : ℤₘ₀) = 1 * 1 by rfl]
+    rw [(CommGroupWithZero.mul_inv_cancel x xne0).symm, Valuation.map_mul, show (1 : ℤₘ₀) = 1 * 1 by rfl]
     apply mul_lt_mul_of_lt_of_le₀ v'xle (by simp only [ne_eq, one_ne_zero, not_false_eq_true])
     exact lt_one_lt_one_of_le_one_le_one h <| (one_lt_val_iff _ xne0).mp vxgt
   contradiction
