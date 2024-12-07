@@ -428,7 +428,7 @@ theorem aux_0 {x : L ≃ₐ[K] L} (hx : x ≠ .refl) : ∃ n : ℤ , x ∈ G(L/K
   intro n
   set t := n + 1; have : n = t - 1 := by ring
   rw [this]
-  induction' t using Int.induction_on with m hm m hm
+  induction' t using Int.induction_on with m hm m _
   · simp only [zero_sub, reduceNeg]
     rw [lowerRamificationGroup_eq_decompositionGroup, decompositionGroup_eq_top]
     apply Subgroup.mem_top; rfl
@@ -515,9 +515,9 @@ theorem sum_sub_aux {u : ℚ} (hu : 0 ≤ ⌈u⌉ - 1): (∑ i in Finset.Icc (-1
   calc
     _ = ∑ i in Finset.Icc (-1) (⌈u⌉ - 1), ((i + 1) * Nat.card G(L/K)_[i] - (i + 1) * Nat.card G(L/K)_[(i + 1)]) := by
       apply (Finset.sum_eq_sum_iff_of_le _).2
-      · intro i hi
+      · intro i _
         rw [mul_sub]
-      · intro i hi
+      · intro i _
         apply le_of_eq
         rw [mul_sub]
     _ = ∑ i in Finset.Icc (-1) (⌈u⌉ - 1), (i + 1) * Nat.card G(L/K)_[i] - ∑ i in Finset.Icc (-1) (⌈u⌉ - 1), (i + 1) * Nat.card G(L/K)_[(i + 1)] := by
@@ -552,7 +552,7 @@ theorem sum_sub_aux {u : ℚ} (hu : 0 ≤ ⌈u⌉ - 1): (∑ i in Finset.Icc (-1
         constructor
         · linarith [hi]
         · linarith [add_one_le_ceil_iff.2 hi']
-      rintro i hi
+      rintro i _
       simp only [Nat.card_eq_fintype_card, Equiv.coe_fn_mk, e]
     _ = ((-1) + 1) * Nat.card G(L/K)_[(-1)] + ∑ i in Finset.Icc 0 (⌈u⌉ - 1), (i + 1) * Nat.card G(L/K)_[i] - ∑ i in Finset.Icc 0 (⌈u⌉ - 1), i * Nat.card G(L/K)_[i] - ⌈u⌉ * Nat.card G(L/K)_[⌈u⌉] := by
       have h : (-1) ≤ ⌈u⌉ - 1 := by linarith [hu]
@@ -578,7 +578,7 @@ theorem sum_of_diff_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc (-1) (⌈u⌉ 
       apply sum_equiv (by rfl : (L ≃ₐ[K] L) ≃ (L ≃ₐ[K] L)) (by simp)
       intro s hs
       apply truncatedLowerindex_eq_if
-      obtain ⟨h1, h2⟩ := Finset.mem_Icc.1 h
+      obtain ⟨_, h2⟩ := Finset.mem_Icc.1 h
       exact h2
       exact hs
      _ = (i + 1) * (Nat.card G(L/K)_[i] - Nat.card G(L/K)_[(i + 1)]) := by

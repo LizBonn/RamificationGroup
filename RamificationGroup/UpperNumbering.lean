@@ -254,7 +254,7 @@ open Function HerbrandFunction
 -- @[simp]
 -- theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
 
-  sorry
+  -- sorry
 
 @[simp]
 theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by

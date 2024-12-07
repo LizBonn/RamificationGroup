@@ -66,7 +66,7 @@ theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) 
             apply sum_le_sum_of_subset_of_nonneg
             refine Finset.Icc_subset_Icc (by linarith) ?_
             simp only [ceil_intCast, ceil_add_one, add_sub_cancel_right, tsub_le_iff_right,le_add_iff_nonneg_right, zero_le_one]
-            intro i hi1 hi2
+            intro i _ _
             apply le_of_lt
             convert Ramification_Group_card_pos K L (u := i)
             exact Eq.symm (ceil_intCast i)
@@ -178,7 +178,7 @@ theorem card_of_Ramigroup_gt_one {n : ℤ} : 1 ≤ Nat.card G(L/K)_[n] := by
 
 theorem id_le_phi {x : ℚ} (hx : 0 < x) : (1 / Nat.card G(L/K)_[0]) * x ≤ phi K L x := by
   rw [phi_eq_sum_card K L hx]
-  apply le_trans (b := 1 / (Nat.card ↥ G(L/K)_[0]) * ((∑ x ∈ Finset.Icc 1 (⌈x⌉ - 1), (1 : ℕ)) + (x - (max 0 (⌈x⌉ - 1))) * (Nat.card G(L/K)_[⌈x⌉] )))
+  apply le_trans (b := 1 / (Nat.card ↥ G(L/K)_[0]) * ((∑ _ ∈ Finset.Icc 1 (⌈x⌉ - 1), (1 : ℕ)) + (x - (max 0 (⌈x⌉ - 1))) * (Nat.card G(L/K)_[⌈x⌉] )))
   · rw [← Finset.cast_card]
     apply le_trans (b :=  1 / ↑(Nat.card ↥ G(L/K)_[0] ) * (↑↑(Finset.Icc 1 (⌈x⌉ - 1)).card + (x - ↑(max 0 (⌈x⌉ - 1))) * 1))
     · rw [mul_one, mul_le_mul_iff_of_pos_left]
@@ -207,7 +207,7 @@ theorem id_le_phi {x : ℚ} (hx : 0 < x) : (1 / Nat.card G(L/K)_[0]) * x ≤ phi
   · apply (mul_le_mul_left ?_).2
     rw [add_le_add_iff_right, Nat.cast_le]
     apply Finset.sum_le_sum
-    intro i hi
+    intro i _
     apply card_of_Ramigroup_gt_one
     refine one_div_pos.mpr ?_
     simp only [Nat.cast_pos]
