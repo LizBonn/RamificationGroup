@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "blueprint-template"
+version = "0.1.0"
+description = ""
+authors = ["timechess <tyc221@ruc.edu.cn>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+watchfiles = "^0.23.0"
+plastex = "^3.1"
+leanblueprint = "^0.0.14"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -2,25 +2,29 @@
 
 PROJECT = RamificationGroup
 
-.PHONY: all build blueprint blueprint-dev analyze serve update
+.PHONY: all build blueprint blueprint-dev analyze
 
 all : build blueprint
 
 build:
-	(lake -Kenv=dev exe cache get && lake -Kenv=dev build && lake -Kenv=dev build ${PROJECT}:docs)
+	(lake exe cache get && lake build)
 
-blueprint: build
-	(cd blueprint && inv all && cp -r ../.lake/build/doc ./web/)
+build-print:
+	(cd blueprint && mkdir -p print && cd src && xelatex -output-directory=../print print.tex)
+	(cd blueprint/print && BIBINPUTS=../src bibtex print.aux)
+	(cd blueprint/src && xelatex -output-directory=../print print.tex)
+	(cd blueprint/src && xelatex -output-directory=../print print.tex)
+	(cp blueprint/print/print.bbl blueprint/src/web.bbl)
 
-blueprint-dev:
-	(cd blueprint && inv all)
+build-web:
+	(cd blueprint/src && poetry run plastex -c plastex.cfg web.tex)
+
+blueprint: build build-print build-web
+	(lake -Kenv=dev update doc-gen4 && lake -Kenv=dev build $(PROJECT):docs)
+	(cd blueprint && cp -r ../.lake/build/doc ./web/)
+
+blueprint-dev: build-print build-web
+	(cd blueprint/web && poetry run python -m http.server)
 
 analyze:
-	(python3 blueprint/blueprint_auto.py -p ${PROJECT})
-
-serve: blueprint-dev analyze
-	(cd blueprint && inv serve)
-
-update:
-	(curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain && \
-		lake -Kenv=dev update -R)
+	(poetry run python3 blueprint/blueprint_auto.py -p ${PROJECT})
