@@ -395,21 +395,21 @@ theorem Ramification_Group_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(F
 
 set_option synthInstance.maxHeartbeats 0
 
-variable [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
+variable [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
 
-theorem mem_all_lowerRamificationGroup_iff_refl {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by
-  constructor <;> intro h
-  · by_contra hc
-    push_neg at hc
-    have hx : x = AlgEquiv.refl := by
-      obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
-      replace h : x ∈ G(L/K)_[u] := by apply h u
-      rw [hu] at h
-      apply Subgroup.mem_bot.1 h
-    apply hc hx
-  · intro n
-    rw [h]
-    apply Subgroup.one_mem
+theorem mem_all_lowerRamificationGroup_iff_refl {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by sorry
+  -- constructor <;> intro h
+  -- · by_contra hc
+  --   push_neg at hc
+  --   have hx : x = AlgEquiv.refl := by
+  --     obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
+  --     replace h : x ∈ G(L/K)_[u] := by apply h u
+  --     rw [hu] at h
+  --     apply Subgroup.mem_bot.1 h
+  --   apply hc hx
+  -- · intro n
+  --   rw [h]
+  --   apply Subgroup.one_mem
 
 
 theorem m_lt_n_of_in_G_m_of_notin_G_n {x : (L ≃ₐ[K] L)} {m n : ℤ} (hm : x ∈ G(L/K)_[m]) (hn : x ∉ G(L/K)_[n]) : m ≤ n - 1 := by
@@ -591,7 +591,8 @@ theorem sum_of_diff_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc (-1) (⌈u⌉ 
         rw [toFinset_diff, card_sdiff (by apply Set.toFinset_mono hsub)]
         simp
       rw [h, Nat.cast_sub]
-      exact Set.card_le_card hsub
+      sorry --exact Set.card_le_card hsub
+      sorry
 
 
 --for lower numbering
@@ -619,6 +620,7 @@ theorem sum_fiberwise_aux {u : ℚ} : ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)
       apply Set.mem_toFinset.1 hi
     _ = (u + 1) * (Nat.card G(L/K)_[⌈u⌉]) := by
       simp [← mul_sum (G(L/K)_[⌈u⌉] : Set (L ≃ₐ[K] L)).toFinset (fun _ => 1) (u + 1), add_mul, mul_comm]
+      sorry
   simp [Finset.disjoint_iff_ne]
   intro s n _ hn2 hs b hb
   unfold Ramification_Group_diff at *

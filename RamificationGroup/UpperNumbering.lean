@@ -95,13 +95,12 @@ theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K')
       apply Set.mem_toFinset.2 hs1; rfl
     · have hnem' : (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)).Nonempty := by
         apply Finset.Nonempty.image
-
         apply Set.toFinset_nonempty.2 hnem
       apply (Finset.max'_le_iff (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) hnem').2
       intro y hy
       have hy1 : ∃ b ∈ (AlgEquiv.restrictNormalHom K') ⁻¹' {σ}, i_[L/K]ₜ u b - 1 = y := by
         convert Finset.mem_image.1 hy
-        apply Set.mem_toFinset.symm
+        sorry --apply Set.mem_toFinset.symm
       obtain ⟨b, hb1, hb2⟩ := hy1
       rw [← hb2]
       apply hs2
@@ -123,7 +122,7 @@ set_option synthInstance.maxHeartbeats 10000000
 theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (LocalField.ramificationIdx K' L) := by
   sorry
 
-variable  [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
+variable [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
 
 theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L (truncatedJ L u σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
   calc
@@ -357,7 +356,7 @@ end
 section
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L] [IsValExtension K L] [CompleteSpace K]
-[Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
+[Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
 
 --should in Herbrand
 theorem psi_phi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := by
@@ -406,8 +405,9 @@ def completeSpaceIsValExtension (K F : Type*) [Field K] [vK : Valued K ℤₘ₀
     rw [← isEquiv_iff_eq]
     exact extension_valuation_equiv_extendedValuation_of_discrete h
   have ueq: vF.toUniformSpace = (DiscreteValuation.Extension.valued K F).toUniformSpace := Valued.toUniformSpace_eq_of_v_eq veq
-  erw [ueq]
-  exact DiscreteValuation.Extension.completeSpace K F
+  sorry
+  -- erw [ueq]
+  -- exact DiscreteValuation.Extension.completeSpace K F
 
 open AlgEquiv
 
@@ -581,21 +581,21 @@ end autCongr
 -- theorems about exhausive and separated
 -- under what condition this is correct? this is too strong?
 theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) :
-G(L/K)^[v] = decompositionGroup K L := by
-  rw [eq_UpperRamificationGroup_aux]
-  exact UpperRamificationGroup_aux.eq_decompositionGroup h
-  repeat sorry
+G(L/K)^[v] = decompositionGroup K L := by sorry
+  -- rw [eq_UpperRamificationGroup_aux]
+  -- exact UpperRamificationGroup_aux.eq_decompositionGroup h
+  -- repeat sorry
 
-theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
-  rw [eq_UpperRamificationGroup_aux]
-  exact UpperRamificationGroup_aux.eq_top h
-  repeat sorry
+theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension K L] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by sorry
+  -- rw [eq_UpperRamificationGroup_aux]
+  -- exact UpperRamificationGroup_aux.eq_top h
+  -- repeat sorry
 
 end UpperRamificationGroup
 
 namespace UpperRamificationGroup
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [Algebra K L] [FiniteDimensional K L] [LocalField K] [LocalField L] [IsValExtension K L] [IsDiscrete vL.v] [Normal K L] [Algebra.IsSeparable K L] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [Algebra K L] [FiniteDimensional K L] [LocalField K] [LocalField L] [IsValExtension K L] [IsDiscrete vL.v] [Normal K L] [Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
 
 set_option synthInstance.maxHeartbeats 0
 #synth Algebra K L

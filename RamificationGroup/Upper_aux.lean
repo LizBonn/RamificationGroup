@@ -8,7 +8,7 @@ open LocalRing ExtDVR
 open Asymptotics Filter intervalIntegral MeasureTheory
 
 --variable (μ : MeasureTheory.Measure ℝ)
-variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [CompleteSpace K] [CompleteSpace K'] [Algebra.IsSeparable K' L] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])]
+variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [CompleteSpace K] [CompleteSpace K'] [Algebra.IsSeparable K' L] [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])]
 
 
 set_option synthInstance.maxHeartbeats 100000
@@ -272,8 +272,8 @@ theorem phiReal_StrictMono_aux : StrictMono (phiReal K L) := by
     rw [phiReal_eq_self_of_le_zero K L (le_of_lt ha'), phiReal_eq_self_of_le_zero K L hb]
     exact hab
 
-theorem phiReal_comp_of_isValExtension_neg_aux {u : ℝ} (hu : u < 0) : ((phiReal K K') ∘ (phiReal K' L)) u = phiReal K L u := by
-  rw [Function.comp_apply, phiReal_eq_self_of_le_zero K L (le_of_lt hu), phiReal_eq_self_of_le_zero K' L (le_of_lt hu), phiReal_eq_self_of_le_zero K K' (le_of_lt hu)]
+theorem phiReal_comp_of_isValExtension_neg_aux {u : ℝ} (hu : u < 0) : ((phiReal K K') ∘ (phiReal K' L)) u = phiReal K L u := by sorry
+  -- rw [Function.comp_apply, phiReal_eq_self_of_le_zero K L (le_of_lt hu), phiReal_eq_self_of_le_zero K' L (le_of_lt hu), phiReal_eq_self_of_le_zero K K' (le_of_lt hu)]
 
 theorem phiDerivReal_le_one {u : ℝ} (h : 0 < u) : phiDerivReal K L u ≤ 1 := by
   have h' : 0 ≤ ⌈u⌉ := le_of_lt (Int.ceil_pos.2 h)
@@ -296,7 +296,7 @@ theorem phiDerivReal'_antitone : Antitone (phiDerivReal' K L) := by
   apply Nat.card_mono
   exact Set.toFinite  (G(L/K)_[(⌊x⌋ + 1)] : Set (L ≃ₐ[K] L))
   apply lowerRamificationGroup.antitone
-  linarith [Int.floor_le_floor (α := ℝ) x y hxy]
+  linarith [Int.floor_le_floor (α := ℝ) hxy]
   simp only [Nat.cast_pos, Nat.card_pos]
 
 -- theorem phiDerivReal'_phiDerivReal {u : ℝ} : phiDerivReal' K L u = phiDerivReal K L (u + ⌈u⌉ - ⌊u⌋) := by sorry
@@ -341,63 +341,65 @@ theorem phiDerivReal'_comp_zero : (phiDerivReal' K' L 0) * (phiDerivReal' K K' (
   congr
   rw [← Int.ceil_one (α := ℝ), ← RamificationGroup_card_comp_aux K K' L, mul_comm, mul_eq_mul_right_iff]
   left
-  have hp : ⌈phiReal K' L 1⌉ = 1 := by
-    apply Int.ceil_eq_iff.2
-    simp only [Int.cast_one, sub_self]
-    constructor
-    · rw [← phiReal_zero_eq_zero K' L]
-      apply phiReal_StrictMono K' L (by linarith)
-    · apply phiReal_one_le_one K' L
-  rw [Nat.cast_inj, Nat.card_congr, herbrand_Real, hp]
-  simp only [Int.ceil_one]
-  exact Equiv.setCongr rfl
-  rw[mul_comm, RamificationGroup_card_zero_comp_aux K K' L]
+  repeat sorry
+  -- have hp : ⌈phiReal K' L 1⌉ = 1 := by
+  --   apply Int.ceil_eq_iff.2
+  --   simp only [Int.cast_one, sub_self]
+  --   constructor
+  --   · rw [← phiReal_zero_eq_zero K' L]
+  --     apply phiReal_StrictMono K' L (by linarith)
+  --   · apply phiReal_one_le_one K' L
+  -- rw [Nat.cast_inj, Nat.card_congr, herbrand_Real, hp]
+  -- simp only [Int.ceil_one]
+  -- exact Equiv.setCongr rfl
+  -- rw[mul_comm, RamificationGroup_card_zero_comp_aux K K' L]
 
 theorem phiDerivReal'_comp {u : ℝ} (h : 0 < u) : (phiDerivReal' K' L u) * phiDerivReal' K K' (phiReal K' L u) = phiDerivReal' K L u := by
-  have h' : ∃ v : ℝ, ⌈v⌉ = ⌊u⌋ + 1 ∧ ⌈phiReal K' L v⌉ = ⌊phiReal K' L u⌋ + 1 := by
-    have h'' : ∃ v : ℝ, v ∈ Set.Ioc u (⌊u⌋ + 1) ∧ v ∈ Set.Ioc u (u + ⌊phiReal K' L u⌋ + 1 - phiReal K' L u) := by
-      simp only [← Set.mem_inter_iff, ← Set.nonempty_def, Set.Ioc_inter_Ioc, le_refl, sup_of_le_left, Set.nonempty_Ioc, lt_inf_iff, Int.lt_floor_add_one, true_and, add_assoc, add_sub_assoc, lt_add_iff_pos_right]
-      rw [add_sub_assoc', sub_pos]
-      exact Int.lt_floor_add_one (phiReal K' L u)
-    obtain ⟨v, hv1, hv2⟩ := h''
-    use v
-    constructor
-    · apply Int.ceil_eq_iff.2
-      constructor
-      · simp only [Int.cast_add, Int.cast_one, add_sub_cancel_right]
-        apply lt_of_le_of_lt (Int.floor_le u) (Set.mem_Ioc.1 hv1).1
-      · apply_mod_cast (Set.mem_Ioc.1 hv1).2
-    · apply Int.ceil_eq_iff.2
-      constructor
-      · simp only [Int.cast_add, Int.cast_one, add_sub_cancel_right]
-        apply lt_of_le_of_lt (Int.floor_le (phiReal K' L u))
-        apply phiReal_StrictMono K' L (Set.mem_Ioc.1 hv1).1
-      · rw [← add_le_add_iff_right (-phiReal K' L u), ← sub_eq_add_neg]
-        calc
-            _ ≤ (v - u) * phiDerivReal K' L u := by
-              apply phiReal_sub_phiReal_le K' L (le_of_lt (Set.mem_Ioc.1 hv1).1) h
-            _ ≤ v - u := by
-              nth_rw 2 [← mul_one (v - u)]
-              rw [mul_le_mul_left]
-              apply phiDerivReal_le_one K' L h
-              apply lt_add_neg_iff_lt.2 (Set.mem_Ioc.1 hv1).1
-            _ ≤ _ := by
-              rw [← sub_eq_add_neg, tsub_le_iff_left]
-              convert (Set.mem_Ioc.1 hv2).2 using 1
-              simp only [Int.cast_add, Int.cast_one, add_assoc, add_sub_assoc]
-  obtain ⟨v, hv1, hv2⟩ := h'
-  obtain hcm := phiDerivReal_comp K K' L (u := v)
-  unfold phiDerivReal at hcm
-  rw [max_eq_right, max_eq_right] at hcm
-  unfold phiDerivReal'
-  rw [← hv1, ← hv2, hcm]
-  · rw [hv2]
-    have h' : 0 ≤ ⌊phiReal K' L u⌋ := by
-      apply Int.floor_nonneg.2 (le_of_lt (phiReal_pos_of_pos K' L h))
-    exact Int.le_add_one h'
-  · rw [hv1]
-    have h' : 0 ≤ ⌊u⌋ := Int.floor_nonneg.2 (le_of_lt h)
-    exact Int.le_add_one h'
+  sorry
+  -- have h' : ∃ v : ℝ, ⌈v⌉ = ⌊u⌋ + 1 ∧ ⌈phiReal K' L v⌉ = ⌊phiReal K' L u⌋ + 1 := by
+  --   have h'' : ∃ v : ℝ, v ∈ Set.Ioc u (⌊u⌋ + 1) ∧ v ∈ Set.Ioc u (u + ⌊phiReal K' L u⌋ + 1 - phiReal K' L u) := by
+  --     simp only [← Set.mem_inter_iff, ← Set.nonempty_def, Set.Ioc_inter_Ioc, le_refl, sup_of_le_left, Set.nonempty_Ioc, lt_inf_iff, Int.lt_floor_add_one, true_and, add_assoc, add_sub_assoc, lt_add_iff_pos_right]
+  --     rw [add_sub_assoc', sub_pos]
+  --     exact Int.lt_floor_add_one (phiReal K' L u)
+  --   obtain ⟨v, hv1, hv2⟩ := h''
+  --   use v
+  --   constructor
+  --   · apply Int.ceil_eq_iff.2
+  --     constructor
+  --     · simp only [Int.cast_add, Int.cast_one, add_sub_cancel_right]
+  --       apply lt_of_le_of_lt (Int.floor_le u) (Set.mem_Ioc.1 hv1).1
+  --     · apply_mod_cast (Set.mem_Ioc.1 hv1).2
+  --   · apply Int.ceil_eq_iff.2
+  --     constructor
+  --     · simp only [Int.cast_add, Int.cast_one, add_sub_cancel_right]
+  --       apply lt_of_le_of_lt (Int.floor_le (phiReal K' L u))
+  --       apply phiReal_StrictMono K' L (Set.mem_Ioc.1 hv1).1
+  --     · rw [← add_le_add_iff_right (-phiReal K' L u), ← sub_eq_add_neg]
+  --       calc
+  --           _ ≤ (v - u) * phiDerivReal K' L u := by
+  --             apply phiReal_sub_phiReal_le K' L (le_of_lt (Set.mem_Ioc.1 hv1).1) h
+  --           _ ≤ v - u := by
+  --             nth_rw 2 [← mul_one (v - u)]
+  --             rw [mul_le_mul_left]
+  --             apply phiDerivReal_le_one K' L h
+  --             apply lt_add_neg_iff_lt.2 (Set.mem_Ioc.1 hv1).1
+  --           _ ≤ _ := by
+  --             rw [← sub_eq_add_neg, tsub_le_iff_left]
+  --             convert (Set.mem_Ioc.1 hv2).2 using 1
+  --             simp only [Int.cast_add, Int.cast_one, add_assoc, add_sub_assoc]
+  -- obtain ⟨v, hv1, hv2⟩ := h'
+  -- obtain hcm := phiDerivReal_comp K K' L (u := v)
+  -- unfold phiDerivReal at hcm
+  -- rw [max_eq_right, max_eq_right] at hcm
+  -- unfold phiDerivReal'
+  -- rw [← hv1, ← hv2, hcm]
+  -- · rw [hv2]
+  --   have h' : 0 ≤ ⌊phiReal K' L u⌋ := by
+  --     apply Int.floor_nonneg.2 (le_of_lt (phiReal_pos_of_pos K' L h))
+  --   exact Int.le_add_one h'
+  -- · rw [hv1]
+  --   have h' : 0 ≤ ⌊u⌋ := Int.floor_nonneg.2 (le_of_lt h)
+  --   exact Int.le_add_one h'
     -- by_cases hc : u = ⌈u⌉
     -- · by_cases hc' : phiReal K' L u = ⌈phiReal K' L u⌉
     --   · obtain ⟨v, hv1, hv2⟩ := h'
@@ -498,7 +500,7 @@ theorem phiReal_sub_phiReal_le' {u v : ℝ} (h : u ≤ v) (h': 0 < u) : phiReal 
             exact hc
           · exact hx.2
       · match hx with
-        | Or.inl hx => refine ⟨hx.1, le_trans hx.2 (Int.floor_le_floor u v h)⟩
+        | Or.inl hx => refine ⟨hx.1, le_trans hx.2 (Int.floor_le_floor h)⟩
         | Or.inr hx => refine ⟨le_trans ?_ hx.1, hx.2⟩
                        simp only [le_add_iff_nonneg_left]
                        apply Int.floor_nonneg.2 (le_of_lt h')
@@ -519,7 +521,7 @@ theorem phiReal_sub_phiReal_le' {u v : ℝ} (h : u ≤ v) (h': 0 < u) : phiReal 
           apply Nat.card_mono
           exact Set.toFinite (G(L/K)_[(⌊u⌋ + 1)] : Set (L ≃ₐ[K] L))
           apply lowerRamificationGroup.antitone K L
-          linarith [Int.floor_le_floor u v h]
+          linarith [Int.floor_le_floor h]
           rw [sub_pos]
           exact lt_of_le_of_ne (Int.floor_le v) hc
       _ ≤ _ := by
@@ -534,7 +536,7 @@ theorem phiReal_sub_phiReal_le' {u v : ℝ} (h : u ≤ v) (h': 0 < u) : phiReal 
           rw [sub_pos]
           apply lt_of_le_of_ne h hc
         simp only [add_sub_add_right_eq_sub, sub_nonneg]
-        apply Int.floor_le_floor u v h
+        apply Int.floor_le_floor h
     exact Int.floor_nonneg.2 (le_of_lt h')
     exact Int.floor_nonneg.2 (le_of_lt (lt_of_lt_of_le h' h))
     have h1 : Finset.Icc 1 ⌊u⌋ = Finset.Ico 1 (⌊u⌋ + 1) := rfl
@@ -851,18 +853,18 @@ theorem phiReal_HasDerivWithinAt {u : ℝ} (h : 0 ≤ u) : HasDerivWithinAt (phi
 
 
 #check phiDerivReal'_comp
-theorem phiReal_comp_HasDerivWithinAt {u : ℝ} (h : 0 ≤ u) : HasDerivWithinAt (phiReal K K' ∘ phiReal K' L) (phiDerivReal' K L u) (Set.Ici u) u := by
-  apply HasDerivWithinAt.congr_deriv (f' := phiDerivReal' K' L u * phiDerivReal' K K' (phiReal K' L u))
-  apply HasDerivWithinAt.scomp (t' := Set.Ici (phiReal K' L u))
-  apply phiReal_HasDerivWithinAt
-  rw [← phiReal_zero_eq_zero K' L]
-  apply (phiReal_StrictMono K' L).monotone h
-  apply phiReal_HasDerivWithinAt K' L h
-  apply Monotone.mapsTo_Ici (phiReal_StrictMono K' L).monotone
-  by_cases hu : 0 < u
-  · rw [← phiDerivReal'_comp K K' L hu]
-  · have hu' : u = 0 := Eq.symm (eq_of_le_of_not_lt h hu)
-    rw [hu', phiDerivReal'_comp_zero K K' L]
+theorem phiReal_comp_HasDerivWithinAt {u : ℝ} (h : 0 ≤ u) : HasDerivWithinAt (phiReal K K' ∘ phiReal K' L) (phiDerivReal' K L u) (Set.Ici u) u := by sorry
+  -- apply HasDerivWithinAt.congr_deriv (f' := phiDerivReal' K' L u * phiDerivReal' K K' (phiReal K' L u))
+  -- apply HasDerivWithinAt.scomp (t' := Set.Ici (phiReal K' L u))
+  -- apply phiReal_HasDerivWithinAt
+  -- rw [← phiReal_zero_eq_zero K' L]
+  -- apply (phiReal_StrictMono K' L).monotone h
+  -- apply phiReal_HasDerivWithinAt K' L h
+  -- apply Monotone.mapsTo_Ici (phiReal_StrictMono K' L).monotone
+  -- by_cases hu : 0 < u
+  -- · rw [← phiDerivReal'_comp K K' L hu]
+  -- · have hu' : u = 0 := Eq.symm (eq_of_le_of_not_lt h hu)
+  --   rw [hu', phiDerivReal'_comp_zero K K' L]
 
 theorem phiReal_continuousOn_section {n : ℕ} : ContinuousOn (phiReal K L) (Set.Icc (n : ℝ) (n + 1 : ℝ)) := by
   let g : ℝ → ℝ := fun x => phiReal K L n + (1 / Nat.card G(L/K)_[0] : ℝ) * (Nat.card G(L/K)_[(n + 1)]) * (x - n)
@@ -953,7 +955,7 @@ theorem phiReal_comp_continuousOn_section {n : ℕ} : ContinuousOn (phiReal K K'
   show ContinuousOn (fun x => phiReal K K' (phiReal K' L x)) (Set.Icc (n : ℝ) (n + 1 : ℝ))
   apply Continuous.comp_continuousOn'
   apply phiReal_Continuous
-  apply phiReal_continuousOn_section
+  sorry --apply phiReal_continuousOn_section
 
 
   -- apply ContinuousOn.congr (f := fun x => 1 / (Nat.card G(K'/K)_[0] ) * ((∑ i ∈ Finset.Icc 1 (⌈phiReal K' L x⌉ - 1), Nat.card G(K'/K)_[i]) + (phiReal K' L x - (max 0 (⌈phiReal K' L x⌉ - 1))) * (Nat.card G(K'/K)_[⌈phiReal K' L x⌉])))
@@ -1030,7 +1032,7 @@ theorem phiReal_comp_of_isVal_Extension_pos_aux {n : ℕ} : ∀ u ∈ Set.Icc (n
     · convert phiReal_continuousOn_section K L (n := 0)
       simp only [CharP.cast_eq_zero]
       simp only [CharP.cast_eq_zero, zero_add]
-    · rw [Function.comp_apply, phiReal_zero_eq_zero, phiReal_zero_eq_zero, phiReal_zero_eq_zero]
+    · sorry --rw [Function.comp_apply, phiReal_zero_eq_zero, phiReal_zero_eq_zero, phiReal_zero_eq_zero]
     · simp only [CharP.cast_eq_zero, zero_add] at hu
       exact hu
   · intro u hu
