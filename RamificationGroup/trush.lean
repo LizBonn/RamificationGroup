@@ -64,7 +64,7 @@ section three
 
 variable {a b c : ℝ} (h1 : a < b) (h2 : b < c)
 
-theorem The_second_example : a < c := by
+theorem The_second_example (h1 : a < b) (h2 : b < c) : a < c := by
   apply lt_trans h1 h2
 
 end three
@@ -159,7 +159,7 @@ end five
 #check mul_comm
 #check add_sub_cancel_right
 example{a b:ℝ}:(a+b)*(a-b)=a*a-b*b :=by
-  rw[add_mul,mul_sub,mul_sub, add_sub,mul_comm a b,sub_add, sub_self,sub_zero ]
+  rw[add_mul,mul_sub,mul_sub, add_sub,mul_comm a b,sub_add, sub_self,sub_zero]
 
 section six
 /-:

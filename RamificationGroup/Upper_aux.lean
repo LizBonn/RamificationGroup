@@ -7,6 +7,8 @@ open AlgEquiv AlgHom
 open LocalRing ExtDVR
 open Asymptotics Filter intervalIntegral MeasureTheory
 
+#check Nat.not_succ_le_zero 
+
 --variable (μ : MeasureTheory.Measure ℝ)
 variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [CompleteSpace K] [CompleteSpace K'] [Algebra.IsSeparable K' L] [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])]
 

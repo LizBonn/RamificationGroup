@@ -28,7 +28,7 @@ theorem phiReal_zero_eq_zero : phiReal K L 0 = 0 := by
 
 theorem phiReal_one_le_one : phiReal K L 1 ≤ 1 := by
   unfold phiReal
-  rw [integral_of_le, MeasureTheory.setIntegral_congr (g := fun x => phiDerivReal K L 1) measurableSet_Ioc, MeasureTheory.setIntegral_const]
+  rw [integral_of_le, MeasureTheory.setIntegral_congr_fun (g := fun x => phiDerivReal K L 1) measurableSet_Ioc, MeasureTheory.setIntegral_const]
   -- rw [integral_congr (g := fun x => phiDerivReal K L 1), integral_const' (phiDerivReal K L 1)]
   simp only [not_lt, zero_le_one, Set.Ioc_eq_empty, MeasureTheory.measure_empty, ENNReal.zero_toReal, sub_zero, smul_eq_mul, μ, Real.volume_Ioc, sub_zero, ENNReal.ofReal_one, ENNReal.one_toReal, one_mul, phiDerivReal]
   apply (div_le_one _).2
@@ -46,7 +46,15 @@ theorem phiReal_one_le_one : phiReal K L 1 ≤ 1 := by
   rw [hx']
   linarith
 
-theorem phiReal_nonneg {u : ℝ} (h : 0 ≤ u) : 0 ≤ phiReal K L u := by sorry
+theorem phiReal_nonneg {u : ℝ} (h : 0 ≤ u) : 0 ≤ phiReal K L u := by
+  simp only [phiReal, integral_of_le h]
+  apply MeasureTheory.setIntegral_nonneg_ae measurableSet_Ioc
+  unfold Filter.Eventually phiDerivReal
+  apply MeasureTheory.ae_of_all
+  intro a _
+  apply div_nonneg
+  apply Nat.cast_nonneg
+  apply Nat.cast_nonneg
 
 #check intervalIntegral.differentiableOn_integral_of_continuous
 
@@ -458,13 +466,32 @@ open Asymptotics Filter intervalIntegral MeasureTheory
 
 
 
--- theorem phiDerivReal_integrableOn_section {k : ℝ}: IntegrableOn (phiDerivReal K L) (Set.Ioc k (k + 1)) μ := by sorry
+theorem phiDerivReal_integrableOn_section {k : ℤ} (hk : 0 ≤ k): IntegrableOn (phiDerivReal K L) (Set.Ioc (k : ℝ) (k + 1 : ℝ)) μ := by
+  apply IntegrableOn.congr_fun_ae (f := fun x => (Nat.card G(L/K)_[⌈k + 1⌉] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))
+  apply integrableOn_const.2
+  right
+  dsimp [μ]
+  exact measure_Ioc_lt_top
+  unfold phiDerivReal EventuallyEq
+  apply (ae_restrict_iff_subtype _).2
+  apply ae_of_all
+  intro ⟨a, ha⟩
+  have ha' : ⌈a⌉ = k + 1 := by
+    apply Int.ceil_eq_on_Ioc (k + 1) a ?_
+    simp only [Int.cast_add, Int.cast_one, add_sub_cancel_right, ha]
+  dsimp
+  rw [max_eq_right]
+  rw [ha']
+  rw [ha']
+  apply le_trans hk (by linarith)
+  exact measurableSet_Ioc
+
 
 theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.card G(L/K)_[0]) * ((∑ x in Finset.Icc 1 (⌈u⌉ - 1), Nat.card G(L/K)_[x]) + (u - (max 0 (⌈u⌉ - 1))) * (Nat.card G(L/K)_[⌈u⌉])) := by
   unfold phiReal
   by_cases hu' : u = 0
   · --rw [hu', phiReal_zero_eq_zero]
-    sorry
+    simp only [hu', integral_same, one_div, Int.ceil_zero, zero_sub, Int.reduceNeg, neg_lt_self_iff, zero_lt_one, Finset.Icc_eq_empty_of_lt, Finset.sum_empty, CharP.cast_eq_zero, Left.neg_nonpos_iff, zero_le_one, max_eq_left, Int.cast_zero, sub_self, zero_mul, add_zero, mul_zero]
   · calc
       _ = ∫ (x : ℝ) in (0 : ℝ)..(⌈u⌉ - 1 : ℝ), phiDerivReal K L x ∂μ + ∫ (x : ℝ) in (⌈u⌉ - 1 : ℝ)..(u : ℝ), phiDerivReal K L x ∂μ := by
         have h : Set.Ioc 0 u = Set.Ioc 0 (⌈u⌉ - 1 : ℝ) ∪ (Set.Ioc (⌈u⌉ - 1 : ℝ) u) := by
@@ -492,8 +519,9 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
               · constructor
                 · constructor
                   · apply Int.one_le_ceil_iff.2 (Set.mem_Ioc.1 hx).1
-                  · 
-                    sorry
+                  · apply Int.ceil_le.2
+                    rw [Int.cast_sub, Int.cast_one]
+                    exact (Set.mem_Ioc.1 hx).2
                     -- · apply Int.ceil_le_ceil
                   --   apply le_of_lt (lt_of_le_of_lt (Set.mem_Ioc.1 hx).2 (by linarith [Int.ceil_lt_add_one u]))
                 · rw [Int.cast_sub, Int.cast_one, sub_add_cancel]
@@ -505,46 +533,39 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
               · apply lt_of_le_of_lt ?_ hi1
                 simp only [Int.cast_nonneg, hi2.1]
               · apply le_trans hi3
-
-                sorry
+                rw [← Int.cast_one (R := ℝ), ← Int.cast_add, ← Int.cast_sub, Int.cast_le]
+                linarith [hi2.2]
           rw [hbu]
           apply (integrableOn_finite_biUnion _).2
           intro i hi
-          apply IntegrableOn.congr_fun_ae (f := fun x => (Nat.card G(L/K)_[⌈i + 1⌉] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))
-          apply integrableOn_const.2
-          right
-          dsimp [μ]
-          exact measure_Ioc_lt_top
-          unfold phiDerivReal EventuallyEq
-          apply (ae_restrict_iff_subtype _).2
-          apply ae_of_all
-          intro ⟨a, ha⟩
-          have ha' : ⌈a⌉ = i + 1 := by
-            apply Int.ceil_eq_on_Ioc (i + 1) a ?_
-            simp only [Int.cast_add, Int.cast_one, add_sub_cancel_right, ha]
-          dsimp
-          rw [max_eq_right]
-          rw [ha']
-          rw [ha']
-          apply le_trans (Set.mem_Icc.1 hi).1 (by linarith)
-          exact measurableSet_Ioc
-          exact Set.finite_Icc 0 (⌈u⌉ - 1)
-        · apply IntegrableOn.congr_fun_ae (f := fun x => (Nat.card G(L/K)_[(⌈u⌉)] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))
-          apply integrableOn_const.2
-          right
-          dsimp [μ]
-          exact measure_Ioc_lt_top
-          unfold phiDerivReal EventuallyEq
-          apply (ae_restrict_iff_subtype _).2
-          apply ae_of_all
-          intro ⟨a, ha⟩
-          have ha' : ⌈a⌉ = ⌈u⌉ := by
-            apply Int.ceil_eq_iff.2
-            refine ⟨(Set.mem_Ioc.1 ha).1, le_trans (Set.mem_Ioc.1 ha).2 (Int.le_ceil u)⟩
-          dsimp
-          rw [ha', max_eq_right]
-          exact Int.ceil_nonneg hu
-          exact measurableSet_Ioc
+          apply phiDerivReal_integrableOn_section K L (Set.mem_Icc.1 hi).1
+          exact Set.finite_Icc 0 (⌈u⌉ - 1 - 1)
+        · apply IntegrableOn.mono_set (t := Set.Ioc (↑(⌈u⌉ - 1) : ℝ) (↑(⌈u⌉ - 1 : ℝ) + 1))
+          nth_rw 1 [← Int.cast_one (R := ℝ)]
+          rw [← Int.cast_sub]
+          apply phiDerivReal_integrableOn_section K L (k := ⌈u⌉ - 1)
+          apply sub_nonneg.2 (Int.one_le_ceil_iff.2 (lt_of_le_of_ne hu ?_))
+          exact fun a ↦ hu' (id (Eq.symm a))
+          apply Set.Ioc_subset_Ioc
+          simp only [Int.cast_sub, Int.cast_one, le_refl]
+          simp only [sub_add_cancel]
+          apply Int.le_ceil u
+          -- apply IntegrableOn.congr_fun_ae (f := fun x => (Nat.card G(L/K)_[(⌈u⌉)] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))
+          -- apply integrableOn_const.2
+          -- right
+          -- dsimp [μ]
+          -- exact measure_Ioc_lt_top
+          -- unfold phiDerivReal EventuallyEq
+          -- apply (ae_restrict_iff_subtype _).2
+          -- apply ae_of_all
+          -- intro ⟨a, ha⟩
+          -- have ha' : ⌈a⌉ = ⌈u⌉ := by
+          --   apply Int.ceil_eq_iff.2
+          --   refine ⟨(Set.mem_Ioc.1 ha).1, le_trans (Set.mem_Ioc.1 ha).2 (Int.le_ceil u)⟩
+          -- dsimp
+          -- rw [ha', max_eq_right]
+          -- exact Int.ceil_nonneg hu
+          -- exact measurableSet_Ioc
         · linarith [Int.ceil_lt_add_one u]
         · rw [sub_nonneg, ← (Int.cast_one (R := ℝ)), Int.cast_le]
           apply Int.one_le_ceil_iff.2
@@ -628,12 +649,17 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
         rw [Nat.cast_zero]
         norm_cast
         rw [Int.toNat_of_nonneg]
-        sorry
-        intro k hk
+        rw [sub_nonneg]
+        apply Int.one_le_ceil_iff.2
+        apply lt_of_le_of_ne hu
+        exact fun a ↦ hu' (id (Eq.symm a))
+        intro k _
         dsimp [IntervalIntegrable]
         constructor
-        · sorry-- apply phiDerivReal_integrableOn_section K L
-        · sorry
+        · rw [← Int.cast_natCast, ← Int.cast_natCast (k + 1), Nat.cast_add, Nat.cast_one, Int.cast_add, Int.cast_one]
+          apply phiDerivReal_integrableOn_section K L (k := (k : ℤ))
+          exact Int.ofNat_zero_le k
+        · simp only [Nat.cast_add, Nat.cast_one, add_lt_iff_neg_left, not_lt, zero_le_one, Set.Ioc_eq_empty, integrableOn_empty]
         --simp only [Pi.one_apply]
       _ = _ := by
         have h : ∑ k in Finset.range (⌈u⌉ - 1).toNat, ∫ x in (k : ℝ)..(↑(k + 1) : ℝ), phiDerivReal K L x ∂μ = ∑ k in Finset.Icc 1 (⌈u⌉ - 1), (Nat.card G(L/K)_[k] : ℝ) / (Nat.card G(L/K)_[0] : ℝ) := by
@@ -651,14 +677,24 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
           · apply Int.le_sub_one_of_lt
             rw [← Nat.cast_lt (α := ℤ), Int.toNat_of_nonneg] at ha
             linarith [ha]
-            sorry
+            rw [sub_nonneg]
+            apply Int.one_le_ceil_iff.2
+            apply lt_of_le_of_ne hu
+            exact fun a ↦ hu' (id (Eq.symm a))
           intro a ha
-          dsimp [j]
-          rw [Finset.mem_Icc] at ha
-          apply Finset.mem_range.2
-          apply (Int.toNat_lt_toNat _).2
-          linarith [ha.2]
-          sorry
+          by_cases hu'' : ⌈u⌉ = 1
+          · simp only [hu'', sub_self, zero_lt_one, Finset.Icc_eq_empty_of_lt, Finset.not_mem_empty] at ha
+          · dsimp [j]
+            rw [Finset.mem_Icc] at ha
+            apply Finset.mem_range.2
+            apply (Int.toNat_lt_toNat _).2
+            linarith [ha.2]
+            apply lt_of_le_of_ne
+            rw [sub_nonneg]
+            apply Int.one_le_ceil_iff.2
+            apply lt_of_le_of_ne hu
+            exact fun a ↦ hu' (id (Eq.symm a))
+            exact Ne.symm (sub_ne_zero_of_ne hu'')
           intro a ha
           dsimp [i, j]
           simp only [add_sub_cancel_right, Int.toNat_ofNat]
@@ -669,29 +705,33 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
           rw [Finset.mem_Icc] at ha
           linarith [ha.1]
           intro a ha
-          rw [integral_congr (g := fun x => (Nat.card ↥ G(L/K)_[(i a)] : ℝ) / (Nat.card ↥ G(L/K)_[0] : ℝ))]
-          rw [intervalIntegral.integral_const' (a := a) (b := ↑(a + 1)) ((Nat.card G(L/K)_[(i a)] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))]
-          dsimp [μ]
-          simp only [Nat.cast_add, Nat.cast_one, Real.volume_Ioc, add_sub_cancel_left,
-            ENNReal.ofReal_one, ENNReal.one_toReal, add_lt_iff_neg_left, not_lt, zero_le_one,
-            Set.Ioc_eq_empty, measure_empty, ENNReal.zero_toReal, sub_zero, one_mul]
-          dsimp [Set.EqOn]
+          rw [integral_of_le, setIntegral_congr_fun (g := fun x => (Nat.card G(L/K)_[(i a)] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))]
+          simp only [Nat.cast_add, Nat.cast_one, MeasureTheory.integral_const, MeasurableSet.univ, Measure.restrict_apply, Set.univ_inter, smul_eq_mul, μ, Real.volume_Ioc, add_sub_cancel_left, ENNReal.ofReal_one, ENNReal.one_toReal,one_mul]
+          exact measurableSet_Ioc
+          simp only [Set.EqOn, phiDerivReal, i]
           intro x hx
-          dsimp [phiDerivReal, i]
-          obtain ⟨hx1, hx2⟩ := Set.mem_uIcc.1 hx
-          have h' : ⌈x⌉ = a + 1 := by
-            apply Int.ceil_eq_iff.2
-            constructor
-            · rw [Int.cast_add]
-              simp only [Int.cast_natCast, Int.cast_one, add_sub_cancel_right]
-              sorry
-            · apply_mod_cast hx2
-          rw [max_eq_right, h']
-          rw [h']
-          exact Int.le.intro_sub (a + 1 + 0) rfl
-          rw [max_eq_right]
-          sorry
-          sorry
+          rw [max_eq_right, Int.ceil_eq_iff.2 ⟨by simp only [Nat.cast_add, Nat.cast_one, Int.cast_add, Int.cast_natCast, Int.cast_one, add_sub_cancel_right, (Set.mem_Ioc.1 hx).1], (Set.mem_Ioc.1 hx).2⟩, Nat.cast_add, Nat.cast_one]
+          apply Int.ceil_nonneg (le_of_lt (lt_of_le_of_lt (Nat.cast_nonneg' a) (Set.mem_Ioc.1 hx).1))
+          rw [Nat.cast_le]
+          linarith
+          -- rw [integral_congr (g := fun x => (Nat.card ↥ G(L/K)_[(i a)] : ℝ) / (Nat.card ↥ G(L/K)_[0] : ℝ))]
+          -- rw [intervalIntegral.integral_const' (a := a) (b := ↑(a + 1)) ((Nat.card G(L/K)_[(i a)] : ℝ) / (Nat.card G(L/K)_[0] : ℝ))]
+          -- dsimp [μ]
+          -- simp only [Nat.cast_add, Nat.cast_one, Real.volume_Ioc, add_sub_cancel_left, ENNReal.ofReal_one, ENNReal.one_toReal, add_lt_iff_neg_left, not_lt, zero_le_one, Set.Ioc_eq_empty, measure_empty, ENNReal.zero_toReal, sub_zero, one_mul]
+          -- dsimp [Set.EqOn]
+          -- intro x hx
+          -- dsimp [phiDerivReal, i]
+          -- sorry
+          -- it's wrong!!!
+          -- obtain ⟨hx1, hx2⟩ := Set.mem_uIcc.1 hx
+          -- have h' : ⌈x⌉ = a + 1 := by
+          --   sorry
+          -- rw [max_eq_right, h']
+          -- rw [h']
+          -- exact Int.le.intro_sub (a + 1 + 0) rfl
+          -- rw [max_eq_right]
+          -- sorry
+          -- sorry
           -- nth_rw 1 [← Nat.sub_zero (⌈u⌉ - 1).toNat]
           -- have h : ∑ k in Finset.range ((⌈u⌉ - 1).toNat - 0), ∫ x in (k : ℝ)..(k + 1 : ℝ), phiDerivReal K L x ∂μ = ∑ k in Finset.range ((⌈u⌉ - 1).toNat - 0), ∫ x in (↑(0 + k) : ℝ)..(↑(0 + k) + 1 : ℝ), phiDerivReal K L x ∂μ := by simp only [zero_add]
           -- simp only [h, zero_add]
@@ -718,15 +758,36 @@ theorem phiReal_eq_sum_card {u : ℝ} (hu : 0 ≤ u) : phiReal K L u = (1 / Nat.
             dsimp [e]
             rw [one_div, inv_mul_eq_div]
         · have h : ∫ (x : ℝ) in (⌈u⌉ - 1 : ℝ)..u, phiDerivReal K L x ∂μ = ∫ (x : ℝ) in (⌈u⌉ - 1 : ℝ)..u, (Nat.card G(L/K)_[⌈u⌉] : ℝ) / (Nat.card G(L/K)_[0] : ℝ) := by
-            apply integral_congr
-            dsimp [Set.EqOn]
+            rw [integral_of_le, integral_of_le, μ]
+            apply setIntegral_congr_fun
+            exact measurableSet_Ioc
+            simp only [Set.EqOn, phiDerivReal]
             intro x hx
-            have h : ⌈x⌉ = ⌈u⌉ := by
-              sorry
-            rw [phiDerivReal, h, max_eq_right]
-            apply Int.ceil_nonneg hu
-          rw [h, intervalIntegral.integral_const, smul_eq_mul, max_eq_right, one_div, inv_mul_eq_div, Int.cast_sub, Int.cast_one, mul_div]
-          sorry
+            rw [max_eq_right, Int.ceil_eq_iff.2 ⟨(Set.mem_Ioc.1 hx).1, le_trans (Set.mem_Ioc.1 hx).2 (Int.le_ceil u)⟩]
+            rw [← Int.cast_le (R := ℝ), Int.cast_zero]
+            apply le_trans ?_ (Int.le_ceil x)
+            apply le_of_lt (lt_of_le_of_lt ?_ (Set.mem_Ioc.1 hx).1)
+            rw [sub_nonneg, ← Int.cast_one (R := ℝ)]
+            apply Int.cast_le.2 (Int.one_le_ceil_iff.2 (lt_of_le_of_ne hu ?_))
+            exact fun a ↦ hu' (id (Eq.symm a))
+            apply le_of_lt
+            linarith [Int.ceil_lt_add_one u]
+            apply le_of_lt
+            linarith [Int.ceil_lt_add_one u]
+          simp only [h, intervalIntegral.integral_const, smul_eq_mul, Int.cast_max]
+          rw [max_eq_right, Int.cast_sub, Int.cast_one]
+          ring
+          apply Int.cast_le.2 (sub_nonneg.2 (Int.one_le_ceil_iff.2 (lt_of_le_of_ne hu ?_)))
+          exact fun a ↦ hu' (id (Eq.symm a))
+          --   apply integral_congr
+          --   dsimp [Set.EqOn]
+          --   intro x hx
+          --   have h : ⌈x⌉ = ⌈u⌉ := by
+          --     sorry
+          --   rw [phiDerivReal, h, max_eq_right]
+          --   apply Int.ceil_nonneg hu
+          -- rw [h, intervalIntegral.integral_const, smul_eq_mul, max_eq_right, one_div, inv_mul_eq_div, Int.cast_sub, Int.cast_one, mul_div]
+          -- sorry
   --rw [← intervalIntegral.sum_integral_adjacent_intervals (f := phiDerivReal K L) (μ := μ) (a := 1)]
 
 theorem phiReal_eq_phi {u : ℚ} (hu : 0 ≤ u) : phiReal K L u = phi K L u := by
