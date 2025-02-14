@@ -20,7 +20,7 @@ build-web:
 	(cd blueprint/src && poetry run plastex -c plastex.cfg web.tex)
 
 blueprint: build build-print build-web
-	(lake -Kenv=dev update doc-gen4 && lake -Kenv=dev build $(PROJECT):docs)
+	(lake -Kenv=dev update doc-gen4 -R && lake -Kenv=dev build $(PROJECT):docs)
 	(cd blueprint && cp -r ../.lake/build/doc ./web/)
 
 blueprint-dev: build-print build-web
