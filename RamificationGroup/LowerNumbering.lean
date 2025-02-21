@@ -880,34 +880,60 @@ theorem prop3
     simp only [_root_.map_sub, SubmonoidClass.coe_pow, a, b] at hnu1 hnu2
     simp only [_root_.map_sub, hnu1, hnu2, _root_.map_mul, _root_.map_pow, val_valuationSubring_unit, mul_one]
     apply congrArg
+    obtain ⟨s, hs⟩ := exsit_preimage σ (L := L)
+    let f := ∏ t ∈ (⊤ : Set (L ≃ₐ[K] L)).toFinset, (X - C (t x.gen))
+    let e : L →+* L := {
+      toFun := fun t => s t
+      map_one' := map_one s
+      map_mul' := AlgEquiv.map_mul' s
+      map_zero' := map_zero s
+      map_add' := AlgEquiv.map_add' s
+    }
+    let sf := Polynomial.map e f
+    let sf' := ∏ t ∈ (⊤ : Set (L ≃ₐ[K] L)).toFinset, (X - C ((s * t) x.gen))
+    have hcoeff : ∀ i : ℕ, coeff sf i = s (coeff f i) := by sorry
     apply le_antisymm
     · have hab : b ∣ a := by
-        simp only [a, b]
+        have hy : ∃ g : K[X], eval x.gen.1 (Polynomial.map (algebraMap K L) g) = algebraMap M L y.gen := by sorry
+        have hmin : f = Polynomial.map (algebraMap M L) (minpoly M x.gen.1) := by sorry
+        obtain ⟨g, hg⟩ := hy
+        let g_sub_y := Polynomial.map (algebraMap K M) g - C y.gen.1
+        have hdvd : minpoly M x.gen.1 ∣ g_sub_y := by
+          apply minpoly.dvd_iff.2
+          simp only [g_sub_y]
+          sorry
+        obtain ⟨h, hh⟩ := hdvd
+        have ha : a = eval x.gen.1 (Polynomial.map e (Polynomial.map (algebraMap M L) g_sub_y)) := by sorry
+        have hb : b = eval x.gen.1 sf := by sorry
+        rw [ha, hb]
+        apply Polynomial.eval_dvd
+        use Polynomial.map (algebraMap M L) h
+        ext i
+        simp only [coeff_map]
         sorry
-      sorry
+      simp only [a, b, _root_.map_sub, hnu1, hnu2] at hab
+      obtain ⟨t, ht⟩ := hab
+      have hr : t ∈ v.valuationSubring := by sorry
+      have hr' :  (⟨t, hr⟩ : vL.v.valuationSubring) ≠ 0 := by sorry
+      obtain ⟨n, u, hnu⟩ := pow_Uniformizer vL.v hr' ⟨π, hpi⟩
+      have hn : n2 + n = n1 := by sorry
+      rw [← hn]
+      linarith
     · have hab : a ∣ b := by
         --simp only [a, b]
-        obtain ⟨s, hs⟩ := exsit_preimage σ (L := L)
-        let f := ∏ t ∈ (⊤ : Set (L ≃ₐ[K] L)).toFinset, (X - C (t x.gen))
-        let e : L →+* L := {
-          toFun := fun t => s t
-          map_one' := map_one s
-          map_mul' := AlgEquiv.map_mul' s
-          map_zero' := map_zero s
-          map_add' := AlgEquiv.map_add' s
-        }
-        let sf := Polynomial.map e f
-        let sf' := ∏ t ∈ (⊤ : Set (L ≃ₐ[K] L)).toFinset, (X - C ((s * t) x.gen))
         have ha : a = s (algebraMap M L y.gen) - (algebraMap M L y.gen) := by sorry
         have hb : b = eval x.gen.1 (sf - f) := by sorry
-        rw [ha, hb]
-        rw [← eval_C (a := (s (algebraMap M L y.gen) - (algebraMap M L y.gen))) (x := x.gen.1)]
+        rw [ha, hb, ← eval_C (a := (s (algebraMap M L y.gen) - (algebraMap M L y.gen))) (x := x.gen.1)]
         apply Polynomial.eval_dvd
         apply (Polynomial.C_dvd_iff_dvd_coeff _ _).2
-        have hcoeff : ∀ i : ℕ, coeff sf i = s (coeff f i) := by sorry
         intro i
         rw [coeff_sub, hcoeff i]
-        sorry
+        have hdvd : (algebraMap M L y.gen) ∣ f.coeff i := by sorry
+        obtain ⟨t, ht⟩ := hdvd
+        have ht' : s (f.coeff i) = s ((algebraMap M L) y.gen) * t := by sorry
+        use t
+        nth_rw 2 [ht]
+        rw [ht', sub_mul]
       sorry
     -- have : ∑ x : ((restrictNormalHom M)⁻¹' {σ}), g x = ↑(ramificationIdx M L) * ↑(-Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero y (of_eq_false (eq_false hσ))))).toNat := by
     --   unfold g
