@@ -104,7 +104,7 @@ variable {K : Type*} [Field K]
   {v v' : Valuation K ℤₘ₀} [IsDiscrete v] [IsDiscrete v']
 
 theorem pow_Uniformizer_all {x : K} (hx : x ≠ 0) (π : Uniformizer v) :
-  ∃ n : ℤ, ∃ u : v.valuationSubringˣ, x = (π.1 : K) ^ n  * u.1 := by
+  ∃ n : ℤ, ∃ u : v.valuationSubringˣ, x = (π.1 : K) ^ n * u.1 := by
   rcases ValuationSubring.mem_or_inv_mem v.valuationSubring x with h | h
   · let r : v.valuationSubring := ⟨x, h⟩
     have : r ≠ 0 := by simp only [ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, hx, not_false_eq_true]

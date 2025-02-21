@@ -3,6 +3,9 @@ import RamificationGroup.ForMathlib.Algebra.Algebra.Tower
 import LocalClassFieldTheory.LocalField.Basic
 import RamificationGroup.ForMathlib.Algebra.Algebra.PowerBasis
 import RamificationGroup.Valued.AlgebraicInstances
+import RamificationGroup.Valuation.Extension
+import RamificationGroup.Valued.Hom.ValExtension
+import RamificationGroup.Valued.AlgebraicInstances
 /-
 # Lower Numbering Ramification Group
 
@@ -98,19 +101,54 @@ section autCongr
 
 variable {R S S': Type*} {ΓR : outParam Type*} [CommRing R] [Ring S] [Ring S'] [vS : Valued S ℤₘ₀] [vS : Valued S' ℤₘ₀] [Algebra R S] [Algebra R S']
 
+#check comap
 --if f is a R-algebra isom of S and S', f preserves the valuation, then s ∈ G(S/R)_[u] if and only if F s ∈ G(S'/R)_[u], where F : Gal(S/R) → Gal(S'/R), F(σ)(s') = σ(f⁻¹(s')).
 --the u-th lower ramification groups of two isomorphic ring extensions are isomorphic for all u ∈ ℤ.
 theorem autCongr_mem_lowerRamificationGroup_iff {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (s : S ≃ₐ[R] S) (u : ℤ) : s ∈ G(S/R)_[u] ↔ (AlgEquiv.autCongr f s : S' ≃ₐ[R] S') ∈ G(S'/R)_[u] := by
+  have hf' : ∀ a : S', v (f.symm a) = v a := by
+    intro a
+    rw [hf (f.symm a), AlgEquiv.apply_symm_apply]
   simp only [lowerRamificationGroup, ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk,
     Set.mem_setOf_eq, AlgEquiv.autCongr_apply, AlgEquiv.trans_apply]
   constructor <;>
   intro h <;>
   constructor <;>
   intro a ha
-  · sorry -- need theorem/def of lift of f to integer is isom
-  · sorry
-  · sorry
-  · sorry
+  constructor <;> intro h'
+  · simp only [comap_apply, RingHom.coe_coe, AlgEquiv.trans_apply]
+    rw [← hf _, ← hf _]
+    apply (h.1 (f.symm a) (f.symm ha)).1
+    rw [hf' _, hf' _]
+    exact h'
+  · rw [← hf' _, ← hf' _]
+    apply (h.1 (f.symm a) (f.symm ha)).2
+    simp only [comap_apply, RingHom.coe_coe]
+    rw [hf _, hf _]
+    exact h'
+   -- need theorem/def of lift of f to integer is isom
+  · nth_rw 2 [← AlgEquiv.symm_apply_apply f.symm a]
+    simp only [AlgEquiv.symm_symm]
+    rw [← _root_.map_sub f (s (f.symm a)) (f.symm a), ← hf _]
+    apply h.2
+    apply (mem_integer_iff _ _).2
+    rw [hf' _]
+    exact ha
+  · constructor <;> intro hs'
+    · simp only [comap_apply, RingHom.coe_coe]
+      rw [hf _, hf _, ← AlgEquiv.symm_apply_apply f a, ← AlgEquiv.symm_apply_apply f ha]
+      apply (h.1 (f a) (f ha)).1
+      rw [← hf _, ← hf _]
+      exact hs'
+    · simp only [comap_apply, RingHom.coe_coe, hf _, hf _] at hs'
+      rw [← AlgEquiv.symm_apply_apply f a, ← AlgEquiv.symm_apply_apply f ha] at hs'
+      rw [hf _, hf _]
+      apply (h.1 (f a) (f ha)).2 hs'
+  · rw [hf _, _root_.map_sub, ← AlgEquiv.symm_apply_apply f a]
+    nth_rw 2 [AlgEquiv.symm_apply_apply]
+    apply h.2
+    apply (mem_integer_iff _ _).2
+    rw [← hf _]
+    exact ha
 
 end autCongr
 
@@ -324,6 +362,18 @@ section K_is_field
 variable {K L : Type*} [Field K] [Field L]
 [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
 
+theorem mem_lowerRamificationGroup_of_le_neg_one {s : L ≃ₐ[K] L} (hs : s ∈ decompositionGroup K L) {u : ℤ} (hu : u ≤ -1) : s ∈ G(L/K)_[u] := by
+  unfold lowerRamificationGroup
+  simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq]
+  constructor
+  · exact hs
+  · intro a ha
+    apply le_trans (val_map_sub_le_one hs ⟨a, ha⟩)
+    simp only [WithZero.one_le_coe, one_le_div', le_inv_iff_mul_le_one_left, ← ofAdd_add]
+    refine Multiplicative.toAdd_le.mp ?_
+    simp only [ofAdd_add, toAdd_mul, toAdd_ofAdd, toAdd_one]
+    linarith [hu]
+
 -- the type of `n` should be changed
 -- instead, change when use this theorem
 open Multiplicative in
@@ -376,49 +426,107 @@ theorem mem_lowerRamificationGroup_iff_of_generator
       apply decomp_val_map_sub_le_generator hgen hs' ⟨x, hx⟩
 
 
-theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
+theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {u r : ℚ} (h : u ≤ i_[L/K]ₜ r s - 1) : s ∈ G(L/K)_[⌈u⌉] := by
   unfold AlgEquiv.truncatedLowerIndex at h
-  by_cases hs : i_[L/K] s = ⊤
-  · simp [hs] at h
-    --maybe there is a better way
-    have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
-    convert (mem_lowerRamificationGroup_iff_of_generator sorry hs' ⌈u⌉.toNat).2 this
-    sorry; sorry
-  · simp [hs] at h
-    have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
-      have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
-      have hnt: i_[L/K] s = (WithTop.untop (i_[L/K] s) hs) := by sorry
-      rw [hnt]
-      convert (le_min_iff.1 h').right
-      sorry
-    convert (mem_lowerRamificationGroup_iff_of_generator sorry hs' ⌈u⌉.toNat).2 this
-    sorry; sorry
+  by_cases hu : u ≤ -1
+  · apply mem_lowerRamificationGroup_of_le_neg_one hs'
+    exact Int.ceil_le.mpr hu
+  · push_neg at hu
+    have hu' : ⌈u⌉.toNat = ⌈u⌉ := by
+      apply Int.toNat_of_nonneg
+      apply Int.le_ceil_iff.2
+      simp only [Int.cast_zero, zero_sub, hu]
+    by_cases hs : i_[L/K] s = ⊤
+    · simp [hs] at h
+      --maybe there is a better way
+      have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by simp [hs]
+      convert (mem_lowerRamificationGroup_iff_of_generator hgen hs' ⌈u⌉.toNat).2 this
+      rw [hu']
+    · simp [hs] at h
+      have : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
+        have h' : u + 1 ≤ min r ↑(WithTop.untop (i_[L/K] s) hs) := by linarith [h]
+        rw [← WithTop.coe_untop (i_[L/K] s) hs]
+        convert (le_min_iff.1 h').right
+        constructor <;> intro hle
+        · -- there might be a better way, it's too long :(
+          have : u + 1 ≤ ⌈u⌉.toNat + 1 := by
+            simp only [add_le_add_iff_right]
+            apply le_trans (Int.le_ceil u)
+            rw [← Int.cast_natCast]
+            simp only [Int.ofNat_toNat, Int.cast_max, Int.cast_zero, le_max_iff, le_refl, Int.cast_nonpos, true_or]
+          simp only [← Nat.cast_one (R := ℕ∞), ← Nat.cast_add] at hle
+          apply WithTop.coe_le_coe.1 at hle
+          apply le_trans this
+          simp only [← Nat.cast_one (R := ℚ), ← Nat.cast_add]
+          norm_cast
+        · simp only [← Nat.cast_one (R := ℕ∞), ← Nat.cast_add]
+          apply WithTop.coe_le_coe.2
+          simp only [Nat.cast_add, Nat.cast_id, Nat.cast_one]
+          apply Int.ceil_le.2 at hle
+          rw [Int.ceil_add_one, ← hu'] at hle
+          exact Int.ofNat_le.mp hle
+      convert (mem_lowerRamificationGroup_iff_of_generator hgen hs' ⌈u⌉.toNat).2 this
+      exact Eq.symm hu'
 
 variable [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension K L] [CompleteSpace K] [FiniteDimensional K L]
 
 theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐ[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
-  constructor
-  · apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one
-    rw [decompositionGroup_eq_top]
-    apply Subgroup.mem_top
-  · intro hs
-    have h1 : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
-      apply (mem_lowerRamificationGroup_iff_of_generator hgen ?_ ⌈u⌉.toNat).1
-      --the type of N and Z make some truble
-      sorry
+  by_cases hu : u ≤ -1
+  · constructor <;> intro hu'
+    · apply mem_lowerRamificationGroup_of_le_neg_one
       rw [decompositionGroup_eq_top]
       apply Subgroup.mem_top
-    unfold AlgEquiv.truncatedLowerIndex
-    by_cases hc : i_[L/K] s = ⊤
-    · simp [hc]
-      linarith [h]
-    · simp [hc]
-      have hle : u + 1 ≤ min r ↑(WithTop.untop ( i_[L/K] s) (of_eq_false (eq_false hc) : ¬ i_[L/K] s = ⊤)) := by
-        apply le_min_iff.2
-        constructor
-        · exact h
-        · sorry
-      linarith [hle]
+      apply Int.ceil_le.2
+      simp only [Int.reduceNeg, Int.cast_neg, Int.cast_one]
+      apply hu
+    · unfold AlgEquiv.truncatedLowerIndex
+      by_cases hc : i_[L/K] s = ⊤
+      · simp only [hc, ↓reduceDIte]
+        linarith
+      · simp only [hc, ↓reduceDIte]
+        by_cases hr : r ≤ (WithTop.untop (i_[L/K] s) hc)
+        · rw [min_eq_left hr]
+          linarith
+        · push_neg at hr
+          rw [min_eq_right (le_of_lt hr)]
+          have : 0 ≤ ((WithTop.untop (i_[L/K] s) hc : ℕ) : ℚ) := Nat.cast_nonneg' (WithTop.untop ( i_[L/K] s) hc)
+          linarith
+  · push_neg at hu
+    have hu' : ⌈u⌉.toNat = ⌈u⌉ := by
+      apply Int.toNat_of_nonneg
+      apply Int.le_ceil_iff.2
+      simp only [Int.cast_zero, zero_sub, hu]
+    constructor
+    · apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one _ hgen
+      rw [decompositionGroup_eq_top]
+      apply Subgroup.mem_top
+    · intro hs
+      have h1 : (⌈u⌉.toNat + 1) ≤ i_[L/K] s := by
+        apply (mem_lowerRamificationGroup_iff_of_generator hgen ?_ ⌈u⌉.toNat).1
+        --the type of N and Z make some truble
+        rw [hu']
+        exact hs
+        rw [decompositionGroup_eq_top]
+        apply Subgroup.mem_top
+      unfold AlgEquiv.truncatedLowerIndex
+      by_cases hc : i_[L/K] s = ⊤
+      · simp [hc]
+        linarith [h]
+      · simp [hc]
+        have hle : u + 1 ≤ min r ↑(WithTop.untop ( i_[L/K] s) (of_eq_false (eq_false hc) : ¬ i_[L/K] s = ⊤)) := by
+          apply le_min_iff.2
+          constructor
+          · exact h
+          · have hle' : u + 1 ≤ ⌈u⌉.toNat + 1 := by
+              simp only [add_le_add_iff_right]
+              apply le_trans (Int.le_ceil u)
+              rw [← Int.cast_natCast]
+              simp only [Int.ofNat_toNat, Int.cast_max, Int.cast_zero, le_max_iff, le_refl, Int.cast_nonpos, true_or]
+            apply le_trans hle'
+            rw [← Nat.cast_one, ← Nat.cast_add]
+            apply Nat.mono_cast
+            exact (WithTop.le_untop_iff (of_eq_false (eq_false hc))).mpr h1
+        linarith [hle]
 
 
 
@@ -475,7 +583,7 @@ section eq_bot
 open ExtDVR IsValExtension Polynomial
 
 -- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
-variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
+variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L] [Algebra.IsSeparable K L]
 
 variable {K L}
 variable [CompleteSpace K]
@@ -484,7 +592,27 @@ theorem AlgEquiv.mem_decompositionGroup [CompleteSpace K] (s : L ≃ₐ[K] L) : 
   rw [decompositionGroup_eq_top]
   exact Subgroup.mem_top s
 
-theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := by sorry
+--it's already in ValExtension
+instance : IsLocalHom (algebraMap 𝒪[K] 𝒪[L]) where
+    map_nonunit r hr := by
+      by_cases h : r = 0
+      · simp [h] at hr
+      · apply Valuation.Integers.isUnit_of_one (v := vK.v)
+        · exact Valuation.integer.integers (v := vK.v)
+        · simpa only [Algebra.algebraMap_ofSubring_apply, isUnit_iff_ne_zero, ne_eq,
+          ZeroMemClass.coe_eq_zero]
+        · apply Valuation.Integers.one_of_isUnit (Valuation.integer.integers (v := vL.v)) at hr
+          change v (((algebraMap ↥𝒪[K] ↥𝒪[L]) r) : L) = 1 at hr
+          norm_cast at hr
+          simp only [IsValExtension.val_map_eq_one_iff] at hr
+          exact hr
+
+instance : Module.Finite 𝒪[K] 𝒪[L] := Module.IsNoetherian.finite 𝒪[K] 𝒪[L]
+
+set_option synthInstance.maxHeartbeats 1000000
+
+theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := ExtDVR.exists_primitive (A := 𝒪[K]) (B := 𝒪[L]) (integerAlgebra_injective K L)
+
 
 --can delete the assumption of generator.
 /-- Should be strenthened to ` > 0`-/
@@ -601,7 +729,7 @@ theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparab
     simp only [WithTop.coe_add, WithTop.coe_untop, WithTop.coe_one, gt_iff_lt]
     nth_rw 1 [← add_zero (⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)]
     have : (0 : ℕ∞) < 1 := by
-      rw [← ENat.coe_one, ← ENat.some_eq_coe, WithTop.zero_lt_coe]
+      rw [← ENat.coe_one, ← ENat.some_eq_coe, WithTop.coe_pos]
       exact zero_lt_one
     convert WithTop.add_lt_add_left (iSup_ne_refl_lowerIndex_ne_top K L) this
   · use 0
@@ -630,8 +758,9 @@ variable {K M L : Type*} [Field K] [Field M] [Field L]
 [vK : Valued K ℤₘ₀] [IsDiscrete vK.v]
 [vM : Valued M ℤₘ₀] [IsDiscrete vM.v]
 [vL : Valued L ℤₘ₀] [IsDiscrete vL.v]
-[IsValExtension K L] [IsValExtension M L]
-[CompleteSpace K]
+[IsValExtension K L] [IsValExtension M L] [IsValExtension K M]
+[Algebra.IsSeparable K L] [Algebra.IsSeparable M L] [Algebra.IsSeparable K M]
+[CompleteSpace K] [CompleteSpace M]
 
 -- #synth FiniteDimensional M L
 
@@ -646,32 +775,165 @@ variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 #check LocalField
 
 --#check aux2 K L
+open AlgEquiv Classical
 
 #check Eq.subst
+theorem preimage_nerefl (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((restrictNormalHom M)⁻¹' {σ})) : s ≠ .refl := by
+  by_contra hc
+  have h : (restrictNormalHom M) (.refl (A₁ := L)) = .refl (R := K) := (restrictNormalHom M).map_one
+  simp only [Set.mem_preimage, Set.mem_singleton_iff, hc, h] at hs
+  absurd hsig
+  exact id (Eq.symm hs)
 
+#check AlgEquiv.val_map_powerBasis_sub_ne_zero
+theorem val_mappb_sub_self_toAdd_nonpos {s : L ≃ₐ[K] L} (hs : s ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) : 0 ≤ -Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero x hs)) := by
+  rw [← toAdd_one, ← toAdd_inv]
+  apply Multiplicative.toAdd_le.2
+  apply one_le_inv'.mpr
+  rw [← WithZero.coe_le_coe]
+  simp only [WithZero.coe_unzero, WithZero.coe_one]
+  apply val_map_sub_le_one _ x.gen
+  exact mem_decompositionGroup s
+
+-- @[coe, match_pattern] def WithZero.some {α : Type*} : α → WithTop α :=
+--   Option.some
+
+-- def addHom {α : Type*} [AddZeroClass α] : α →+ WithZero α where
+--   toFun := WithTop.some
+--   map_zero' := by
+--     simp only [WithTop.coe_zero]
+--     sorry
+--   map_add' _ _ := rfl
+
+#check Nat.cast_prod
+#check WithTop.coe_sum
+#check WithZero
+theorem WithZero.coe_prod {α β : Type*} [CommMonoid β] {s : Finset α} {f : α → β} : (↑ (∏ x ∈ s, f x) : WithZero β) =  (∏ x ∈ s, ↑(f x : WithZero β)) := by
+  simp only [WithZero.coe]
+  --apply map_prod
+  sorry
+
+theorem Valuation.prolongs_by_ramificationIndex {x : M} : vM.v (x) ^ ramificationIdx M L = vL.v (algebraMap M L x) := by sorry
+
+theorem Valuation.map_prod {α : Type*} {s : Finset α} {f : α → L} : vL.v (∏ x ∈ s, f x) = ∏ x ∈ s, vL.v (f x) := by sorry
+
+open Polynomial
+
+#synth CommMonoid (Multiplicative ℤ)
+#check Valuation
 --i_G/H σ = (1 / e_L/K) * ∑_{s → σ} i_G s
-open Classical AlgEquiv in
+#check toAdd_prod
+#check Valuation.map_mul
+#check Valuation.map_eq_of_sub_lt
+
+theorem exsit_preimage : ∃ s : (L ≃ₐ[K] L), (restrictNormalHom M) s = σ := by sorry
+
+
+#check Polynomial.map
+#check Polynomial.C_dvd_iff_dvd_coeff
+#check Polynomial.eval_dvd
 theorem prop3
-  (σ : M ≃ₐ[K] M) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[M] 𝒪[L]) :
+  (σ : M ≃ₐ[K] M) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[M]) [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[M]) (LocalRing.ResidueField 𝒪[L])] :
     ∑ s ∈ ((restrictNormalHom M)⁻¹' {σ}), i_[L/K] s
-    = (ramificationIdx K L) * i_[M/K] σ := by
+    = (ramificationIdx M L) * i_[M/K] σ := by
   by_cases hσ : σ = .refl
   · subst hσ
     rw [lowerIndex_refl, ENat.mul_top]
     · have : (.refl : L ≃ₐ[K] L) ∈ (restrictNormalHom M)⁻¹' {.refl} := by
         rw [Set.mem_preimage, Set.mem_singleton_iff, ← AlgEquiv.aut_one, ← AlgEquiv.aut_one,
           _root_.map_one]
-      rw [WithTop.sum_eq_top_iff]
+      rw [WithTop.sum_eq_top]
       exact ⟨.refl, Set.mem_toFinset.mpr this, lowerIndex_refl⟩
     · intro h
       rw [← ENat.coe_zero, ← ENat.some_eq_coe, WithTop.coe_eq_coe] at h
-      exact ramificationIdx_ne_zero K L h
-  ·
+      apply ramificationIdx_ne_zero M L h
+  · simp only [lowerIndex_of_powerBasis y, lowerIndex_of_powerBasis x]
+    simp only [hσ, ↓reduceDIte]
+    -- let g : ((restrictNormalHom M (K₁ := L))⁻¹' {σ}) → ℕ∞ := fun t => (-Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero x (preimage_nerefl σ hσ t.1 t.2)))).toNat
+    rw [← Finset.sum_attach]
+    conv =>
+      enter [1, 2]
+      ext t
+      simp only [preimage_nerefl σ hσ t.1 (Set.mem_toFinset.1 t.2), ↓reduceDIte]
+    rw [← ENat.coe_mul, ← Nat.cast_sum]
+    apply Nat.cast_inj.2
+    rw [← Nat.cast_inj (R := ℤ), Nat.cast_sum]
+    conv =>
+      enter [1, 2]
+      ext t
+      rw [Int.toNat_of_nonneg (val_mappb_sub_self_toAdd_nonpos (preimage_nerefl σ hσ t.1 (Set.mem_toFinset.mp t.2)) x), ← toAdd_inv]
+    conv_rhs =>
+        rw [Nat.cast_mul, Int.toNat_of_nonneg (val_mappb_sub_self_toAdd_nonpos hσ y), mul_comm, ← toAdd_inv, ← Int.toAdd_pow, inv_pow]
+    rw [← toAdd_prod]
+    apply Equiv.congr_arg
+    rw [Finset.prod_inv_distrib, inv_inj, ← WithZero.coe_inj, WithZero.coe_pow, WithZero.coe_unzero, WithZero.coe_prod]
+    simp only [WithZero.coe_unzero, Valuation.prolongs_by_ramificationIndex, ← Valuation.map_prod]
+    obtain ⟨π, hpi⟩ := exists_Uniformizer_ofDiscrete vL.v
+    let a := (algebraMap M L) (σ ↑y.gen - ↑y.gen)
+    let b := (∏ x_1 ∈ (⇑(restrictNormalHom M (K₁ := L)) ⁻¹' {σ}).toFinset.attach, (x_1.1 x.gen - x.gen))
+    have hr1 : a ∈ v.valuationSubring := by sorry
+    have hr1' :  (⟨a, hr1⟩ : vL.v.valuationSubring) ≠ 0 := by sorry
+    have hr2 : b ∈ v.valuationSubring := by sorry
+    have hr2' :  (⟨b, hr2⟩ : vL.v.valuationSubring) ≠ 0 := by sorry
+    obtain ⟨n1, u1, hnu1⟩ := pow_Uniformizer vL.v (r := ⟨a, hr1⟩) hr1' ⟨π, hpi⟩
+    obtain ⟨n2, u2, hnu2⟩ := pow_Uniformizer vL.v (r := ⟨b, hr2⟩) hr2' ⟨π, hpi⟩
+    simp only [_root_.map_sub, SubmonoidClass.coe_pow, a, b] at hnu1 hnu2
+    simp only [_root_.map_sub, hnu1, hnu2, _root_.map_mul, _root_.map_pow, val_valuationSubring_unit, mul_one]
+    apply congrArg
+    apply le_antisymm
+    · have hab : b ∣ a := by
+        simp only [a, b]
+        sorry
+      sorry
+    · have hab : a ∣ b := by
+        --simp only [a, b]
+        obtain ⟨s, hs⟩ := exsit_preimage σ (L := L)
+        let f := ∏ t ∈ (⊤ : Set (L ≃ₐ[K] L)).toFinset, (X - C (t x.gen))
+        let e : L →+* L := {
+          toFun := fun t => s t
+          map_one' := map_one s
+          map_mul' := AlgEquiv.map_mul' s
+          map_zero' := map_zero s
+          map_add' := AlgEquiv.map_add' s
+        }
+        let sf := Polynomial.map e f
+        let sf' := ∏ t ∈ (⊤ : Set (L ≃ₐ[K] L)).toFinset, (X - C ((s * t) x.gen))
+        have ha : a = s (algebraMap M L y.gen) - (algebraMap M L y.gen) := by sorry
+        have hb : b = eval x.gen.1 (sf - f) := by sorry
+        rw [ha, hb]
+        rw [← eval_C (a := (s (algebraMap M L y.gen) - (algebraMap M L y.gen))) (x := x.gen.1)]
+        apply Polynomial.eval_dvd
+        apply (Polynomial.C_dvd_iff_dvd_coeff _ _).2
+        have hcoeff : ∀ i : ℕ, coeff sf i = s (coeff f i) := by sorry
+        intro i
+        rw [coeff_sub, hcoeff i]
+        sorry
+      sorry
+    -- have : ∑ x : ((restrictNormalHom M)⁻¹' {σ}), g x = ↑(ramificationIdx M L) * ↑(-Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero y (of_eq_false (eq_false hσ))))).toNat := by
+    --   unfold g
+    --   rw [← ENat.coe_mul, ← Nat.cast_sum]
+    --   apply Nat.cast_inj.mpr ?_
+    --   rw [← Nat.cast_inj (R := ℤ)]
+    --   have h1 : 0 ≤ -Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero y (of_eq_false (eq_false hσ)))) := by sorry
+    --   have h2 : ∀ t : ((restrictNormalHom M)⁻¹' {σ}), 0 ≤ -Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero x (preimage_nerefl σ hσ t.1 t.2))) := by sorry
+    --   conv =>
+    --     right
+    --     rw [Nat.cast_mul, Int.toNat_of_nonneg h1, mul_comm, ← toAdd_inv, ← Int.toAdd_pow, inv_pow, toAdd_inv]
+    --   rw [Nat.cast_sum]
+    --   conv =>
+    --     enter [1, 2]
+    --     ext t
+    --     rw [Int.toNat_of_nonneg (h2 t)]
+    --   #check Finset.sum_attach_univ
+    --   #check Finset.attach ((restrictNormalHom M) ⁻¹' {σ}).toFinset
+    --   sorry
+
+#help tactic conv
+
     /- Need:
     2. all valuations are discrete
     3. 𝒪[L] / 𝒪[M] admits a power basis b, so that the minpoly of b over M has coeff in 𝒪[M]
     -/
-    sorry
 
 
 end sum_lowerIndex

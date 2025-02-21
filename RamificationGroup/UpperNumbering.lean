@@ -67,7 +67,7 @@ theorem preimage_singleton_nonempty {σ : K' ≃ₐ[K] K'} : ((AlgEquiv.restrict
   exact Set.Nonempty.preimage (Set.singleton_nonempty _) (AlgEquiv.restrictNormalHom_surjective (F := K) (E := L) (K₁ := K'))
 
 variable (L) in
-def HerbrandFunction.FuncJ (σ : K' ≃ₐ[K] K') : ℕ∞ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => AlgEquiv.lowerIndex K L x - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
+def HerbrandFunction.FuncJ (σ : K' ≃ₐ[K] K') : ℕ∞ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => AlgEquiv.lowerIndex K L x)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
 variable (L) in
 def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
@@ -117,7 +117,7 @@ variable {σ : K' ≃ₐ[K] K'}
 --theorem prop2_aux {t : L ≃ₐ[K'] L} : i_[L/K] (t.restrictScalars K) = i_[L/K'] t := by
   --sorry
 
-theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ + 1) (AlgEquiv.restrictScalars K s))) := by
+theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L (u + 1) σ + 1) (AlgEquiv.restrictScalars K s))) := by
   sorry
 
 set_option synthInstance.maxHeartbeats 10000000
@@ -127,15 +127,15 @@ theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (Loc
 
 variable [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
 
-theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L (truncatedJ L u σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
+theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L (truncatedJ L (u + 1) σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
   calc
-  _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L u σ + 1) ·))) := by
+  _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
     rw [phi_eq_sum_inf]
     simp
-  _ = (1 / LocalField.ramificationIdx K' L) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L u σ + 1) ·))) := by
+  _ = (1 / LocalField.ramificationIdx K' L) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
     congr
     apply RamificationIdx_eq_card_of_inertia_group
-  _ = (1 / LocalField.ramificationIdx K' L) * ((∑ x in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L u σ + 1) (AlgEquiv.restrictScalars K x)))) := by
+  _ = (1 / LocalField.ramificationIdx K' L) * ((∑ x in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L (u + 1) σ + 1) (AlgEquiv.restrictScalars K x)))) := by
     congr
   _ = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
     rw [lemma3_aux]
@@ -306,17 +306,14 @@ theorem herbrand (u : ℚ) {gen : 𝒪[K']} (hgen : Algebra.adjoin 𝒪[K] {gen}
   _ ↔ truncatedJ L (u + 1) σ ≥ u :=
     (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup (by linarith) hgen').symm
   _ ↔ phi K' L (truncatedJ L (u + 1) σ) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
-  _ ↔ σ.truncatedLowerIndex K K' ((phi K' L (u + 1)) + 1) - 1 ≥ phi K' L u := by
-    have heq : phi K' L (truncatedJ L (u + 1) σ) + 1 = i_[K'/K]ₜ (phi K' L (u + 1) + 1) σ := by
+  _ ↔ σ.truncatedLowerIndex K K' (phi K' L u + 1) - 1 ≥ phi K' L u := by
+    have heq : phi K' L (truncatedJ L (u + 1) σ) + 1 = i_[K'/K]ₜ (phi K' L u + 1) σ := by
       simp only [phi_truncatedJ_sub_one]
-    have heq' : phi K' L (truncatedJ L (u + 1) σ) = i_[K'/K]ₜ (phi K' L (u + 1) + 1) σ - 1 := by
+    have heq' : phi K' L (truncatedJ L (u + 1) σ) = i_[K'/K]ₜ (phi K' L u + 1) σ - 1 := by
       linarith [heq]
     rw [heq']
   _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := by
     apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (K := K) (L := K') σ (phi K' L u) _ ?_ hgen
-    rw [add_le_add_iff_right]
-    apply le_of_lt
-    apply (phi_strictMono K' L)
     linarith
 
 

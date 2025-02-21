@@ -214,7 +214,7 @@ theorem coe_algebraMap_valuationSubring (r : 𝒪[R]) :
     ((algebraMap 𝒪[R] 𝒪[A]) r : A) = (algebraMap R A) (r : R) := rfl
 
 #synth Algebra 𝒪[R] R
-instance : IsLocalRingHom (algebraMap 𝒪[R] 𝒪[A]) where
+instance : IsLocalHom (algebraMap 𝒪[R] 𝒪[A]) where
     map_nonunit r hr := by
       by_cases h : r = 0
       · simp [h] at hr
