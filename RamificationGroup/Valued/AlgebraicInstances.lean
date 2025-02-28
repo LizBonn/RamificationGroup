@@ -78,6 +78,7 @@ noncomputable def PowerBasisValExtension [CompleteSpace K] [Algebra.IsSeparable 
   -- letI : DiscreteValuationRing 𝒪[L] := aux6 K L
   -- PowerBasisExtDVR (integerAlgebra_injective K L)
 
+#check PowerBasisExtDVR
 example [CompleteSpace K] [Algebra.IsSeparable K L] :
   Algebra.FiniteType 𝒪[K] 𝒪[L] := inferInstance
 
