@@ -123,7 +123,8 @@ theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1
 set_option synthInstance.maxHeartbeats 10000000
 
 theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (LocalField.ramificationIdx K' L) := by
-  sorry
+  simp only [lowerRamificationGroup, LocalField.ramificationIdx, LocalRing.ramificationIdx]
+  sorry 
 
 variable [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
 
@@ -153,6 +154,7 @@ theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u �
     linarith [h]
     rw [decompositionGroup_eq_top]
     apply Subgroup.mem_top
+    repeat sorry
   use s
 
 #check AlgEquiv
@@ -215,9 +217,10 @@ theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ}
       have h2 : u ≤ i_[L/K]ₜ r k - 1 := by
         apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup _ _ _ h hgen).2 hk1
       have h3 : u ≤ i_[L/K]ₜ r s - 1 := by linarith [h1, h2]
-      apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one ?_ h3
+      apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one ?_ ?_ h3
       rw [decompositionGroup_eq_top]
       apply Subgroup.mem_top
+      repeat sorry
     rw [← hs]
     apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h hgen).2 hs'
 
