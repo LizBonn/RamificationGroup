@@ -5,8 +5,8 @@ open scoped Classical
 open HerbrandFunction DiscreteValuation AlgEquiv Valued
 open DiscreteValuation Subgroup Set Function Finset BigOperators Int Valued
 
-variable (K L : Type*) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L] [CompleteSpace K] [Algebra.IsSeparable K L]
-[Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
+variable (K L : Type*) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [CompleteSpace K] [Algebra.IsSeparable K L]
+[Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 

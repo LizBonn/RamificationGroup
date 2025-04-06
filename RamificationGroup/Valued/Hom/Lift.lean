@@ -42,15 +42,16 @@ namespace Valued
 
 section integer
 
+#check Valuation
 variable {R S : Type*} {ΓR ΓS : outParam Type*} [Ring R] [Ring S]
 [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR][LinearOrderedCommGroupWithZero ΓS] [vS : Valued S ΓS]
-
 
 def RingHom.restrictInteger {f : R →+* S} (hf : vR.v.IsEquiv (vS.v.comap f)) : vR.v.integer →+* vS.v.integer where
   toFun := by
     refine fun ⟨x, hx⟩ ↦ ⟨f x, ?_⟩
-    rw [mem_integer_iff, val_map_le_one_iff (f := f) hf]
-    exact hx
+    rw [mem_integer_iff, ← comap_apply]
+    sorry
+    -- exact hx
   map_one' := by simp only [_root_.map_one]; rfl
   map_mul' := by simp only [_root_.map_mul, MulMemClass.mk_mul_mk, implies_true]
   map_zero' := by simp only [_root_.map_zero]; rfl
@@ -68,7 +69,7 @@ variable {R K L : Type*} {ΓK ΓL ΓR: outParam Type*}
 [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR]
 [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK]
 [LinearOrderedCommGroupWithZero ΓL] [vL : Valued L ΓL]
-[Algebra R K] [Algebra R L] [IsValExtension R K] [IsValExtension R L]
+[Algebra R K] [Algebra R L] [IsValExtension vR.v vK.v] [IsValExtension vR.v vL.v]
 
 def RingHom.restrictValuationSubring {f : K →+* L} (hf : vK.v.IsEquiv (vL.v.comap f)) : 𝒪[K] →+* 𝒪[L] := RingHom.restrictInteger hf
 
@@ -80,8 +81,7 @@ def AlgHom.restrictValuationSubring {f : K →ₐ[R] L} (hf : vK.v.IsEquiv (vL.v
   RingHom.restrictValuationSubring hf with
   commutes' := by
     intro; ext; simp only [RingHom.toMonoidHom_eq_coe, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe,
-      MonoidHom.coe_coe, RingHom.restrictValuationSubring_apply,
-      IsValExtension.coe_algebraMap_valuationSubring, RingHom.coe_coe, AlgHom.commutes]
+      MonoidHom.coe_coe, RingHom.restrictValuationSubring_apply, IsValExtension.val_algebraMap, RingHom.coe_coe, AlgHom.commutes]
 }
 
 @[simp]
@@ -95,7 +95,7 @@ section decomposition_grp
 
 variable {K L : Type*} [Field K] [Field L]
 {ΓK ΓL : outParam Type*} [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
-[vK : Valued K ΓK] [vL : Valued L ΓL] [Algebra K L] [IsValExtension K L]
+[vK : Valued K ΓK] [vL : Valued L ΓL] [Algebra K L] [IsValExtension vK.v vL.v]
 
 variable (s : decompositionGroup K L)
 
@@ -151,7 +151,7 @@ end decomposition_grp
 
 section discrete
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L] [IsValExtension K L] [CompleteSpace K] [IsDiscrete vK.v]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L] [IsValExtension vK.v vL.v] [CompleteSpace K] [IsDiscrete vK.v]
 
 def AlgEquiv.restrictValuationSubring (s : L ≃ₐ[K] L) :
   𝒪[L] ≃ₐ[𝒪[K]] 𝒪[L] := DecompositionGroup.restrictValuationSubring ⟨s, by simp only [decompositionGroup_eq_top, Subgroup.mem_top]⟩

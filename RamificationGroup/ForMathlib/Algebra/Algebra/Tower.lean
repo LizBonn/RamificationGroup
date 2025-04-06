@@ -12,6 +12,8 @@ def restrictScalarsHom (R : Type*) {S A: Type*} [CommSemiring R] [CommSemiring S
       rfl
 
 theorem restrictScalarsHom_injective (R : Type*) {S A: Type*} [CommSemiring R] [CommSemiring S] [Semiring A]
-  [Algebra R S] [Algebra S A] [Algebra R A] [IsScalarTower R S A] : Function.Injective (restrictScalarsHom R (S := S) (A := A)):= by sorry
+  [Algebra R S] [Algebra S A] [Algebra R A] [IsScalarTower R S A] : Function.Injective (restrictScalarsHom R (S := S) (A := A)):= by
+  simp only [restrictScalarsHom, MonoidHom.coe_mk, OneHom.coe_mk]
+  exact restrictScalars_injective R
 
 end AlgEquiv

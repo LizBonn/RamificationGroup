@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jiedong Jiang, Bichang Lei
 -/
 import Mathlib.Topology.Algebra.Valued.ValuedField
+import Mathlib.RingTheory.Valuation.ValExtension
 -- import Mathlib.Topology.Algebra.Valued.ValuedField
 
 /-!
@@ -72,61 +73,62 @@ theorem val_map_eq_one_iff (x : R) : v (f x) = 1 ↔ v x = 1 := by
 
 end Valued
 
-/--
-The class `IsValExtension R A` states that the valuation of `A` is an extension of the valuation
-on `R`. More precisely, the valuation on `R` is equivlent to the comap of the valuation on `A`.
--/
-class IsValExtension (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
-  [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-  [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] : Prop where
-  /-- The valuation on `R` is equivlent to the comap of the valuation on `A` -/
-  val_isEquiv_comap : vR.v.IsEquiv <| vA.v.comap (algebraMap R A)
+-- /--
+-- The class `IsValExtension R A` states that the valuation of `A` is an extension of the valuation
+-- on `R`. More precisely, the valuation on `R` is equivlent to the comap of the valuation on `A`.
+-- -/
+
+-- class IsValExtension (R A : Type*) {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
+--   [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
+--   [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] : Prop where
+--   /-- The valuation on `R` is equivlent to the comap of the valuation on `A` -/
+--   val_isEquiv_comap : vR.v.IsEquiv <| vA.v.comap (algebraMap R A)
 
 namespace IsValExtension
 
-section CoeLemma
+-- section CoeLemma
 
 variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
     [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
+    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension vR.v vA.v]
 
-@[simp]
-theorem val_map_le_iff (x y : R) : v (algebraMap R A x) ≤ v (algebraMap R A y) ↔ v x ≤ v y :=
-  Valued.val_map_le_iff (f := algebraMap R A) val_isEquiv_comap  x y
+-- @[simp]
+-- theorem val_map_le_iff (x y : R) : v (algebraMap R A x) ≤ v (algebraMap R A y) ↔ v x ≤ v y :=
+--   Valued.val_map_le_iff (f := algebraMap R A) val_isEquiv_comap  x y
 
-@[simp]
-theorem val_map_lt_iff (x y : R) : v (algebraMap R A x) < v (algebraMap R A y) ↔ v x < v y :=
-  Valued.val_map_lt_iff (f := algebraMap R A) val_isEquiv_comap x y
+-- @[simp]
+-- theorem val_map_lt_iff (x y : R) : v (algebraMap R A x) < v (algebraMap R A y) ↔ v x < v y :=
+--   Valued.val_map_lt_iff (f := algebraMap R A) val_isEquiv_comap x y
 
-@[simp]
-theorem val_map_eq_iff (x y : R) : v (algebraMap R A x) = v (algebraMap R A y) ↔ v x = v y :=
-  Valued.val_map_eq_iff (f := algebraMap R A) val_isEquiv_comap x y
+-- @[simp]
+-- theorem val_map_eq_iff (x y : R) : v (algebraMap R A x) = v (algebraMap R A y) ↔ v x = v y :=
+--   Valued.val_map_eq_iff (f := algebraMap R A) val_isEquiv_comap x y
 
-@[simp]
-theorem val_map_le_one_iff (x : R) : v (algebraMap R A x) ≤ 1 ↔ v x ≤ 1 :=
-  Valued.val_map_le_one_iff (f := algebraMap R A) val_isEquiv_comap x
+-- @[simp]
+-- theorem val_map_le_one_iff (x : R) : v (algebraMap R A x) ≤ 1 ↔ v x ≤ 1 :=
+--   Valued.val_map_le_one_iff (f := algebraMap R A) val_isEquiv_comap x
 
-@[simp]
-theorem val_map_lt_one_iff (x : R) : v (algebraMap R A x) < 1 ↔ v x < 1 :=
-  Valued.val_map_lt_one_iff (f := algebraMap R A) val_isEquiv_comap x
+-- -- @[simp]
+-- -- theorem val_map_lt_one_iff (x : R) : v (algebraMap R A x) < 1 ↔ v x < 1 :=
+-- --   Valued.val_map_lt_one_iff (f := algebraMap R A) val_isEquiv_comap x
 
-@[simp]
-theorem val_map_eq_one_iff (x : R) : v (algebraMap R A x) = 1 ↔ v x = 1 :=
-  Valued.val_map_eq_one_iff (f := algebraMap R A) val_isEquiv_comap x
+-- @[simp]
+-- theorem val_map_eq_one_iff (x : R) : v (algebraMap R A x) = 1 ↔ v x = 1 :=
+--   Valued.val_map_eq_one_iff (f := algebraMap R A) val_isEquiv_comap x
 
-instance id : IsValExtension R R where
-  val_isEquiv_comap := by
-    simp only [Algebra.id.map_eq_id, comap_id]
-    rfl
+-- instance id : IsValExtension R R where
+--   val_isEquiv_comap := by
+--     simp only [Algebra.id.map_eq_id, comap_id]
+--     rfl
 
-end CoeLemma
+-- end CoeLemma
 
 section mk'
 
 def ofIntegerComap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
     [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
-    (h : vA.v.integer.comap (algebraMap R A) = vR.v.integer) : IsValExtension R A where
+    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension vR.v vA.v]
+    (h : vA.v.integer.comap (algebraMap R A) = vR.v.integer) : IsValExtension vR.v vA.v where
   val_isEquiv_comap := by
     rw [Valuation.isEquiv_iff_val_le_one]
     intro x
@@ -136,8 +138,8 @@ def ofIntegerComap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Ring A]
 
 def ofValuationSubringComap {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
     [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
-    (h : 𝒪[A].comap (algebraMap R A) = 𝒪[R]) : IsValExtension R A := by
+    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension vR.v vA.v]
+    (h : 𝒪[A].comap (algebraMap R A) = 𝒪[R]) : IsValExtension vR.v vA.v := by
   apply ofIntegerComap
   rw [show vR.v.integer = 𝒪[R] by rfl, ← h]
 
@@ -149,7 +151,7 @@ section Integer
 
 variable {R A : Type*} {ΓR ΓA : outParam Type*} [CommRing R] [Ring A]
     [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
+    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension vR.v vA.v]
 
 instance integerAlgebra : Algebra vR.v.integer vA.v.integer where
     smul r a := {
@@ -159,29 +161,31 @@ instance integerAlgebra : Algebra vR.v.integer vA.v.integer where
           show r • ↑a = algebraMap R A r * a by exact (Algebra.smul_def r (a : A))]
         norm_num
         apply mul_le_one'
-        · simp only [val_map_le_one_iff]
+        · rw [val_map_le_one_iff (vR := vR.v)]
           exact r.2
         · exact a.2
     }
-    toFun r := {
-      val := algebraMap R A r,
-      property := by
-        simp only [Valuation.mem_integer_iff,
-          val_map_le_one_iff]
-        exact r.2
-    }
-    map_one' := by
-      ext
-      simp
-    map_mul' _ _ := by
-      ext
-      simp
-    map_zero' := by
-      ext
-      simp
-    map_add' _ _ := by
-      ext
-      simp
+    algebraMap :=
+    {
+      toFun r := {
+        val := algebraMap R A r,
+        property := by
+          simp only [Valuation.mem_integer_iff,
+            val_map_le_one_iff (vR := vR.v)]
+          exact r.2
+      }
+      map_one' := by
+        ext
+        simp
+      map_mul' _ _ := by
+        ext
+        simp
+      map_zero' := by
+        ext
+        simp
+      map_add' _ _ := by
+        ext
+        simp}
     commutes' _ _ := by
       ext
       exact Algebra.commutes _ _
@@ -194,10 +198,10 @@ theorem coe_algebraMap_integer (r : vR.v.integer) :
     ((algebraMap vR.v.integer vA.v.integer) r : A) = (algebraMap R A) (r : R) := by
   rfl
 
-instance instIsScalarTowerInteger : IsScalarTower vR.v.integer vA.v.integer A where
-  smul_assoc x y z := by
-    simp only [Algebra.smul_def]
-    exact mul_assoc _ _ _
+-- instance instIsScalarTowerInteger : IsScalarTower vR.v.integer vA.v.integer A where
+--   smul_assoc x y z := by
+--     simp only [Algebra.smul_def]
+--     exact mul_assoc _ _ _
 
 end Integer
 
@@ -205,7 +209,7 @@ section ValuationSubring
 
 variable {R A : Type*} {ΓR ΓA : outParam Type*} [Field R] [Field A]
     [LinearOrderedCommGroupWithZero ΓR] [LinearOrderedCommGroupWithZero ΓA]
-    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension R A]
+    [Algebra R A] [vR : Valued R ΓR] [vA : Valued A ΓA] [IsValExtension vR.v vA.v]
 
 instance : Algebra 𝒪[R] 𝒪[A] := inferInstanceAs (Algebra vR.v.integer vA.v.integer)
 
@@ -225,7 +229,7 @@ instance : IsLocalHom (algebraMap 𝒪[R] 𝒪[A]) where
         · apply Valuation.Integers.one_of_isUnit (Valuation.integer.integers (v := vA.v)) at hr
           change v (((algebraMap ↥𝒪[R] ↥𝒪[A]) r) : A) = 1 at hr
           norm_cast at hr
-          simp only [val_map_eq_one_iff] at hr
+          simp only [val_map_eq_one_iff (vR := vR.v)] at hr
           exact hr
 
 variable (R A) in

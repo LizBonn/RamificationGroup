@@ -52,7 +52,7 @@ lemma eq_one_of_eq_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 
   · have : v' u ≠ 0 := by
       rw [Valuation.ne_zero_iff, ← Valuation.ne_zero_iff v, hu]
       exact one_ne_zero
-    rw [show 1 ≤ v' u ↔ (v' u)⁻¹ ≤ 1 by sorry, ← map_inv₀]
+    rw [show 1 ≤ v' u ↔ (v' u)⁻¹ ≤ 1 by exact Iff.symm (inv_le_one₀ (lt_of_le_of_ne zero_le' (id (Ne.symm this)))), ← map_inv₀]
     apply h <| le_of_eq _
     rw [map_inv₀, hu, inv_one]
 
@@ -107,14 +107,15 @@ theorem pow_Uniformizer_all {x : K} (hx : x ≠ 0) (π : Uniformizer v) :
   ∃ n : ℤ, ∃ u : v.valuationSubringˣ, x = (π.1 : K) ^ n * u.1 := by
   rcases ValuationSubring.mem_or_inv_mem v.valuationSubring x with h | h
   · let r : v.valuationSubring := ⟨x, h⟩
-    have : r ≠ 0 := by simp only [ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, hx, not_false_eq_true]
-    rcases pow_Uniformizer v this π with ⟨n, u, hnu⟩
+    have : r ≠ 0 := by
+      simp only [r, ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, hx, not_false_eq_true]
+    rcases pow_uniformizer v this π with ⟨n, u, hnu⟩
     use n, u
     rw [show x = r.1 by rfl, hnu]
     simp only [SubmonoidClass.coe_pow, zpow_natCast]
   · let r : v.valuationSubring := ⟨x⁻¹, h⟩
-    have : r ≠ 0 := by simp only [ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, inv_eq_zero, hx, not_false_eq_true]
-    rcases pow_Uniformizer v this π with ⟨n, u, hnu⟩
+    have : r ≠ 0 := by simp only [r, ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, inv_eq_zero, hx, not_false_eq_true]
+    rcases pow_uniformizer v this π with ⟨n, u, hnu⟩
     use -n, u⁻¹
     rw [← inv_inj, show x⁻¹ = r.1 by rfl, hnu, mul_inv]
     simp only [SubmonoidClass.coe_pow, zpow_neg, zpow_natCast, inv_inv, mul_eq_mul_left_iff, pow_eq_zero_iff', ZeroMemClass.coe_eq_zero, ne_eq]
@@ -127,8 +128,8 @@ theorem pow_Uniformizer_all {x : K} (hx : x ≠ 0) (π : Uniformizer v) :
 theorem pow_Uniformizer' {x : K} (h0 : x ≠ 0) (hx : v x ≤ 1) (π : Uniformizer v) :
   ∃ n : ℕ, ∃ u : v.valuationSubring ˣ, x = (π.1 : K) ^ n * u.1 := by
   let r : v.valuationSubring := ⟨x, hx⟩
-  have : r ≠ 0 := by simp only [ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, h0, not_false_eq_true]
-  rcases pow_Uniformizer v this π with ⟨n, u, hnu⟩
+  have : r ≠ 0 := by simp only [r, ne_eq, Subtype.ext_iff, ZeroMemClass.coe_zero, h0, not_false_eq_true]
+  rcases pow_uniformizer v this π with ⟨n, u, hnu⟩
   use n, u
   rw [show x = r.1 by rfl, hnu, SubmonoidClass.coe_pow]
 
@@ -148,18 +149,18 @@ theorem val_pow_Uniformizer_all {π : Uniformizer v} {n : ℤ} {u : v.valuationS
 
 theorem val_pow_Uniformizer_all' {π : K} (hπ : IsUniformizer v π) {n : ℤ} {u : v.valuationSubringˣ} :
   v (π ^ n * u.1) = ofAdd (-n : ℤ) := by
-  let ϖ := Uniformizer.mk' _ _ hπ
+  let ϖ := Uniformizer.mk' hπ
   rw [show π = ϖ.1 by exact rfl, val_pow_Uniformizer_all]
 
 /--If `π : K` is a uniformizer for `v`, and `v x ≤ 1 → v' x ≤ 1, ∀ x : K`, then `π` is also a uniformizer for `v'`.-/
 lemma isUniformizer_of_uniformizer_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1)
   (π : Uniformizer v) : IsUniformizer v' π.1 := by
-  rcases exists_Uniformizer_ofDiscrete v' with ⟨π', hπ'⟩
-  rcases pow_Uniformizer_all (Uniformizer_ne_zero v' hπ') π with ⟨m, u, hmu⟩
+  rcases exists_isUniformizer_of_isDiscrete v' with ⟨π', hπ'⟩
+  rcases pow_Uniformizer_all (isUniformizer_ne_zero hπ') π with ⟨m, u, hmu⟩
   replace hmu := congrArg v' hmu
   rw [_root_.map_mul, map_zpow₀,
     eq_one_of_eq_one_of_le_one_le_one h val_valuationSubring_unit, mul_one, hπ'] at hmu
-  rw [IsUniformizer, WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one (h <| le_of_lt <| Uniformizer_valuation_lt_one v π.2) hmu.symm]
+  rw [IsUniformizer, WithZero.ofAdd_eq_neg_one_of_pow_eq_neg_one (h <| le_of_lt <| isUniformizer_val_lt_one π.2) hmu.symm]
 
 /--If `π : K` is a uniformizer for `v`, and `v` is equivalent to `v'`, then `π` is also a uniformizer for `v'`.-/
 theorem isUniformizer_of_uniformizer_of_equiv (h : v.IsEquiv v')
@@ -178,7 +179,7 @@ theorem val_pow_Uniformizer_all_of_equiv (h : v.IsEquiv v') {π : Uniformizer v}
 theorem lt_one_lt_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1) {x : K} (hx : v x < 1) : v' x < 1 := by
   by_cases xne0 : x = 0
   · simp only [xne0, _root_.map_zero, zero_lt_one]
-  rcases exists_Uniformizer_ofDiscrete v with ⟨π, hπ⟩
+  rcases exists_isUniformizer_of_isDiscrete v with ⟨π, hπ⟩
   rcases pow_Uniformizer' xne0 (le_of_lt hx) ⟨π, hπ⟩ with ⟨n, u, hnu⟩
   have ngt1 : ((ofAdd (-n) : Multiplicative ℤ) : ℤₘ₀) < 1 := by
     apply congrArg v at hnu
@@ -188,7 +189,7 @@ theorem lt_one_lt_one_of_le_one_le_one (h : ∀{x : K}, v x ≤ 1 → v' x ≤ 1
   simp only at hnu
   have : v' u.1 = 1 := eq_one_of_eq_one_of_le_one_le_one h val_valuationSubring_unit
   rw [show (u.1 : K) = (unitOfValOne this).1 by rw [unitOfValOne_elem]] at hnu
-  let π' : Uniformizer v' := Uniformizer.mk' v' _ (isUniformizer_of_uniformizer_of_le_one_le_one h ⟨π, hπ⟩)
+  let π' : Uniformizer v' := Uniformizer.mk'  (isUniformizer_of_uniformizer_of_le_one_le_one h ⟨π, hπ⟩)
   have : π.1 = π'.1 := by simp only [Uniformizer.mk', π']
   rw [this] at hnu
   apply congrArg v' at hnu
@@ -217,7 +218,7 @@ theorem isEquiv_iff_eq : v.IsEquiv v' ↔ v = v' := by
   · intro heq; ext x
     by_cases h0 : x = 0
     · simp only [h0, _root_.map_zero]
-    · rcases exists_Uniformizer_ofDiscrete v with ⟨π, hπ⟩
+    · rcases exists_isUniformizer_of_isDiscrete v with ⟨π, hπ⟩
       rcases pow_Uniformizer_all h0 ⟨π, hπ⟩ with ⟨n, u, hnu⟩
       rw [hnu, val_pow_Uniformizer_all, val_pow_Uniformizer_all_of_equiv heq]
   · exact IsEquiv.of_eq
@@ -254,21 +255,22 @@ variable {R : Type*} [Field R]
 namespace DiscreteValuation
 
 theorem valuationSubring_DVR_of_equiv_discrete {v u : Valuation R ℤₘ₀} [IsDiscrete u]
-  (h : v.IsEquiv u) : DiscreteValuationRing v.valuationSubring := by
+  (h : v.IsEquiv u) : IsDiscreteValuationRing v.valuationSubring := by
   rw [(Valuation.isEquiv_iff_valuationSubring _ _).mp h]
   infer_instance
 
-def ofNontrivial (v : Valuation R ℤₘ₀) [Nontrivial v] : Valuation R ℤₘ₀ := sorry
+def ofNontrivial (v : Valuation R ℤₘ₀) [Nontrivial v] : Valuation R ℤₘ₀ := v
 
 variable (v : Valuation R ℤₘ₀) [Nontrivial v]
 
-theorem isEquiv_ofNontrivial : v.IsEquiv (ofNontrivial v) := by sorry
+theorem isEquiv_ofNontrivial : v.IsEquiv (ofNontrivial v) := IsEquiv.refl
 
-#check DiscreteValuationRing
+#check IsDiscreteValuationRing
 
-instance : IsDiscrete (ofNontrivial v) := by sorry
+instance : IsDiscrete (ofNontrivial v) where
+  one_mem_range  := by sorry
 
-instance : DiscreteValuationRing v.valuationSubring :=
+instance : IsDiscreteValuationRing v.valuationSubring :=
   valuationSubring_DVR_of_equiv_discrete (isEquiv_ofNontrivial v)
 
 end DiscreteValuation

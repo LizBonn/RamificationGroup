@@ -3,9 +3,9 @@ import RamificationGroup.Upper_phiComp
 
 open AlgEquiv DiscreteValuation Valuation Valued HerbrandFunction
 
-variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [Algebra.IsSeparable K' L] [Algebra (LocalRing.ResidueField (Valued.integer K')) (LocalRing.ResidueField (Valued.integer L))] [Algebra.IsSeparable (LocalRing.ResidueField (Valued.integer K')) (LocalRing.ResidueField (Valued.integer L))] [CompleteSpace K']
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra.IsSeparable K L] [Algebra K K'] [Algebra.IsSeparable K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK'.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [Algebra.IsSeparable K' L] [Algebra (IsLocalRing.ResidueField (Valued.integer K')) (IsLocalRing.ResidueField (Valued.integer L))] [Algebra.IsSeparable (IsLocalRing.ResidueField (Valued.integer K')) (IsLocalRing.ResidueField (Valued.integer L))] [CompleteSpace K']
 
-variable [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [IsValExtension K K'] [IsValExtension K L]
+variable [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [IsValExtension vK.v vK'.v] [IsValExtension vK.v vL.v]
 
 variable (σ : K' ≃ₐ[K] K')
 
@@ -254,7 +254,6 @@ theorem truncatedJ_eq_truncated_FuncJ (u : ℚ) : truncatedJ L u σ =
 
 #check eq_false
 #check of_eq_false
-#check prop3
 #check lowerIndex_ne_refl
 theorem preimage_restrictNormalHom_untop (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((restrictNormalHom K')⁻¹' {σ})) : i_[L/K] s ≠ ⊤ := by
   by_contra hc
@@ -337,11 +336,11 @@ theorem sum_preimage_eq_sum_subgroup (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (
     use x
     simp only [hx, inv_mul_cancel_right, Subtype.coe_eta]
   · intro i hi
-    simp only
+    rfl
 
 
 #check restrictScalarsHom
-#check WithTop.sum_lt_top_iff
+
 theorem Finset.sum_untop {α : Type*} {s : Finset α} {β : Type*} [AddCommMonoid β] [LT β] {f : α → WithTop β} (h : ∑ x : s, f x ≠ ⊤) : ∑ x : s, ((f x).untop (WithTop.lt_top_iff_ne_top.1 ((WithTop.sum_lt_top).1 (WithTop.lt_top_iff_ne_top.2
 h) x (mem_univ x)))) = (∑ x : s, f x).untop h := by
   symm

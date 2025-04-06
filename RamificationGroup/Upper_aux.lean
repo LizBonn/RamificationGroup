@@ -7,10 +7,10 @@ open AlgEquiv AlgHom
 open LocalRing ExtDVR
 open Asymptotics Filter intervalIntegral MeasureTheory
 
-#check Nat.not_succ_le_zero 
+#check Nat.not_succ_le_zero
 
 --variable (μ : MeasureTheory.Measure ℝ)
-variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [CompleteSpace K] [CompleteSpace K'] [Algebra.IsSeparable K' L] [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])]
+variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK.v vK'.v] [IsValExtension vK'.v vL.v] [IsValExtension vK.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [CompleteSpace K] [CompleteSpace K'] [Algebra.IsSeparable K' L] [Algebra (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])]
 
 
 set_option synthInstance.maxHeartbeats 100000
@@ -27,17 +27,17 @@ theorem nhds_neg_aux {x : ℝ} {k : Set ℝ} (h : k ∈ nhds x) : -k ∈ nhds (-
     · exact IsOpen.neg hm2
     · exact Set.neg_mem_neg.mpr hm3
 
-theorem Set.neg_Icc {a b : ℝ} : -(Set.Icc a b) = Set.Icc (-b) (-a) := by
-  ext x
-  simp only [preimage_neg_Icc, mem_Icc]
+-- theorem Set.neg_Icc {a b : ℝ} : -(Set.Icc a b) = Set.Icc (-b) (-a) := by
+--   ext x
+--   simp only [preimage_neg_Icc, mem_Icc]
 
-theorem Set.neg_Ici {a : ℝ} : Set.Ici a = - Set.Iic (-a) := by
-  ext x
-  simp only [mem_Ici, preimage_neg_Iic, neg_neg]
+-- theorem Set.neg_Ici {a : ℝ} : Set.Ici a = - Set.Iic (-a) := by
+--   ext x
+--   simp only [mem_Ici, preimage_neg_Iic, neg_neg]
 
-theorem Set.neg_Ioc {a b : ℝ} : Set.Ioc a b = - (Set.Ico (-b) (-a)) := by
-  ext x
-  simp only [mem_Ioc, preimage_neg_Ico, neg_neg]
+-- theorem Set.neg_Ioc {a b : ℝ} : Set.Ioc a b = - (Set.Ico (-b) (-a)) := by
+--   ext x
+--   simp only [mem_Ioc, preimage_neg_Ico, neg_neg]
 
 
 theorem ContinuousOn_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℝ E] {f g : ℝ → E} {a b : ℝ} (hf : ∀x : ℝ, f x = g (-x)) (fcont : ContinuousOn f (Set.Icc a b)) : ContinuousOn g (Set.Icc (-b) (-a)) := by
@@ -64,7 +64,7 @@ theorem ContinuousOn_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSpace 
         use -c
         constructor
         · rw [mem_principal] at *
-          have h'' : Set.Icc (-b) (-a) = -(Set.Icc a b) := by apply Eq.symm Set.neg_Icc
+          have h'' : Set.Icc (-b) (-a) = -(Set.Icc a b) := by apply Eq.symm (Set.neg_Icc a b)
           rw [h''] at hc1
           exact Set.neg_subset.mp hc1
         · rw [Set.preimage] at *
@@ -97,7 +97,7 @@ theorem ContinuousOn_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSpace 
         use -c
         constructor
         · rw [mem_principal] at *
-          have h'' : Set.Icc (-b) (-a) = -(Set.Icc a b) := by apply Eq.symm Set.neg_Icc
+          have h'' : Set.Icc (-b) (-a) = -(Set.Icc a b) := by apply Eq.symm (Set.neg_Icc a b)
           rw [h'']
           simp only [Set.neg_subset_neg, hc1]
         · rw [Set.preimage] at *
@@ -147,9 +147,10 @@ theorem HasDerivWithinAt_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSp
   -- dsimp [HasDerivWithinAt, HasDerivAtFilter] at *
   -- #check h.isLittleO
   haveI h : HasFDerivAtFilter (𝕜 := ℝ) finv (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (finv' x)) x (nhdsWithin x (Set.Ici x)) := {
-    isLittleO := by
-      rw [IsLittleO_def]
+    isLittleOTVS := by
+      rw [isLittleOTVS_iff_isLittleO, IsLittleO_def]
       intro c hc
+      simp only [ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply]
       rw [IsBigOWith_def]
       obtain ⟨k, hk1, hk2⟩ := isLittleO_iff.1 (derivf (-x) ?_).isLittleO hc
       use -k
@@ -160,7 +161,7 @@ theorem HasDerivWithinAt_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSp
         use -t
         constructor
         · rw [mem_principal] at *
-          have h' : Set.Ici x = - (Set.Iic (-x)) := by apply Set.neg_Ici
+          have h' : Set.Ici x = - (Set.Iic (-x)) := by simp only [Set.neg_Iic, neg_neg]
           rw [h', Set.neg_subset_neg]
           exact ht1
         · rw [← Set.inter_neg, ← ht2]
@@ -169,7 +170,7 @@ theorem HasDerivWithinAt_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSp
             ContinuousLinearMap.one_apply, Real.norm_eq_abs, Set.mem_setOf_eq, sub_neg_eq_add,
             _root_.map_add, Set.mem_neg, neg_smul, h (-t), h (-x), h' (-x), neg_neg]
           simp only [smul_neg, neg_neg, ← sub_eq_add_neg]
-          rw [← abs_neg, neg_sub, neg_add_eq_sub]
+          rw [← abs_neg, neg_sub, neg_add_eq_sub, sub_smul]
       -- have h1 : ∀ x : ℝ, finv x = f (-x) := by sorry
       -- have h2 : ∀ x : ℝ, finv' x = -f' (-x) := by sorry
       -- have h2 : (fun x' ↦ finv x' - finv x - (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (finv' x)) (x' - x)) = (fun x' ↦ f (-x') - f (-x) - (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (-f' (-x))) (x' - x)) := by
@@ -181,8 +182,10 @@ theorem HasDerivWithinAt_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSp
       -- intro c hc
       -- obtain ⟨t, ht⟩ := h3 hc
   }
-  rw [Set.neg_Ioc, Set.mem_neg, neg_neg]
-  exact hx
+  -- rw [Set.neg_Ioc, Set.mem_neg, neg_neg]
+  -- exact hx
+  rw [← Set.neg_Ioc a b] at hx
+  exact hx 
   exact h
 
 theorem eq_of_has_deriv_left_eq {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℝ E] {f : ℝ → E} {a b : ℝ} {f' g : ℝ → E} (derivf : ∀ x ∈ Set.Ioc a b, HasDerivWithinAt f (f' x) (Set.Iic x) x) (derivg : ∀ x ∈ Set.Ioc a b, HasDerivWithinAt g (f' x) (Set.Iic x) x) (fcont : ContinuousOn f (Set.Icc a b)) (gcont : ContinuousOn g (Set.Icc a b)) (hi : f b = g b) (y : ℝ) : y ∈ Set.Icc a b → f y = g y := by
@@ -274,8 +277,8 @@ theorem phiReal_StrictMono_aux : StrictMono (phiReal K L) := by
     rw [phiReal_eq_self_of_le_zero K L (le_of_lt ha'), phiReal_eq_self_of_le_zero K L hb]
     exact hab
 
-theorem phiReal_comp_of_isValExtension_neg_aux {u : ℝ} (hu : u < 0) : ((phiReal K K') ∘ (phiReal K' L)) u = phiReal K L u := by sorry
-  -- rw [Function.comp_apply, phiReal_eq_self_of_le_zero K L (le_of_lt hu), phiReal_eq_self_of_le_zero K' L (le_of_lt hu), phiReal_eq_self_of_le_zero K K' (le_of_lt hu)]
+theorem phiReal_comp_of_isValExtension_neg_aux [Normal K' L] {u : ℝ} (hu : u < 0) : ((phiReal K K') ∘ (phiReal K' L)) u = phiReal K L u := by
+  rw [Function.comp_apply, phiReal_eq_self_of_le_zero K L (le_of_lt hu), phiReal_eq_self_of_le_zero K' L (le_of_lt hu), phiReal_eq_self_of_le_zero K K' (le_of_lt hu)]
 
 theorem phiDerivReal_le_one {u : ℝ} (h : 0 < u) : phiDerivReal K L u ≤ 1 := by
   have h' : 0 ≤ ⌈u⌉ := le_of_lt (Int.ceil_pos.2 h)

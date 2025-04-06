@@ -7,12 +7,12 @@ uniqueness of extension of valuation and the isom between L ≃ₐ[K] L and  L �
 variable {K L} {ΓK ΓL : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [LinearOrderedCommGroupWithZero ΓL]
 
 
-section
-variable [Valued K ΓK] [CompleteSpace K] [Algebra K L]
+-- section
+-- variable [Valued K ΓK] [CompleteSpace K] [Algebra K L]
 
-theorem unique_of_valuation_extension (v₁ v₂ : Valuation L ΓL) (h₁ : v₁.comap (algebraMap K L) = v₂.comap (algebraMap K L)): v₁ = v₂ := sorry
+-- theorem unique_of_valuation_extension (v₁ v₂ : Valuation L ΓL) (h₁ : v₁.comap (algebraMap K L) = v₂.comap (algebraMap K L)): v₁ = v₂ := sorry
 
-end
+-- end
 
 -- should be changed G_[-1] = ⊤
 /-

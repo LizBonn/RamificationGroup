@@ -16,11 +16,9 @@ theorem ceil_nonpos {u : ℚ} (h : u ≤ 0) : ⌈u⌉ ≤ 0 := by
 
 namespace HerbrandFunction
 
-variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S] [Finite (S ≃ₐ[R] S)]
 
-theorem Ramification_Group_card_pos {u : ℚ} : 0 < Nat.card G(S/R)_[⌈u⌉] := by
-  haveI : Finite G(S/R)_[⌈u⌉] := sorry
-  refine Nat.card_pos
+theorem Ramification_Group_card_pos {u : ℚ} : 0 < Nat.card G(S/R)_[⌈u⌉] := Nat.card_pos
 
 -- by definition of relindex, it's always 1 when u < 0
 noncomputable def phiDeriv (u : ℚ) : ℚ :=
@@ -357,7 +355,7 @@ theorem psi_eq_self_of_le_neg_one {v : ℚ} (hv : v ≤ 0) : psi R S v = v := by
 open scoped Classical
 
 
-variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
+variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L]
 
 noncomputable def G_diff (i : ℤ) : Finset (L ≃ₐ[K] L) := ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset
 noncomputable def Ramification_Group_diff (i : ℤ) : Finset (L ≃ₐ[K] L) := ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset
@@ -395,9 +393,9 @@ theorem Ramification_Group_pairwiseDisjoint (n : ℤ) : (PairwiseDisjoint (↑(F
 
 set_option synthInstance.maxHeartbeats 0
 
-variable [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
+variable [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
 
-theorem mem_all_lowerRamificationGroup_iff_refl {x : (L ≃ₐ[K] L)}: (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by sorry
+theorem mem_all_lowerRamificationGroup_iff_refl {x : (L ≃ₐ[K] L)} : (∀ n : ℤ, x ∈ G(L/K)_[n]) ↔ x = .refl := by sorry
   -- constructor <;> intro h
   -- · by_contra hc
   --   push_neg at hc
@@ -438,7 +436,7 @@ theorem aux_0 {x : L ≃ₐ[K] L} (hx : x ≠ .refl) : ∃ n : ℤ , x ∈ G(L/K
     apply hc (m - 1) hm
   · rw [lowerRamificationGroup_eq_decompositionGroup, decompositionGroup_eq_top]
     apply Subgroup.mem_top
-    simp only [reduceNeg, tsub_le_iff_right, add_left_neg, zero_add]
+    simp only [reduceNeg, tsub_le_iff_right, neg_add_cancel, zero_add]
     omega
 
 theorem Raimification_Group_split (n : ℤ) : (⊤ : Finset (L ≃ₐ[K] L)) = (disjiUnion (Finset.Icc (-1) (n - 1)) (Ramification_Group_diff K L) (Ramification_Group_pairwiseDisjoint K L n)) ∪ (G(L/K)_[n] : Set (L ≃ₐ[K] L)).toFinset := by
@@ -559,7 +557,7 @@ theorem sum_sub_aux {u : ℚ} (hu : 0 ≤ ⌈u⌉ - 1): (∑ i in Finset.Icc (-1
       erw [← sum_insert_left_aux' (-1) (⌈u⌉ - 1) h (fun i => (i + 1) * Nat.card (lowerRamificationGroup K L i)), sub_sub, ← sum_insert_right_aux' 0 ⌈u⌉ (by linarith [h]) (fun i => i * Nat.card (lowerRamificationGroup K L i))]
       simp
     _ = ∑ i in Finset.Icc 0 (⌈u⌉ - 1), Nat.card G(L/K)_[i] - ⌈u⌉ * (Nat.card G(L/K)_[⌈u⌉]) := by
-      rw [neg_add_self, zero_mul, zero_add]
+      rw [neg_add_cancel, zero_mul, zero_add]
       congr
       rw [← sum_sub_distrib]
       ring_nf
@@ -653,7 +651,7 @@ theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((F
     symm
     by_cases huc : ⌈u⌉ < 0
     · have huc' : ⌈u⌉ - 1 < (-1) := by linarith [huc]
-      simp [huc', mul_comm, mul_assoc, mul_inv_self]
+      simp [huc', mul_comm, mul_assoc]
       sorry
     · have huc' : ⌈u⌉ = 0 := by omega
       have huc'' : ⌈u⌉ - 1 = (-1) := by linarith [huc']
@@ -661,7 +659,7 @@ theorem phi_eq_sum_inf (u : ℚ) : (phi K L u) = (1 / Nat.card G(L/K)_[0]) * ((F
         apply Finset.sum_eq_zero
         intro x hx
         simp [truncatedLowerindex_eq_if K L (by linarith [huc'']) hx]
-      simp [huc', huc'', hsum, mul_comm, mul_assoc, mul_inv_self]
+      simp [huc', huc'', hsum, mul_comm, mul_assoc]
       --sorry
   · have hu' : 0 ≤ ⌈u⌉ - 1 := by
       push_neg at hu

@@ -1,11 +1,11 @@
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import RamificationGroup.ForMathlib.LocalRing.Basic
 
-namespace DiscreteValuationRing
+namespace IsDiscreteValuationRing
 
 open LocalRing
 
-variable {A : Type*} [CommRing A] [IsDomain A] [DiscreteValuationRing A]
+variable {A : Type*} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
 
 section uniformiser
 
@@ -38,11 +38,11 @@ theorem mul_irreducible_square_of_not_unit_of_not_irreducible (h1 : ¬Irreducibl
 theorem irreducible_of_irreducible_add_addVal_ge_two (hx : Irreducible x) {y : A} : Irreducible (x + y * ϖ ^ 2) := by
   rcases unit_mul_irreducible_of_irreducible hϖ hx with ⟨u, hu, hxu⟩
   rw [hxu, pow_two, ← mul_assoc, ← add_mul]
-  apply (irreducible_isUnit_mul (LocalRing.is_unit_of_unit_add_nonunit hu _)).mpr hϖ
+  apply (irreducible_isUnit_mul (IsLocalRing.is_unit_of_unit_add_nonunit hu _)).mpr hϖ
   simp only [mem_nonunits_iff, IsUnit.mul_iff, not_and]
   exact fun _ ↦ Irreducible.not_unit hϖ
 
-theorem maximalIdeal_pow_eq_span_irreducible_pow (n : ℕ) : maximalIdeal A ^ n = Ideal.span {ϖ ^ n} := by
+theorem maximalIdeal_pow_eq_span_irreducible_pow (n : ℕ) : IsLocalRing.maximalIdeal A ^ n = Ideal.span {ϖ ^ n} := by
   rw [Irreducible.maximalIdeal_eq hϖ, Ideal.span_singleton_pow]
 
 theorem ideal_le_iff {m n : ℕ} :

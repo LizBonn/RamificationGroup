@@ -1,5 +1,6 @@
 import Mathlib.RingTheory.Adjoin.Basic
-import Mathlib.Algebra.Polynomial.Induction
+import Mathlib.Algebra.Polynomial.Basic
+
 
 section semiring
 variable {A : Type _} {B : Type _} [CommSemiring A] [Semiring B] [Algebra A B]

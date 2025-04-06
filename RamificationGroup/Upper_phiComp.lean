@@ -5,7 +5,7 @@ import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 open QuotientGroup IntermediateField DiscreteValuation Valued Valuation HerbrandFunction
 
 --variable (μ : MeasureTheory.Measure ℝ)
-variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K K'] [IsValExtension K' L] [IsValExtension K L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
+variable (K K' L : Type*) {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK : Valued K ℤₘ₀] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK.v vK'.v] [IsValExtension vK'.v vL.v] [IsValExtension vK.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
 
 
 noncomputable def μ : MeasureTheory.Measure ℝ := MeasureTheory.volume
@@ -155,7 +155,6 @@ open AlgEquiv AlgHom
 #check Algebra.algebraMap_eq_smul_one
 #check ofInjectiveField
 #check algebraMap.coe_smul
-#check AlgEquiv.map_smul
 #check algebraMap_smul
 
 theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : AlgEquiv.restrictNormalHom K' (AlgEquiv.restrictScalarsHom K x) = 1 := by
@@ -171,7 +170,7 @@ theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : A
   --   #check (IsScalarTower.toAlgHom K K' L).range
   -- haveI : Algebra K' (IsScalarTower.toAlgHom K K' L).range := by
   --   refine (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra
-  have h1 : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom t := rfl
+  have h1 : (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) t = (ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toRingHom t := rfl
   rw [h1]
   -- haveI range : Subalgebra K' L := {
   --   carrier := (IsScalarTower.toAlgHom K K' L).range
@@ -181,13 +180,15 @@ theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[K'] L)} : A
   --   zero_mem' := ?zero_mem'
   --   algebraMap_mem' := ?algebraMap_mem'
   -- }
-  have h2 : ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toAlgebra.toRingHom t) = algebraMap K' L t := by
-    rw [← algebraMap]
-    exact rfl
-  simp only [toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, h2, commutes]
-  simp only [← h2, toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, Subtype.coe_eta]
-  rw [← h1]
-  simp only [symm_apply_apply]
+  have h2 : ((ofInjectiveField (IsScalarTower.toAlgHom K K' L)).toAlgHom.toRingHom t) = algebraMap K' L t := rfl
+  simp only [h2, commutes]
+  -- simp only [toAlgHom_eq_coe]
+  -- simp only [toRingHom_eq_coe]
+  -- simp only [toAlgHom_toRingHom, commutes]
+  simp only [← h2, RingHom.coe_coe, Subtype.coe_eta, toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, RingHom.coe_coe, symm_apply_apply]
+  -- rw [← h2, toAlgHom_eq_coe, toRingHom_eq_coe, toAlgHom_toRingHom, Subtype.coe_eta]
+  -- rw [← h1]
+  -- simp only [symm_apply_apply]
   -- have h1 : ∀ k : K', (ofInjectiveField (IsScalarTower.toAlgHom K K' L)) k = algebraMap K' (IsScalarTower.toAlgHom K K' L).range k := by
   --   intro k
   --   unfold algebraMap
@@ -426,11 +427,11 @@ variable [IsScalarTower 𝒪[K] 𝒪[K'] 𝒪[L]]
 theorem RamificationGroup_card_zero_comp_aux : (Nat.card G(K'/K)_[0] : ℝ) * (Nat.card G(L/K')_[0] : ℝ) = (Nat.card G(L/K)_[0] : ℝ) := by
   repeat rw [RamificationIdx_eq_card_of_inertia_group]
   norm_cast
-  unfold LocalField.ramificationIdx LocalRing.ramificationIdx
-  let e_K'K := Ideal.ramificationIdx (algebraMap ↥𝒪[K] ↥𝒪[K']) (LocalRing.maximalIdeal ↥𝒪[K]) (LocalRing.maximalIdeal ↥𝒪[K'])
-  let e_LK' := Ideal.ramificationIdx (algebraMap ↥𝒪[K'] ↥𝒪[L]) (LocalRing.maximalIdeal ↥𝒪[K']) (LocalRing.maximalIdeal ↥𝒪[L])
-  let e_LK := Ideal.ramificationIdx (algebraMap ↥𝒪[K] ↥𝒪[L]) (LocalRing.maximalIdeal ↥𝒪[K]) (LocalRing.maximalIdeal ↥𝒪[L])
-  have h : (LocalRing.maximalIdeal 𝒪[L]) ^ (e_K'K * e_LK') = (LocalRing.maximalIdeal 𝒪[L]) ^ (e_LK) := by
+  unfold LocalField.ramificationIdx IsLocalRing.ramificationIdx
+  let e_K'K := Ideal.ramificationIdx (algebraMap ↥𝒪[K] ↥𝒪[K']) (IsLocalRing.maximalIdeal ↥𝒪[K]) (IsLocalRing.maximalIdeal ↥𝒪[K'])
+  let e_LK' := Ideal.ramificationIdx (algebraMap ↥𝒪[K'] ↥𝒪[L]) (IsLocalRing.maximalIdeal ↥𝒪[K']) (IsLocalRing.maximalIdeal ↥𝒪[L])
+  let e_LK := Ideal.ramificationIdx (algebraMap ↥𝒪[K] ↥𝒪[L]) (IsLocalRing.maximalIdeal ↥𝒪[K]) (IsLocalRing.maximalIdeal ↥𝒪[L])
+  have h : (IsLocalRing.maximalIdeal 𝒪[L]) ^ (e_K'K * e_LK') = (IsLocalRing.maximalIdeal 𝒪[L]) ^ (e_LK) := by
     dsimp [e_K'K, e_LK', e_LK]
     sorry
     -- rw [← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K L), mul_comm, pow_mul, ← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K' L), ← Ideal.map_pow, ← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K K'), Ideal.map_map, ← IsScalarTower.algebraMap_eq]
@@ -1293,7 +1294,7 @@ theorem phiReal_phi_ceil_eq_aux {u : ℝ} (hu : 0 ≤ u) {gen : 𝒪[L]} (hgen :
       --   push_neg
       --   exact_mod_cast h'
 
-variable [Algebra (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K']) (LocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K'] [CompleteSpace K]
+variable [Algebra (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K'] [CompleteSpace K]
 theorem herbrand_Real (u : ℝ) (hu : 0 ≤ u) {gen : 𝒪[K']} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K] {gen'} = ⊤) {gen'' : 𝒪[L]} (hgen'' : Algebra.adjoin 𝒪[K'] {gen''} = ⊤) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phiReal K' L u⌉] := by sorry
   -- obtain ⟨u', hu'1, hu'2⟩ := phiReal_phi_ceil_eq_aux K' L (u := u) hu hgen''
   -- rw [hu'1, hu'2]

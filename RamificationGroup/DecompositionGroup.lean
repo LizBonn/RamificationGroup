@@ -44,7 +44,7 @@ section eq_top
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
 @[simp]
-theorem decompositionGroup_eq_top [IsValExtension K L] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
+theorem decompositionGroup_eq_top [IsValExtension vK.v vL.v] [CompleteSpace K] : decompositionGroup K L = ⊤ := by
   rw [Subgroup.eq_top_iff']
   intro f
   unfold decompositionGroup

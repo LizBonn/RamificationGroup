@@ -219,7 +219,8 @@ theorem sub_self_mem_integer {s : S ≃ₐ[R] S} (hs' : s ∈ decompositionGroup
   (x : vS.v.integer) :
     s x - x ∈ vS.v.integer := by
   apply Subring.sub_mem
-  · rw [mem_integer_iff, val_map_le_one_iff hs']; exact x.2
+  ·
+    rw [mem_integer_iff, val_map_le_one_iff hs']; exact x.2
   · exact x.2
 
 /-- One of `val_map_sub_le_one` and `sub_self_mem_integer` should be thrown away.-/
@@ -241,7 +242,7 @@ theorem toAdd_iSup_val_map_sub_le_zero_of_ne_zero {s : S ≃ₐ[R] S} (hs' : s �
 section adjoin_singleton
 
 variable {K L : Type*} [Field K] [Field L]
-[vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
+[vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension vK.v vL.v]
 
 /-- Should be strenthened to ` > 0`-/--??-/
 --suppose the generator of 𝒪[L] as a 𝒪[K]-algebra exists.
@@ -259,20 +260,24 @@ theorem decomp_val_map_generator_sub_ne_zero {gen : 𝒪[L]} (hgen : Algebra.adj
     h, AlgEquiv.coe_refl, id_eq]
 
 open Polynomial in
-theorem decomp_val_map_sub_le_generator {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (x : 𝒪[L]) : v (s x - x) ≤ v (s gen - gen) := by sorry
-  -- by_cases hs : s = .refl
-  -- · subst hs
-  --   simp only [AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, le_refl]
-  -- rcases Algebra.exists_eq_aeval_generator hgen x with ⟨f, hf⟩
-  -- subst hf
-  -- rcases taylor_order_zero_apply_aeval f gen ((DecompositionGroup.restrictValuationSubring' hs') gen - gen) with ⟨b, hb⟩
-  -- rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
-  -- simp only [AddSubgroupClass.coe_sub, DecompositionGroup.restrictValuationSubring_apply' hs', Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
-  -- rw [hb, Valuation.map_mul]
-  -- nth_rw 2 [← mul_one (v (s gen - gen))]
-  -- rw [mul_le_mul_left₀]
-  -- · exact b.2
-  -- · apply decomp_val_map_generator_sub_ne_zero hgen hs' hs
+theorem decomp_val_map_sub_le_generator {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) (x : 𝒪[L]) : v (s x - x) ≤ v (s gen - gen) := by
+  by_cases hs : s = .refl
+  · subst hs
+    simp only [AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, le_refl]
+  rcases Algebra.exists_eq_aeval_generator hgen x with ⟨f, hf⟩
+  subst hf
+  rcases taylor_order_zero_apply_aeval f gen ((DecompositionGroup.restrictValuationSubring' hs') gen - gen) with ⟨b, hb⟩
+  rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
+  simp only [AddSubgroupClass.coe_sub, DecompositionGroup.restrictValuationSubring_apply' hs', Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
+  rw [hb]
+  simp only [Subring.coe_mul, AddSubgroupClass.coe_sub,DecompositionGroup.restrictValuationSubring_apply', _root_.map_mul]
+  nth_rw 2 [← mul_one (v (s gen - gen))]
+  rw [mul_le_mul_left]
+  · exact b.2
+  · apply lt_of_le_of_ne
+    exact WithZero.zero_le (v (s ↑gen - ↑gen))
+    symm
+    apply decomp_val_map_generator_sub_ne_zero hgen hs' hs
 
 --sup_{x ∈ S | v x ≤ 1} v (s (x) - x) = v (s gen - gen)
 theorem decomp_iSup_val_map_sub_eq_generator {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {s : L ≃ₐ[K] L} (hs' : s ∈ decompositionGroup K L) :
@@ -360,8 +365,9 @@ end K_not_field
 section K_is_field
 
 variable {K L : Type*} [Field K] [Field L]
-[vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L]
+[vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension vK.v vL.v]
 
+omit [IsValExtension vK.v vL.v] in
 theorem mem_lowerRamificationGroup_of_le_neg_one {s : L ≃ₐ[K] L} (hs : s ∈ decompositionGroup K L) {u : ℤ} (hu : u ≤ -1) : s ∈ G(L/K)_[u] := by
   unfold lowerRamificationGroup
   simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq]
@@ -468,7 +474,7 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
       convert (mem_lowerRamificationGroup_iff_of_generator hgen hs' ⌈u⌉.toNat).2 this
       exact Eq.symm hu'
 
-variable [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension K L] [CompleteSpace K] [FiniteDimensional K L]
+variable [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension vK.v vL.v] [CompleteSpace K] [FiniteDimensional K L]
 
 theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐ[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
   by_cases hu : u ≤ -1
@@ -573,7 +579,7 @@ section eq_top
 
 variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L]
 
-theorem lowerRamificationGroup_eq_top [IsValExtension K L] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
+theorem lowerRamificationGroup_eq_top [IsValExtension vK.v vL.v] [CompleteSpace K] {u : ℤ} (h : u ≤ -1) : G(L/K)_[u] = ⊤ := by
   rw [lowerRamificationGroup_eq_decompositionGroup h, decompositionGroup_eq_top]
 
 end eq_top
@@ -583,7 +589,7 @@ section eq_bot
 open ExtDVR IsValExtension Polynomial
 
 -- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
-variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L] [Algebra.IsSeparable K L]
+variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [Algebra.IsSeparable K L]
 
 variable {K L}
 variable [CompleteSpace K]
@@ -604,14 +610,15 @@ instance : IsLocalHom (algebraMap 𝒪[K] 𝒪[L]) where
         · apply Valuation.Integers.one_of_isUnit (Valuation.integer.integers (v := vL.v)) at hr
           change v (((algebraMap ↥𝒪[K] ↥𝒪[L]) r) : L) = 1 at hr
           norm_cast at hr
-          simp only [IsValExtension.val_map_eq_one_iff] at hr
+          rw [IsValExtension.val_map_eq_one_iff (vA := vL.v) (vR := vK.v)] at hr
           exact hr
 
 instance : Module.Finite 𝒪[K] 𝒪[L] := Module.IsNoetherian.finite 𝒪[K] 𝒪[L]
 
 set_option synthInstance.maxHeartbeats 1000000
 
-theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := ExtDVR.exists_primitive (A := 𝒪[K]) (B := 𝒪[L]) (integerAlgebra_injective K L)
+theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := by
+  apply ExtDVR.exists_primitive (A := 𝒪[K]) (B := 𝒪[L]) algebraMap_injective
 
 
 --can delete the assumption of generator.
@@ -632,20 +639,24 @@ theorem AlgEquiv.val_map_powerBasis_sub_ne_zero (pb : PowerBasis 𝒪[K] 𝒪[L]
 
 open Polynomial in
 theorem AlgEquiv.val_map_sub_le_generator {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) (s : L ≃ₐ[K] L) (x : 𝒪[L]) : v (s x - x) ≤ v (s gen - gen) := by
-  sorry
-  -- by_cases hs : s = .refl
-  -- · subst hs
-  --   simp only [AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, le_refl]
-  -- rcases Algebra.exists_eq_aeval_generator hgen x with ⟨f, hf⟩
-  -- subst hf
-  -- rcases taylor_order_zero_apply_aeval f gen ((AlgEquiv.restrictValuationSubring s) gen - gen) with ⟨b, hb⟩
-  -- rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
-  -- simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
-  -- rw [hb, Valuation.map_mul]
-  -- nth_rw 2 [← mul_one (v (s gen - gen))]
-  -- rw [mul_le_mul_left₀]
-  -- · exact b.2
-  -- · apply AlgEquiv.val_map_generator_sub_ne_zero hgen hs
+  by_cases hs : s = .refl
+  · subst hs
+    simp only [AlgEquiv.coe_refl, id_eq, sub_self, _root_.map_zero, le_refl]
+  rcases Algebra.exists_eq_aeval_generator hgen x with ⟨f, hf⟩
+  subst hf
+  rcases taylor_order_zero_apply_aeval f gen ((AlgEquiv.restrictValuationSubring s) gen - gen) with ⟨b, hb⟩
+  rw [add_sub_cancel, add_comm, ← sub_eq_iff_eq_add, aeval_algHom_apply, Subtype.ext_iff] at hb
+  simp only [AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, Subring.coe_toSubsemiring] at hb
+  rw [hb]
+  simp only [Subring.coe_mul, AddSubgroupClass.coe_sub, AlgEquiv.restrictValuationSubring_apply,
+    _root_.map_mul]
+  nth_rw 2 [← mul_one (v (s gen - gen))]
+  rw [mul_le_mul_left]
+  · exact b.2
+  · apply lt_of_le_of_ne
+    exact WithZero.zero_le (v (s ↑gen - ↑gen))
+    symm
+    apply AlgEquiv.val_map_generator_sub_ne_zero hgen hs
 
 open Polynomial in
 /-- The orginal proof uses `PowerBasis.exists_eq_aeval`. -/
@@ -703,8 +714,10 @@ theorem iSup_ne_refl_lowerIndex_ne_top [Nontrivial (L ≃ₐ[K] L)] :
       rw [← ENat.some_eq_coe, WithTop.coe_untop]
     simp only [ne_eq, this, Nat.cast_le, ha]
 
+#moogle "isUniformizer_is_generator"
+
 -- if n > sup_{s ≠ 1} i_G s then G_n = {1}.
-theorem aux7 [Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
+theorem aux7 [Algebra.IsSeparable K L] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])]
   {n : ℕ} (hu : n > ⨆ s : {s : (L ≃ₐ[K] L) // s ≠ .refl}, i_[L/K] s)
   {s : L ≃ₐ[K] L} (hs : s ∈ G(L/K)_[n]) : s = .refl := by
   apply (mem_lowerRamificationGroup_iff_of_generator (PowerBasis.adjoin_gen_eq_top (PowerBasisValExtension K L)) s.mem_decompositionGroup n).mp at hs
@@ -713,12 +726,11 @@ theorem aux7 [Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField 𝒪[K])
   have : i_[L/K] s < n := by
     apply lt_of_le_of_lt _ hu
     rw [show s = (⟨s, h⟩ : {s // s ≠ .refl}).1 by rfl]
-    apply le_iSup (fun (x : {s // s ≠ .refl}) => i_[L/K] x) (⟨s, h⟩ : {s // s ≠ .refl})
+    exact le_iSup_iff.mpr fun b a ↦ a ⟨s, h⟩
   apply lt_asymm hs this
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
-theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])]
-  [Algebra.IsSeparable (LocalRing.ResidueField 𝒪[K]) (LocalRing.ResidueField 𝒪[L])] :
+theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparable K L][Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] :
     ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
   by_cases h : Nontrivial (L ≃ₐ[K] L)
   · use (WithTop.untop _ (iSup_ne_refl_lowerIndex_ne_top K L) : ℕ) + 1

@@ -1,14 +1,14 @@
-import Mathlib.NumberTheory.RamificationInertia
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+import Mathlib.NumberTheory.RamificationInertia.Basic
 
-namespace LocalRing
+namespace IsLocalRing
 
 variable (A B : Type*) [CommRing A] [CommRing B]
-  [LocalRing A] [LocalRing B] [Algebra A B] [is_local : IsLocalHom (algebraMap A B)]
+  [IsLocalRing A] [IsLocalRing B] [Algebra A B] [is_local : IsLocalHom (algebraMap A B)]
 
 noncomputable def ramificationIdx : ℕ := Ideal.ramificationIdx (algebraMap A B) (maximalIdeal A) (maximalIdeal B)
 
-noncomputable def inertiaDeg : ℕ := Ideal.inertiaDeg (algebraMap A B) (maximalIdeal A) (maximalIdeal B)
+noncomputable def inertiaDeg : ℕ := Ideal.inertiaDeg (maximalIdeal A) (maximalIdeal B)
 
 instance : Algebra (ResidueField A) (ResidueField B) :=
   Ideal.Quotient.algebraQuotientOfLEComap <| le_of_eq (((local_hom_TFAE <| algebraMap A B).out 0 4 rfl rfl).mp is_local).symm
@@ -34,4 +34,4 @@ theorem maximalIdeal_eq_jacobson_of_bot : maximalIdeal A ≤ Ideal.jacobson ⊥ 
 
 variable (A) in
 theorem maximalIdeal_ne_top : maximalIdeal A ≠ ⊤ :=
-  Ideal.IsMaximal.ne_top (LocalRing.maximalIdeal.isMaximal A)
+  Ideal.IsMaximal.ne_top (IsLocalRing.maximalIdeal.isMaximal A)

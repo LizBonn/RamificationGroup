@@ -5,8 +5,8 @@ open scoped Classical
 open HerbrandFunction DiscreteValuation AlgEquiv Valued
 open DiscreteValuation Subgroup Set Function Finset BigOperators Int Valued
 
-variable (K L : Type*) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension K L] [FiniteDimensional K L] [CompleteSpace K] [Algebra.IsSeparable K L]
-[Algebra.IsSeparable (LocalRing.ResidueField ↥𝒪[K]) (LocalRing.ResidueField ↥𝒪[L])]
+variable (K L : Type*) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Valuation.IsDiscrete vL.v] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
+[Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
 
 theorem Int.aux {a b : ℤ} (h1 : a ≤ b) (h2 : b < a + 1) : a = b := by
   by_contra hc
@@ -31,7 +31,7 @@ theorem truncatedLowerindex_eq_if_aux {i : ℤ} {u : ℚ} {s : (L ≃ₐ[K] L)} 
     by_contra hc; push_neg at hc
     have h : s ∈ decompositionGroup K L := by exact mem_decompositionGroup s
     have hs2' : s ∈ G(L/K)_[⌈i + 1⌉] := by
-      convert mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one h (u := ((i : ℤ) + 1)) (by linarith [hc])
+      convert mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one h (u := ((i : ℤ) + 1)) hgen (by linarith [hc])
       simp only [ceil_add_one, ceil_int, id_eq, ceil_intCast]
     apply hs2
     simp only [ceil_add_one, ceil_int, id_eq] at hs2'; exact hs2'
@@ -105,11 +105,11 @@ theorem truncatedLowerindex_eq_if_aux {i : ℤ} {u : ℚ} {s : (L ≃ₐ[K] L)} 
           symm; apply eq_iff_le_not_lt.2; constructor
           · exact hgt'
           · linarith [hc]
-        simp only [hi, reduceNeg, add_left_neg, toNat_zero, CharP.cast_eq_zero]
+        simp only [hi, reduceNeg, neg_add_cancel, toNat_zero, CharP.cast_eq_zero]
         by_contra hcon
         have hilk : 1 ≤ i_[L/K] s := by
           apply ENat.one_le_iff_ne_zero.2 hcon
-        simp only [hi, reduceNeg, add_left_neg, toNat_zero, CharP.cast_eq_zero, zero_add] at h
+        simp only [hi, reduceNeg, neg_add_cancel, toNat_zero, CharP.cast_eq_zero, zero_add] at h
         absurd h; push_neg
         exact hilk
     apply lt_of_le_of_lt (b := (⌈u⌉.toNat : ℚ))
@@ -212,6 +212,7 @@ theorem sum_of_diff_aux_aux {i : ℤ} {u : ℚ} (h : i ∈ Finset.Icc (-1) (⌈u
         rw [toFinset_diff, card_sdiff (by apply Set.toFinset_mono hsub)]
         simp only [toFinset_card, SetLike.coe_sort_coe]
       rw [h, Nat.cast_sub]
+      ring
       exact Set.card_le_card hsub
 
 theorem truncatedLowerindex_eq_of_lt {s : (L ≃ₐ[K] L)} {u : ℚ} (h : s ∈ G(L/K)_[⌈u⌉]) (hu : 0 ≤ u) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : i_[L/K]ₜ (u + 1) s = u + 1 := by
@@ -319,7 +320,7 @@ theorem phi_eq_sum_inf_aux (u : ℚ) (hu : 0 ≤ u) {gen : 𝒪[L]} (hgen : Alge
           apply Finset.sum_eq_zero
           intro x hx
           rw [← zero_add 1, truncatedLowerindex_eq_if_aux K L (u := 0) (i := -1) rfl ?_ ?_ hx hgen]
-          simp only [reduceNeg, cast_neg, cast_one, add_left_neg]
+          simp only [reduceNeg, cast_neg, cast_one, neg_add_cancel]
           rfl
           simp only [reduceNeg, ceil_zero, zero_sub, le_refl]
         _ = ((Nat.card ↥ G(L/K)_[0]) : ℚ)⁻¹ * (0 + Nat.card G(L/K)_[0]) := by
@@ -330,9 +331,11 @@ theorem phi_eq_sum_inf_aux (u : ℚ) (hu : 0 ≤ u) {gen : 𝒪[L]} (hgen : Alge
           <;> intro i hi
           · simp only [Set.mem_toFinset] at hi
             convert truncatedLowerIndex_aux K L 0 (by simp) i hi hgen
+            repeat simp only [ceil_zero, cast_zero, zero_add]
           · simp only [Set.mem_toFinset] at hi
             apply le_of_eq; convert truncatedLowerIndex_aux K L 0 (by simp) i hi hgen
+            repeat simp only [ceil_zero, cast_zero, zero_add]
         _ = 1 := by simp only [Nat.card_eq_fintype_card, zero_add, isUnit_iff_ne_zero, ne_eq, Nat.cast_eq_zero, Fintype.card_ne_zero, not_false_eq_true, IsUnit.inv_mul_cancel]
     · unfold Ramification_Group_diff
-      simp only [reduceNeg, zero_sub, Finset.Icc_self, toFinset_diff, disjiUnion_eq_biUnion, singleton_biUnion, add_left_neg]
+      simp only [reduceNeg, zero_sub, Finset.Icc_self, toFinset_diff, disjiUnion_eq_biUnion, singleton_biUnion, neg_add_cancel]
       exact sdiff_disjoint

@@ -2,7 +2,7 @@
 normalize to `integer` or `valuationSubring`?
 -/
 
-import RamificationGroup.Valued.Hom.ValExtension
+-- import RamificationGroup.Valued.Hom.ValExtension
 import LocalClassFieldTheory.DiscreteValuationRing.Extensions
 import RamificationGroup.Valuation.Discrete
 
@@ -108,7 +108,7 @@ variable [IsDiscrete vK.v] [CompleteSpace K]
 variable {vL : Valuation L ℤₘ₀}
 
 theorem nontrivial_of_valuation_extension (h : vK.v.IsEquiv <| vL.comap (algebraMap K L)) : vL.Nontrivial := by
-  rcases exists_Uniformizer_ofDiscrete vK.v with ⟨π, hp⟩
+  rcases exists_isUniformizer_of_isDiscrete vK.v with ⟨π, hp⟩
   use (algebraMap K L) π
   constructor
   · rw [← comap_apply, ← IsEquiv.ne_zero h, hp]
@@ -168,7 +168,7 @@ end DiscreteValuation
 namespace DiscreteValuation
 
 variable [CompleteSpace K] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀]
-variable [Algebra K L] [IsValExtension K L] [FiniteDimensional K L]
+variable [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L]
 
 theorem algHom_preserve_val_of_complete (f : L →ₐ[K] L) : vL.v.IsEquiv <| vL.v.comap f := by
   apply unique_val_of_ext (K := K)
