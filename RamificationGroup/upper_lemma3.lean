@@ -3,7 +3,7 @@ import RamificationGroup.Upper_phiComp
 
 open AlgEquiv DiscreteValuation Valuation Valued HerbrandFunction
 
-variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra.IsSeparable K L] [Algebra K K'] [Algebra.IsSeparable K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK'.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [Algebra.IsSeparable K' L] [Algebra (IsLocalRing.ResidueField (Valued.integer K')) (IsLocalRing.ResidueField (Valued.integer L))] [Algebra.IsSeparable (IsLocalRing.ResidueField (Valued.integer K')) (IsLocalRing.ResidueField (Valued.integer L))] [CompleteSpace K']
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra.IsSeparable K L] [Algebra K K'] [Algebra.IsSeparable K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK'.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [Algebra.IsSeparable K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField (Valued.integer K')) (IsLocalRing.ResidueField (Valued.integer L))] [CompleteSpace K']
 
 variable [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [IsValExtension vK.v vK'.v] [IsValExtension vK.v vL.v]
 
@@ -548,13 +548,14 @@ theorem lowerIndex_eq_phi_FuncJ_of_ne_refl (hsig : σ ≠ .refl) (x : PowerBasis
     exact h
     norm_cast
     apply ramificationIdx_ne_zero
-  rw [← Nat.cast_mul, prop3_aux (K := K) (K' := K') (L := L) σ hsig hs1 x y, phi_eq_sum_inf, RamificationIdx_eq_card_of_inertia_group, sub_add_cancel, ← mul_assoc, mul_one_div_cancel, one_mul, Nat.cast_sum]
+  rw [← Nat.cast_mul, prop3_aux (K := K) (K' := K') (L := L) σ hsig hs1 x y, phi_eq_sum_inf_aux, RamificationIdx_eq_card_of_inertia_group, sub_add_cancel, ← mul_assoc, mul_one_div_cancel, one_mul, Nat.cast_sum]
   apply Finset.sum_congr rfl
   intro x hx
   simp only [sub_add_cancel]
   apply lowerIndex_eq_inf σ hsig hs1 hs2 hgen
   norm_cast
   apply ramificationIdx_ne_zero
+  repeat sorry 
   -- let e : (L ≃ₐ[K'] L) → ↑(⇑(restrictNormalHom K' (K₁ := L)) ⁻¹' {σ}) := fun x => ⟨(AlgEquiv.restrictScalarsHom K x) * s⁻¹, by
   --   simp only [Set.mem_preimage, _root_.map_mul, _root_.map_inv, Set.mem_singleton_iff, AlgEquiv.restrictNormalHom_restrictScalarsHom, one_mul]
   --   simp only [Set.mem_preimage, Set.mem_singleton_iff] at hs1
@@ -591,8 +592,9 @@ theorem lemma3_aux' (u : ℚ) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis �
     conv =>
       right
       simp only [hsig, truncatedJ_refl]
-    rw [phi_eq_sum_inf K' L, RamificationIdx_eq_card_of_inertia_group]
+    rw [phi_eq_sum_inf_aux K' L, RamificationIdx_eq_card_of_inertia_group]
     simp only [sub_add_cancel, truncatedLowerIndex_restrictScalars]
+    repeat sorry
   · have h : ¬ lowerIndex K K' σ = ⊤ := by
       apply lowerIndex_ne_one ?_ hsig
       apply mem_decompositionGroup σ
@@ -607,8 +609,9 @@ theorem lemma3_aux' (u : ℚ) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis �
     by_cases hu : min (phi K' L u + 1) ↑(WithTop.untop ( i_[K'/K] σ) h) = phi K' L u + 1
     · have hu' : truncatedJ L (u + 1) σ = u := by
         apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen).1 hu
-      rw [hu, hu', phi_eq_sum_inf, RamificationIdx_eq_card_of_inertia_group]
+      rw [hu, hu', phi_eq_sum_inf_aux, RamificationIdx_eq_card_of_inertia_group]
       simp only [one_div, Finset.top_eq_univ, sub_add_cancel, truncatedLowerIndex_restrictScalars, Finset.subset_univ, Finset.sum_sdiff_eq_sub, Finset.sum_singleton, truncatedLowerIndex_refl]
+      repeat sorry
     · have hu' : truncatedJ L (u + 1) σ = ((WithTop.untop (FuncJ L σ) (FuncJ_untop_of_nerefl σ hsig))) - 1 := by
         suffices h : ¬ truncatedJ L (u + 1) σ = u from by
           simp only [truncatedJ_eq_truncated_FuncJ, FuncJ_untop_of_nerefl σ hsig, ↓reduceDIte, add_sub_cancel_right] at h ⊢
@@ -622,6 +625,7 @@ theorem lemma3_aux' (u : ℚ) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis �
         absurd hu
         apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen).2 hc
       simp only [Classical.or_iff_not_imp_left.1 (min_choice (phi K' L u + 1) (↑(WithTop.untop ( i_[K'/K] σ) h))) hu, hu']
-      rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen, phi_eq_sum_inf, RamificationIdx_eq_card_of_inertia_group, sub_add_cancel]
+      rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen, phi_eq_sum_inf_aux, RamificationIdx_eq_card_of_inertia_group, sub_add_cancel]
       simp only [one_div, Finset.top_eq_univ, truncatedLowerIndex_restrictScalars, Finset.subset_univ, Finset.sum_sdiff_eq_sub, Finset.sum_singleton, truncatedLowerIndex_refl, sub_add_cancel]
+      repeat sorry
     exact Finset.sdiff_disjoint

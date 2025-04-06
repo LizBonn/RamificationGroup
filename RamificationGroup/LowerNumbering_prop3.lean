@@ -1,4 +1,5 @@
 import RamificationGroup.LowerNumbering
+import Mathlib.FieldTheory.KrullTopology
 
 #check lowerIndex_of_powerBasis
 #check PowerBasisValExtension
@@ -19,22 +20,10 @@ variable {K M L : Type*} [Field K] [Field M] [Field L]
 [Algebra.IsSeparable K L] [Algebra.IsSeparable M L] [Algebra.IsSeparable K M]
 [CompleteSpace K] [CompleteSpace M]
 
--- #synth FiniteDimensional M L
-
-#check AlgEquiv.restrictNormalHom_surjective
-
 variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
-#check s.restrictNormal M
-#check (AlgEquiv.restrictNormalHom (K₁ := L) M)⁻¹' {σ}
-#synth Finite ((AlgEquiv.restrictNormalHom (K₁ := L) M)⁻¹' {σ})
-#check Finset.sum
 
-#check LocalField
-
---#check aux2 K L
 open AlgEquiv Classical
 
-#check Eq.subst
 theorem preimage_nerefl (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((restrictNormalHom M)⁻¹' {σ})) : s ≠ .refl := by
   by_contra hc
   have h : (restrictNormalHom M) (.refl (A₁ := L)) = .refl (R := K) := (restrictNormalHom M).map_one
@@ -42,7 +31,6 @@ theorem preimage_nerefl (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((
   absurd hsig
   exact id (Eq.symm hs)
 
-#check AlgEquiv.val_map_powerBasis_sub_ne_zero
 theorem val_mappb_sub_self_toAdd_nonpos {s : L ≃ₐ[K] L} (hs : s ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) : 0 ≤ -Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero x hs)) := by
   rw [← toAdd_one, ← toAdd_inv]
   apply Multiplicative.toAdd_le.2
@@ -51,20 +39,6 @@ theorem val_mappb_sub_self_toAdd_nonpos {s : L ≃ₐ[K] L} (hs : s ≠ .refl) (
   simp only [WithZero.coe_unzero, WithZero.coe_one]
   apply val_map_sub_le_one _ x.gen
   exact mem_decompositionGroup s
-
--- @[coe, match_pattern] def WithZero.some {α : Type*} : α → WithTop α :=
---   Option.some
-
--- def addHom {α : Type*} [AddZeroClass α] : α →+ WithZero α where
---   toFun := WithTop.some
---   map_zero' := by
---     simp only [WithTop.coe_zero]
---     sorry
---   map_add' _ _ := rfl
-
-#check Nat.cast_prod
-#check WithTop.coe_sum
-#check WithZero
 
 def WithZero.some {α : Type*} : α → WithZero α :=
   Option.some
@@ -201,103 +175,9 @@ theorem Valuation.prolongs_by_ramificationIndex {x : M} (hx1 : x ∈ vM.v.valuat
   simp only [← MulMemClass.coe_mul, ← SubmonoidClass.coe_pow] at hnu1
   apply Subtype.coe_inj.1 hnu1
 
-
-  -- apply Uniformizer_pow_eq_of_associated hpiL
-  -- let u3 : (vL.v.valuationSubring)ˣ := {
-  --   val := ⟨(u.1.1 ^ n1) * (algebraMap M L u1.1.1) * u2.1.1⁻¹, by
-  --     apply ValuationSubring.mul_mem
-  --     · apply ValuationSubring.mul_mem
-  --       · exact pow_mem u.1.2 n1
-  --       · refine (mem_valuationSubring_iff v ((algebraMap M L) ↑↑u1)).mpr ?_
-  --         refine (IsValExtension.val_map_le_one_iff u1.1.1).mpr ?_
-  --         apply (mem_valuationSubring_iff v u1.1.1).1 u1.1.2
-  --     · sorry
-  --     ⟩
-  --   inv := ⟨u2.1.1 * (algebraMap M L u1.1.1⁻¹) * (u.1.1⁻¹) ^ n1, sorry⟩
-  --   val_inv := by sorry
-  --   inv_val := by sorry
-  -- }
-  -- use u3
-  -- simp only [u3]
-  -- rw [← mul_assoc]
-  -- --this might be simpler
-  -- have h : ↑πL ^ (n1 * n) * ((↑↑u ^ n1) * (algebraMap M L) ↑↑u1) = ↑πL ^ n2 * u2.1.1 := by
-  --   rw [hnu1, pow_mul, mul_pow]
-  --   ring
-  -- simp only [h, isUnit_iff_ne_zero, ne_eq, ZeroMemClass.coe_eq_zero, Units.ne_zero,
-  --   not_false_eq_true, IsUnit.mul_inv_cancel_right]
-
-
 open Polynomial Algebra
 
--- #synth CommMonoid (Multiplicative ℤ)
--- #check Valuation
--- --i_G/H σ = (1 / e_L/K) * ∑_{s → σ} i_G s
--- #check toAdd_prod
--- #check Valuation.map_mul
--- #check Valuation.map_eq_of_sub_lt
-
--- theorem exsit_preimage : ∃ s : (L ≃ₐ[K] L), (restrictNormalHom M) s = σ := by
---   apply AlgEquiv.restrictNormalHom_surjective
-
--- #check Subalgebra K L
--- #check AlgEquiv.restrictValuationSubring_apply
--- theorem adjoin_val_gen_eq_top (x : PowerBasis 𝒪[K] 𝒪[L]) : adjoin K {x.gen.1} = ⊤ := by
---   rw [adjoin_singleton_eq_range_aeval]
---   ext t
---   constructor <;> intro ht
---   · trivial
---   · cases' h : ValuationSubring.mem_or_inv_mem vL.v.valuationSubring t with h1 h1
---     · obtain ⟨f, hf⟩ := Algebra.exists_eq_aeval_generator (PowerBasis.adjoin_gen_eq_top x) (⟨t, h1⟩ : vL.v.valuationSubring)
---       use Polynomial.ofSubring 𝒪[K] f
---       simp only [AlgHom.toRingHom_eq_coe, RingHom.coe_coe]
---       simp only [← Subtype.coe_inj] at hf
---       rw [hf]
---       rw [aeval_eq_sum_range, aeval_eq_sum_range]
---       have heq : (Polynomial.ofSubring 𝒪[K] f).natDegree = f.natDegree := by
---         simp only [Polynomial.ofSubring]
---         rw [Polynomial.natDegree_sum_eq_of_disjoint]
---         simp only [natDegree_monomial, ZeroMemClass.coe_eq_zero]
---         by_cases hc : f = 0
---         · simp only [hc, support_zero, coeff_zero, ↓reduceIte, Finset.sup_empty, bot_eq_zero',natDegree_zero]
---         · apply le_antisymm
---           · apply Finset.sup_le
---             intro b hb
---             by_cases hc : f.coeff b = 0
---             · simp only [hc, ↓reduceIte, zero_le]
---             · simp only [hc, ↓reduceIte]
---               exact le_natDegree_of_mem_supp b hb
---           · by_cases hc' : f.natDegree = 0
---             · rw [hc']
---               simp only [zero_le]
---             · apply (Finset.le_sup_iff _).2
---               use f.natDegree
---               constructor
---               · apply natDegree_mem_support_of_nonzero hc
---               · have hne : f.coeff f.natDegree ≠ 0 := mem_support_iff.mp (natDegree_mem_support_of_nonzero hc)
---                 simp only [hne, ↓reduceIte, le_refl]
---               rw [bot_eq_zero']
---               by_contra hcon
---               simp only [not_lt, nonpos_iff_eq_zero] at hcon
---               absurd hc'
---               exact hcon
---         simp only [mem_support_iff, ne_eq, monomial_eq_zero_iff, ZeroMemClass.coe_eq_zero, and_self]
---         intro a ha b hb hab
---         simp only [Set.mem_setOf_eq] at ha hb
---         simp only [ne_eq, Function.comp_apply, natDegree_monomial, ZeroMemClass.coe_eq_zero, ha, ↓reduceIte, hb]
---         exact hab
---       simp only [heq, AddSubmonoidClass.coe_finset_sum]
---       apply Finset.sum_congr rfl
---       intro i hi
---       rw [coeff_ofSubring]
---       rfl
---     · obtain ⟨f, hf⟩ := Algebra.exists_eq_aeval_generator (PowerBasis.adjoin_gen_eq_top x) (⟨t⁻¹, h1⟩ : vL.v.valuationSubring)
-
-
---       sorry
-
 theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[M] L)} : AlgEquiv.restrictNormalHom M (AlgEquiv.restrictScalarsHom K x) = 1 := by sorry
-
 
 def i (s : L ≃ₐ[K] L) (hs : (restrictNormalHom M) s = σ) (a : { x // x ∈ ((restrictNormalHom (K₁ := L) M) ⁻¹' {σ}).toFinset }) (ha : a ∈ (⇑(restrictNormalHom M) ⁻¹' {σ}).toFinset.attach) : L ≃ₐ[M] L where
   toFun x := (s⁻¹ * a) x
@@ -331,7 +211,6 @@ def i (s : L ≃ₐ[K] L) (hs : (restrictNormalHom M) s = σ) (a : { x // x ∈ 
     rw [hx]
 
 
-#check (restrictNormalHom M).map_inv
 theorem aux_10 (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L) (hs : (restrictNormalHom M) s = σ) (x : PowerBasis 𝒪[K] 𝒪[L]) : ∏ x_1 ∈ (⇑(restrictNormalHom M) ⁻¹' {σ}).toFinset.attach, (x_1.1 x.gen.1 - x.gen.1) = ∏ x_1 ∈ (⊤ : Set (L ≃ₐ[M] L)).toFinset, (s (x_1 ↑x.gen) - ↑x.gen) := by
   apply Finset.prod_bij (i σ s hs)
   · intro a ha
@@ -387,13 +266,12 @@ theorem algEquiv_valuationSubring {s : L ≃ₐ[K] L} (t : 𝒪[L]) : s t ∈ �
 
 theorem algEquiv_eq_refl_of_map_powerbasis {s : L ≃ₐ[K] L} {σ : M ≃ₐ[K] M} (hs : s.restrictNormal M = σ) (y : PowerBasis 𝒪[K] 𝒪[M]) (hc : s ((algebraMap M L) ↑y.gen) - (algebraMap M L) ↑y.gen = 0) : σ = AlgEquiv.refl := by
   simp only [sub_eq_zero, ← AlgEquiv.restrictNormal_commutes, hs] at hc
-  apply NoZeroSMulDivisors.algebraMap_injective M L at hc
+  apply FaithfulSMul.algebraMap_injective M L at hc
   rw [eq_iff_ValuationSubring]
   apply PowerBasis.algHom_ext' y
   rw [← Subtype.val_inj, AlgEquiv.restrictValuationSubring_apply, AlgEquiv.restrictValuationSubring_apply, coe_refl, id_eq]
   exact hc
 
-#help tactic cases
 
 instance : IsScalarTower 𝒪[K] 𝒪[M] 𝒪[L] where
   smul_assoc x y z := SetLike.coe_eq_coe.mp (IsScalarTower.smul_assoc x.1 y.1 z.1)
@@ -411,15 +289,10 @@ set_option maxHeartbeats 0
 
 open IntermediateField
 
-
 theorem AlgEquiv.mem_of_all_apply_eq_self (l : L) (hx : ∀ σ : L ≃ₐ[M] L, σ l = l) : ∃ m : M, algebraMap M L m = l := by
-  #check IsGalois.fixedField_fixingSubgroup
-  #check IntermediateField.fixingSubgroupEquiv
   have hfix : fixedField (⊤ : Subgroup (L ≃ₐ[M] L)) = (⊥ : IntermediateField M L) := by
     have : fixedField (⊤ : Subgroup (L ≃ₐ[M] L)) = fixedField (fixingSubgroup (⊥ : IntermediateField M L)) := by
-      sorry
-      -- this theorem exist in new version
-      --simp [fixingSubgroup_bot]
+      simp [IntermediateField.fixingSubgroup_bot]
     rw [this]
     haveI : IsGalois M L := IsGalois.mk
     apply IsGalois.fixedField_fixingSubgroup
@@ -552,15 +425,6 @@ theorem aux_16 (x : PowerBasis 𝒪[K] 𝒪[L]) : ∀ n : ℕ, ∃ m : M, algebr
       exact monic_X_sub_C (i ↑x.gen)
     rw [hlead]
     simp only [_root_.map_one, one_mul, mul_eq_mul_left_iff, pow_eq_zero_iff', neg_eq_zero, one_ne_zero, ne_eq, false_and, or_false, f]
---       simp only [i1, Subtype.mk.injEq] at ha
---       rw [eq_iff_ValuationSubring]
---       apply_fun restrictScalars 𝒪[K]
---       apply PowerBasis.algHom_ext' x
---       rw [← AlgEquiv.restrictValuationSubring_apply, ← AlgEquiv.restrictValuationSubring_apply] at ha
---       simp only [Subtype.val_inj] at ha
---       simp only [restrictScalars_apply]
---       exact ha
---       exact restrictScalarsHom_injective ↥𝒪[K]
     simp only [aux_15, Polynomial.roots_prod_X_sub_C, Set.image_univ, Set.toFinset_range, Finset.image_val, Multiset.esymm, map_multiset_sum, Multiset.map_map, Function.comp_apply, map_multiset_prod]
     congr 1
     apply aux_17 x σ
@@ -570,12 +434,6 @@ theorem aux_16 (x : PowerBasis 𝒪[K] 𝒪[L]) : ∀ n : ℕ, ∃ m : M, algebr
       refine splits_prod (RingHom.id L) ?_
       intro i hi
       exact splits_X_sub_C (RingHom.id L)
-    -- rw [← map_id (R := L) (p := f)]
-    -- symm
-    -- apply natDegree_eq_card_roots' (i := RingHom.id L)
-    -- refine splits_prod (RingHom.id L) ?_
-    -- intro i hi
-    -- exact splits_X_sub_C (RingHom.id L)
   · push_neg at hc
     simp only [coeff_eq_zero_of_natDegree_lt hc, f]
     exact map_zero σ
@@ -633,8 +491,6 @@ theorem algEquiv_mem_minpoly_roots (x : PowerBasis 𝒪[K] 𝒪[L]) : Multiset.m
   · refine Multiset.subset_iff.mpr ?_
     intro t ht
     rw [Multiset.mem_map] at ht
-    -- simp only [Finset.mem_val, Finset.mem_univ, true_and] at ht
-    -- simp only [Finset.mem_univ, true_and] at ht
     obtain ⟨a, ha⟩ := ht
     rw [Finset.mem_val] at ha
     rcases ha with ⟨ha1, ha2⟩
@@ -651,7 +507,15 @@ theorem algEquiv_mem_minpoly_roots (x : PowerBasis 𝒪[K] 𝒪[L]) : Multiset.m
       use (⟨a x.gen, algEquiv_PowerBasis_mem_valuationSubring x a⟩ : 𝒪[L])
       exact ⟨h, rfl⟩
 
--- #synth FaithfulSMul 𝒪[M] M
+instance : FaithfulSMul 𝒪[M] M where
+  eq_of_smul_eq_smul := by
+    intro m1 m2 ha
+    have ha' : ∀ a : M, (m1 : M) • a = (m2 : M) • a := fun a ↦ ha a
+    simp only [smul_eq_mul, mul_eq_mul_right_iff, SetLike.coe_eq_coe] at ha'
+    replace ha := ha' 1
+    simp only [one_ne_zero, or_false] at ha
+    exact ha
+
 theorem aux_14 (x : PowerBasis 𝒪[K] 𝒪[L]) : ∏ x_1 : L ≃ₐ[M] L, (X - C (⟨x_1 ↑x.gen, algEquiv_PowerBasis_mem_valuationSubring x x_1⟩ : 𝒪[L])) = ∏ t : { y // y ∈ (Polynomial.map (algebraMap 𝒪[M] 𝒪[L]) (minpoly 𝒪[M] x.gen)).roots}, (X - C t.1) := by
   apply Finset.prod_bij (i1 x)
   · intro a ha
@@ -713,12 +577,10 @@ theorem aux_14 (x : PowerBasis 𝒪[K] 𝒪[L]) : ∏ x_1 : L ≃ₐ[M] L, (X - 
     have hdegree' : (minpoly 𝒪[M] x.gen).degree = (Polynomial.map (algebraMap (↥𝒪[M]) M) (minpoly (↥𝒪[M]) x.gen)).degree := by
       symm
       apply Polynomial.degree_map_eq_of_injective
-      sorry
-      --refine FaithfulSMul.algebraMap_injective ?_ M
-    --   apply Polynomial.degree_map_eq_of_injective (NoZeroSMulDivisors.algebraMap_injective (↥𝒪[M]) M)
+      refine FaithfulSMul.algebraMap_injective 𝒪[M] M
     rw [hdegree', ← hmp]
     apply minpoly.min M _
-    · simp only [Function.Injective.monic_map_iff (NoZeroSMulDivisors.algebraMap_injective M L), hf', f]
+    · simp only [Function.Injective.monic_map_iff (FaithfulSMul.algebraMap_injective M L), hf', f]
       apply monic_prod_of_monic
       intro i hi
       exact monic_X_sub_C (i ↑x.gen)
@@ -819,8 +681,7 @@ theorem aux_11 (x : PowerBasis 𝒪[K] 𝒪[L]) : Polynomial.map (algebraMap �
   apply Normal.splits
   infer_instance
   exact FaithfulSMul.algebraMap_injective M L
-  sorry
-  --exact NoZeroSMulDivisors.algebraMap_injective (↥𝒪[M]) M
+  exact FaithfulSMul.algebraMap_injective (↥𝒪[M]) M
   exact IsValExtension.integerAlgebra_injective M L
 
 theorem aux_1 (σ : M ≃ₐ[K] M) (hσ : σ ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[M]) [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[M]) (IsLocalRing.ResidueField 𝒪[L])] : ∃ t : 𝒪[L], (∏ x_1 ∈ (⇑(restrictNormalHom M (K₁ := L)) ⁻¹' {σ}).toFinset.attach, (x_1.1 x.gen - x.gen)) = (algebraMap M L) (σ ↑y.gen - ↑y.gen) * t := by
@@ -970,7 +831,6 @@ theorem aux_2 (σ : M ≃ₐ[K] M) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBa
       use g
       rw [hg]
       simp only [eval_map_algebraMap]
-    -- have hmin : f = Polynomial.map (algebraMap M L) (minpoly M x.gen.1) := by sorry
     obtain ⟨g, hg⟩ := hy
     let g_sub_y := Polynomial.map (algebraMap 𝒪[K] 𝒪[M]) g - C y.gen
     have ha : - a = eval x.gen (Polynomial.map e  (Polynomial.map (algebraMap 𝒪[M] 𝒪[L]) g_sub_y)) := by
@@ -1155,15 +1015,3 @@ theorem prop3
         apply (mem_valuationSubring_iff _ _).1 t.2
       rw [← Multiplicative.toAdd_le, toAdd_ofAdd, toAdd_ofAdd] at hle
       exact_mod_cast hle
-
-
--- #help tactic conv
-
---     /- Need:
---     2. all valuations are discrete
---     3. 𝒪[L] / 𝒪[M] admits a power basis b, so that the minpoly of b over M has coeff in 𝒪[M]
---     -/
-
--- section aux
-
--- variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension K' L] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K']

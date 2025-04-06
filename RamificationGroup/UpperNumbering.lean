@@ -1,10 +1,10 @@
 import RamificationGroup.LowerNumbering
 import Mathlib.RingTheory.Valuation.Basic
 import Mathlib.FieldTheory.KrullTopology
-import RamificationGroup.HerbrandFunction
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
+import RamificationGroup.Herbrand_aux
 -- import RamificationGroup.Valued.Hom.Discrete'
 
 /-!
@@ -79,7 +79,6 @@ theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K')
       simp only [Set.surjOn_singleton, Set.mem_image, Set.mem_preimage, Set.mem_singleton_iff, and_self]
       apply AlgEquiv.restrictNormalHom_surjective
     apply Set.SurjOn.comap_nonempty h1 (by simp)
-  --i'm not sure this condition below is satisfy in our sugestion.If the extension is finite, this proof make sense.
   have hfin : Finite ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) := by
     have hfin' : (⊤ : Set (L ≃ₐ[K] L)).Finite := by
       exact Set.toFinite ⊤
@@ -112,10 +111,6 @@ theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K')
 
 variable {σ : K' ≃ₐ[K] K'}
 
-#check exist_truncatedLowerIndex_eq_truncatedJ 1 σ
---they should in lower
---theorem prop2_aux {t : L ≃ₐ[K'] L} : i_[L/K] (t.restrictScalars K) = i_[L/K'] t := by
-  --sorry
 
 theorem lemma3_aux (u : ℚ) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L (u + 1) σ + 1) (AlgEquiv.restrictScalars K s))) := by
   sorry
@@ -126,13 +121,14 @@ theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (Loc
   simp only [lowerRamificationGroup, LocalField.ramificationIdx, IsLocalRing.ramificationIdx]
   sorry
 
-variable [Algebra (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
+variable [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K']
 
 theorem phi_truncatedJ_sub_one (u : ℚ) (σ : K' ≃ₐ[K] K') : phi K' L (truncatedJ L (u + 1) σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
   calc
   _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
-    rw [phi_eq_sum_inf]
+    rw [phi_eq_sum_inf_aux]
     simp
+    repeat sorry
   _ = (1 / LocalField.ramificationIdx K' L) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
     congr
     apply RamificationIdx_eq_card_of_inertia_group
