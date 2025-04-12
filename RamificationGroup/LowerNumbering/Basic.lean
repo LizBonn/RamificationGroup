@@ -23,9 +23,6 @@ rename theorems, many theorem should be named as LowerRamificationGroup.xxx, not
 
 open DiscreteValuation Valued Valuation
 
-
--- <-1 decomposition group
--- >= -1 decompositiongroup and v (s x - x) ≤ 1
 section def_lower_rami_grp
 
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [vS : Valued S ℤₘ₀] [Algebra R S]
@@ -281,7 +278,6 @@ theorem decomp_iSup_val_map_sub_eq_generator {gen : 𝒪[L]} (hgen : Algebra.adj
     rw [← ha.2, show s a - a = s (⟨a, ha.1⟩ : 𝒪[L]) - (⟨a, ha.1⟩ : 𝒪[L]) by rfl]
     apply decomp_val_map_sub_le_generator hgen hs'
 
-
 end adjoin_singleton
 
 end lowerIndex_inequality
@@ -355,7 +351,7 @@ section K_is_field
 variable {K L : Type*} [Field K] [Field L]
 [vK : Valued K ℤₘ₀] [vL : Valued L ℤₘ₀] [Algebra K L] [IsValExtension vK.v vL.v]
 
-omit [IsValExtension vK.v vL.v] in
+omit [IsValExtension vK.v vL.v] vK in
 theorem mem_lowerRamificationGroup_of_le_neg_one {s : L ≃ₐ[K] L} (hs : s ∈ decompositionGroup K L) {u : ℤ} (hu : u ≤ -1) : s ∈ G(L/K)_[u] := by
   unfold lowerRamificationGroup
   simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq]
@@ -462,7 +458,8 @@ theorem mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one {s : L ≃�
       convert (mem_lowerRamificationGroup_iff_of_generator hgen hs' ⌈u⌉.toNat).2 this
       exact Eq.symm hu'
 
-variable [IsDiscrete vK.v] [IsDiscrete vL.v] [IsValExtension vK.v vL.v] [CompleteSpace K] [FiniteDimensional K L]
+variable [IsDiscrete vK.v] [IsDiscrete vL.v] [CompleteSpace K] [FiniteDimensional K L]
+
 
 theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃ₐ[K] L) (u : ℚ) (r : ℚ) (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ i_[L/K]ₜ r s - 1 ↔ s ∈ G(L/K)_[⌈u⌉] := by
   by_cases hu : u ≤ -1
@@ -522,8 +519,6 @@ theorem le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (s : L ≃
             exact (WithTop.le_untop_iff (of_eq_false (eq_false hc))).mpr h1
         linarith [hle]
 
-
-
 end K_is_field
 
 end lowerIndex_inequality
@@ -577,11 +572,12 @@ section eq_bot
 open ExtDVR IsValExtension Polynomial
 
 -- `IsDiscrete vK.v` may be weakened to `Nontrivial vK.v`.
-variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [Algebra.IsSeparable K L]
+variable (K L : Type*) [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L]
 
 variable {K L}
 variable [CompleteSpace K]
 
+omit [CompleteSpace K] in
 theorem AlgEquiv.mem_decompositionGroup [CompleteSpace K] (s : L ≃ₐ[K] L) : s ∈ decompositionGroup K L := by
   rw [decompositionGroup_eq_top]
   exact Subgroup.mem_top s
@@ -601,13 +597,46 @@ instance : IsLocalHom (algebraMap 𝒪[K] 𝒪[L]) where
           rw [IsValExtension.val_map_eq_one_iff (vA := vL.v) (vR := vK.v)] at hr
           exact hr
 
-instance : Module.Finite 𝒪[K] 𝒪[L] := Module.IsNoetherian.finite 𝒪[K] 𝒪[L]
+instance [Algebra.IsSeparable K L] : Module.Finite 𝒪[K] 𝒪[L] := Module.IsNoetherian.finite 𝒪[K] 𝒪[L]
+
+theorem lowerIndex_inf_le_mul (s t : L ≃ₐ[K] L) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : min (i_[L/K] s) (i_[L/K] t) ≤ i_[L/K] (s * t) := by
+  by_cases hc : i_[L/K] (s * t) = ⊤
+  · rw [hc]
+    exact le_top
+  · have h1 : ∃ n : ℕ, i_[L/K] (s * t) = n := by
+      use (WithTop.untop (i_[L/K] (s * t)) hc)
+      symm
+      apply WithTop.coe_untop
+    obtain ⟨n, hn⟩ := h1
+    have h2 : s * t ∉ G(L/K)_[n] := by
+      by_contra hc'
+      absurd hn
+      have hn' : n + 1 ≤ i_[L/K] (s * t) := by
+        apply (mem_lowerRamificationGroup_iff_of_generator hgen _ _).1 hc'
+        exact AlgEquiv.mem_decompositionGroup (s * t)
+      absurd hn
+      apply ne_of_gt
+      apply (ENat.add_one_le_iff (ENat.coe_ne_top n)).1 hn'
+    by_contra hc'
+    absurd h2
+    push_neg at hc'
+    rw [lt_min_iff, hn] at hc'
+    have h3 : s ∈ G(L/K)_[n] := by
+      apply (mem_lowerRamificationGroup_iff_of_generator hgen _ _).2
+      exact Order.add_one_le_of_lt hc'.1
+      exact AlgEquiv.mem_decompositionGroup s
+    have h4 : t ∈ G(L/K)_[n] := by
+      apply (mem_lowerRamificationGroup_iff_of_generator hgen _ _).2
+      exact Order.add_one_le_of_lt hc'.2
+      exact AlgEquiv.mem_decompositionGroup t
+    exact (Subgroup.mul_mem_cancel_right G(L/K)_[↑n] h4).mpr h3
+
 
 set_option synthInstance.maxHeartbeats 1000000
 
-theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := by
+omit [CompleteSpace K] in
+theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] [Algebra.IsSeparable K L] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := by
   apply ExtDVR.exists_primitive (A := 𝒪[K]) (B := 𝒪[L]) algebraMap_injective
-
 
 --can delete the assumption of generator.
 /-- Should be strenthened to ` > 0`-/
@@ -618,6 +647,7 @@ theorem AlgEquiv.val_map_generator_sub_ne_zero {gen : 𝒪[L]} (hgen : Algebra.a
   rw [AlgEquiv.eq_iff_ValuationSubring]
   apply Algebra.algHomClass_ext_generator hgen
   ext; simp only [AlgEquiv.restrictValuationSubring_apply, h, AlgEquiv.coe_refl, id_eq]
+
 
 /--  The orginal proof uses `PowerBasis.adjoin_gen_eq_top`.
 Should be strenthened to ` > 0`-/
@@ -717,6 +747,7 @@ theorem aux7 [Algebra.IsSeparable K L] [Algebra.IsSeparable (IsLocalRing.Residue
   apply lt_asymm hs this
 
 -- this uses local fields and bichang's work, check if the condition is too strong..., It should be O_L is finitely generated over O_K
+omit [CompleteSpace K] in
 theorem exist_lowerRamificationGroup_eq_bot [CompleteSpace K] [Algebra.IsSeparable K L][Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] :
     ∃ u : ℤ, G(L/K)_[u] = ⊥ := by
   by_cases h : Nontrivial (L ≃ₐ[K] L)

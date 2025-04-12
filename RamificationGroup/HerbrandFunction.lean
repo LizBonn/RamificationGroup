@@ -8,6 +8,7 @@ import Mathlib.Data.Int.Cast.Basic
 
 open DiscreteValuation Subgroup Set Function Finset BigOperators Int Valued
 
+#check Rat.instFloorRing
 theorem ceil_nonpos {u : ℚ} (h : u ≤ 0) : ⌈u⌉ ≤ 0 := by
   by_contra h
   push_neg at *
@@ -187,11 +188,14 @@ theorem insert_Icc_right (a b : ℤ) (h : a ≤ b) : Finset.Icc a b = insert b (
     apply Finset.Icc_subset_Icc
     rfl; linarith
 
+#check Int.instLocallyFiniteOrder
 theorem sum_insert_left_aux (a b : ℤ) (ha : a ≤ b) (f : ℤ → ℕ) : (∑ x in Finset.Icc a b, f x) - f a = (∑ x in Finset.Icc (a + 1) b, f x):= by
   calc
     _ = ∑ x in insert a (Finset.Icc (a + 1) b), f x - f a := by
       rw [insert_Icc_left _ _ ha]
-    _ = (∑ x in Finset.Icc (a + 1) b, f x) := by simp
+    _ = (∑ x in Finset.Icc (a + 1) b, f x) := by simp only [Finset.mem_Icc,
+      add_le_iff_nonpos_right, reduceLE, false_and, not_false_eq_true, sum_insert,
+      add_tsub_cancel_left]
 
 theorem sum_insert_left_aux' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℤ) : (∑ x in Finset.Icc a b, f x) - f a = (∑ x in Finset.Icc (a + 1) b, f x) := by
   calc
@@ -357,7 +361,7 @@ open scoped Classical
 
 variable (K L : Type*) {ΓK : outParam Type*} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Valuation.IsDiscrete vL.v] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L]
 
-noncomputable def G_diff (i : ℤ) : Finset (L ≃ₐ[K] L) := ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset
+-- noncomputable def G_diff (i : ℤ) : Finset (L ≃ₐ[K] L) := ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset
 noncomputable def Ramification_Group_diff (i : ℤ) : Finset (L ≃ₐ[K] L) := ((G(L/K)_[i] : Set (L ≃ₐ[K] L)) \ (G(L/K)_[(i + 1)] : Set (L ≃ₐ[K] L))).toFinset
 
 theorem Ramification_Group_Disjoint {i j : ℤ} {s : (L ≃ₐ[K] L)} (hi : s ∈ Ramification_Group_diff K L i) (hj : s ∈ Ramification_Group_diff K L j) (hij : i ≠ j) : s ∈ (⊥ : Finset (L ≃ₐ[K] L)) := by

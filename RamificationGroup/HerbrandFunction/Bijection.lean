@@ -1,4 +1,4 @@
-import RamificationGroup.Herbrand_aux
+import RamificationGroup.HerbrandFunction.SumInf
 import Mathlib.RingTheory.Valuation.Basic
 
 open scoped Classical
@@ -8,15 +8,9 @@ open DiscreteValuation Subgroup Set Function Finset BigOperators Int Valued
 variable (K L : Type*) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [vK : Valued K ℤₘ₀] [Valuation.IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Valuation.IsDiscrete vL.v] [Algebra K L] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [CompleteSpace K] [Algebra.IsSeparable K L]
 [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
 
--- variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
-theorem sum_insert_right_aux''' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℕ) : (∑ x in Finset.Icc a b, f x) = (∑ x in Finset.Icc a (b - 1), f x) + f b := by
-  calc
-    _ = ∑ x in insert b (Finset.Icc a (b - 1)), f x := by
-      rw [insert_Icc_right _ _ h]
-    _ = (∑ x in Finset.Icc a (b - 1), f x) + f b := by simp [add_comm]
-
-theorem aux_1 {n : ℤ} (hn : 1 ≤ n): (∑ x ∈ Finset.Icc 1 (⌈(n : ℚ) + 1⌉ - 1), Nat.card G(L/K)_[x]) - (∑ x ∈ Finset.Icc 1 (⌈(n : ℚ)⌉ - 1), Nat.card G(L/K)_[x]) = (Nat.card G(L/K)_[n]) := by
+theorem aux {n : ℤ} (hn : 1 ≤ n): (∑ x ∈ Finset.Icc 1 (⌈(n : ℚ) + 1⌉ - 1), Nat.card G(L/K)_[x]) - (∑ x ∈ Finset.Icc 1 (⌈(n : ℚ)⌉ - 1), Nat.card G(L/K)_[x]) = (Nat.card G(L/K)_[n]) := by
   simp only [ceil_add_one, ceil_intCast, add_sub_cancel_right]
   rw [sum_insert_right_aux''' 1 n hn (fun x => (Nat.card G(L/K)_[x]))]
   simp only [Nat.card_eq_fintype_card, add_tsub_cancel_left]
@@ -59,7 +53,7 @@ theorem phi_linear_section_aux {n : ℤ} {x : ℚ} (hx : n ≤ x ∧ x < n + 1) 
         rw [← sub_eq_iff_eq_add', ← mul_sub, ← sub_sub, add_comm, ← add_sub, add_comm, ← add_sub]
         calc
           _ = (1 / Nat.card G(L/K)_[0]) * ((Nat.card G(L/K)_[n]) +  ((x - (max 0 (⌈(n : ℚ) + 1⌉ - 1))) * (Nat.card G(L/K)_[⌈(n : ℚ) + 1⌉] ) - (n - (max 0 (⌈(n : ℚ)⌉ - 1))) * (Nat.card G(L/K)_[⌈(n : ℚ)⌉] ))) := by
-            rw [← Nat.cast_sub, aux_1 K L (n := n)]
+            rw [← Nat.cast_sub, aux K L (n := n)]
             apply Int.le_of_sub_one_lt
             rw [sub_self]
             apply_mod_cast hc'

@@ -17,6 +17,15 @@ set_option synthInstance.maxHeartbeats 100000
 #check preimage_nhds_coinduced
 #check Filter.map_eq_map_iff_of_injOn
 
+
+#synth TopologicalSpace ℝ
+#synth UniformSpace ℝ
+#synth PseudoMetricSpace ℝ
+#check Real.pseudoMetricSpace
+#check UniformSpace.toTopologicalSpace
+#synth ContinuousNeg ℝ
+#synth IsTopologicalRing ℝ
+#check instIsTopologicalRingReal
 theorem nhds_neg_aux {x : ℝ} {k : Set ℝ} (h : k ∈ nhds x) : -k ∈ nhds (-x) := by
   rw [mem_nhds_iff] at *
   obtain ⟨m, hm1, hm2, hm3⟩ := h
@@ -185,7 +194,7 @@ theorem HasDerivWithinAt_inv_aux {E : Type u_1} [NormedAddCommGroup E] [NormedSp
   -- rw [Set.neg_Ioc, Set.mem_neg, neg_neg]
   -- exact hx
   rw [← Set.neg_Ioc a b] at hx
-  exact hx 
+  exact hx
   exact h
 
 theorem eq_of_has_deriv_left_eq {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℝ E] {f : ℝ → E} {a b : ℝ} {f' g : ℝ → E} (derivf : ∀ x ∈ Set.Ioc a b, HasDerivWithinAt f (f' x) (Set.Iic x) x) (derivg : ∀ x ∈ Set.Ioc a b, HasDerivWithinAt g (f' x) (Set.Iic x) x) (fcont : ContinuousOn f (Set.Icc a b)) (gcont : ContinuousOn g (Set.Icc a b)) (hi : f b = g b) (y : ℝ) : y ∈ Set.Icc a b → f y = g y := by

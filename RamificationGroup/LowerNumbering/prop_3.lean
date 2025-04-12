@@ -1,28 +1,21 @@
-import RamificationGroup.LowerNumbering
+import RamificationGroup.LowerNumbering.Basic
 import Mathlib.FieldTheory.KrullTopology
+import RamificationGroup.ForMathlib.WithZero.Basic
+import RamificationGroup.ForMathlib.Unknow
+import RamificationGroup.ForMathlib.DiscreteValuationRing.Basic
+import RamificationGroup.ForMathlib.AlgEquiv.Basic
 
 #check lowerIndex_of_powerBasis
 #check PowerBasisValExtension
 
 
-open LocalField DiscreteValuation Valued Valuation
+open LocalField DiscreteValuation Valued Valuation AlgEquiv Classical IsDiscreteValuationRing Polynomial Algebra
 
 variable {K M L : Type*} [Field K] [Field M] [Field L]
-[Algebra K L] [Algebra K M] [Algebra M L]
-[Normal K L]
-[IsScalarTower K M L]
-[FiniteDimensional K L] [FiniteDimensional K M] [FiniteDimensional M L]
-[Normal K M]
-[vK : Valued K ℤₘ₀] [IsDiscrete vK.v]
-[vM : Valued M ℤₘ₀] [IsDiscrete vM.v]
-[vL : Valued L ℤₘ₀] [IsDiscrete vL.v]
-[IsValExtension vK.v vL.v] [IsValExtension vM.v vL.v] [IsValExtension vK.v vM.v]
-[Algebra.IsSeparable K L] [Algebra.IsSeparable M L] [Algebra.IsSeparable K M]
-[CompleteSpace K] [CompleteSpace M]
+[Algebra K L] [Algebra K M] [Algebra M L] [IsScalarTower K M L] [Normal K M]
 
 variable (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L)
 
-open AlgEquiv Classical
 
 theorem preimage_nerefl (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((restrictNormalHom M)⁻¹' {σ})) : s ≠ .refl := by
   by_contra hc
@@ -31,6 +24,16 @@ theorem preimage_nerefl (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((
   absurd hsig
   exact id (Eq.symm hs)
 
+variable  [vK : Valued K ℤₘ₀] [vM : Valued M ℤₘ₀] [vL : Valued L ℤₘ₀]
+[Normal K L]
+[FiniteDimensional K L] [FiniteDimensional K M] [FiniteDimensional M L]
+[IsDiscrete vK.v] [IsDiscrete vM.v]
+[IsDiscrete vL.v]
+[IsValExtension vK.v vL.v] [IsValExtension vM.v vL.v] [IsValExtension vK.v vM.v]
+[Algebra.IsSeparable K L] [Algebra.IsSeparable M L] [Algebra.IsSeparable K M]
+[CompleteSpace K] [CompleteSpace M]
+
+omit [Normal K L] in
 theorem val_mappb_sub_self_toAdd_nonpos {s : L ≃ₐ[K] L} (hs : s ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) : 0 ≤ -Multiplicative.toAdd (WithZero.unzero (val_map_powerBasis_sub_ne_zero x hs)) := by
   rw [← toAdd_one, ← toAdd_inv]
   apply Multiplicative.toAdd_le.2
@@ -40,47 +43,14 @@ theorem val_mappb_sub_self_toAdd_nonpos {s : L ≃ₐ[K] L} (hs : s ≠ .refl) (
   apply val_map_sub_le_one _ x.gen
   exact mem_decompositionGroup s
 
-def WithZero.some {α : Type*} : α → WithZero α :=
-  Option.some
-
-def WithZero.MulHom {α : Type*} [Monoid α] : α →* WithZero α where
-  toFun := WithZero.some
-  map_one' := rfl
-  map_mul' _ _ := rfl
-
-theorem WithZero.coe_prod {α β : Type*} [CommMonoid β] {s : Finset α} {f : α → β} : (↑(∏ x ∈ s, f x) : WithZero β) =  (∏ x ∈ s, ↑(f x : WithZero β)) := by
-  simp only [WithZero.coe]
-  apply map_prod WithZero.MulHom f s
-
+omit [FiniteDimensional M L] [vK.v.IsDiscrete] [vM.v.IsDiscrete] [vL.v.IsDiscrete] [Algebra.IsSeparable M L] [CompleteSpace M] in
 theorem algebraMap_valuationSubring {x : M} (hx : x ∈ vM.v.valuationSubring) : (algebraMap M L x) ∈ vL.v.valuationSubring := (mem_valuationSubring_iff v ((algebraMap M L) x)).mpr ((IsValExtension.val_map_le_one_iff vM.v vL.v x).mpr hx)
 
+omit [FiniteDimensional M L] [Algebra.IsSeparable M L] [CompleteSpace M] in
 theorem algebraMap_valuationSubring_ne_zero {x : M} (hx1 : x ∈ vM.v.valuationSubring) (hx2 : (⟨x, hx1⟩ : vM.v.valuationSubring) ≠ 0) : (⟨algebraMap M L x, algebraMap_valuationSubring hx1⟩ : vL.v.valuationSubring) ≠ 0 := by
   apply Subtype.coe_ne_coe.1
   simp only [ZeroMemClass.coe_zero, ne_eq, map_eq_zero]
   apply Subtype.coe_ne_coe.2 hx2
-
-theorem IsDiscreteValuationRing.irreducible_of_uniformizer' (π : vL.v.valuationSubring) (hpi : vL.v.IsUniformizer π) : Irreducible π := (IsDiscreteValuationRing.irreducible_iff_uniformizer π).2  (DiscreteValuation.isUniformizer_is_generator v hpi)
-
-theorem sSup_eq_aux (n : ℕ) : sSup {n1 | n1 ≤ n} = n := by
-  apply le_antisymm
-  · exact csSup_le' fun ⦃a⦄ a ↦ a
-  · apply le_csSup
-    use n
-    unfold upperBounds
-    simp only [Set.mem_setOf_eq, imp_self, implies_true]
-    simp only [Set.mem_setOf_eq, le_refl]
-
-theorem DiscreteValuationRing.uniformizer_dvd_iff_le {n1 n2 : ℕ} {π : vL.v.valuationSubring} (hpi : vL.v.IsUniformizer π) : π ^ n1 ∣ π ^ n2 ↔ n1 ≤ n2 := by
-  constructor <;> intro h
-  · have hnezero : π ≠ 0 := by
-      apply_mod_cast uniformizer_ne_zero ⟨π, hpi⟩
-    have hneunit : ¬ IsUnit π := by
-      apply isUniformizer_not_isUnit hpi
-    apply (pow_dvd_pow_iff hnezero hneunit).1
-    obtain ⟨u1, hu1⟩ := h
-    use u1
-  · apply pow_dvd_pow
-    exact h
 
 omit [FiniteDimensional M L] [Algebra.IsSeparable M L] [CompleteSpace M] in
 theorem ramificationIdx_eq_uniformizer_pow {n : ℕ}
@@ -109,13 +79,12 @@ theorem ramificationIdx_eq_uniformizer_pow {n : ℕ}
   simp only [Subtype.coe_eta]
   exact hirrM
 
-open IsDiscreteValuationRing
-
 theorem ValuationSubring.inv_coe_eq_coe_inv_aux (u : (vL.v.valuationSubring)ˣ) : u.1.1⁻¹ = (u⁻¹).1.1 := by
   rw [← Units.inv_eq_val_inv]
   apply DivisionMonoid.inv_eq_of_mul u.1.1 u.inv ?_
   exact (Submonoid.mk_eq_one v.valuationSubring.toSubmonoid).mp u.val_inv
 
+-- omit [FiniteDimensional M L] [Algebra.IsSeparable M L] [CompleteSpace M]
 theorem Valuation.prolongs_by_ramificationIndex {x : M} (hx1 : x ∈ vM.v.valuationSubring) (hx2 : (⟨x, hx1⟩ : vM.v.valuationSubring) ≠ 0) : vM.v (x) ^ ramificationIdx M L = vL.v (algebraMap M L x) := by
   obtain ⟨πL, hpiL⟩ := exists_isUniformizer_of_isDiscrete vL.v
   obtain ⟨πM, hpiM⟩ := exists_isUniformizer_of_isDiscrete vM.v
@@ -175,9 +144,6 @@ theorem Valuation.prolongs_by_ramificationIndex {x : M} (hx1 : x ∈ vM.v.valuat
   simp only [← MulMemClass.coe_mul, ← SubmonoidClass.coe_pow] at hnu1
   apply Subtype.coe_inj.1 hnu1
 
-open Polynomial Algebra
-
-theorem AlgEquiv.restrictNormalHom_restrictScalarsHom {x : (L ≃ₐ[M] L)} : AlgEquiv.restrictNormalHom M (AlgEquiv.restrictScalarsHom K x) = 1 := by sorry
 
 def i (s : L ≃ₐ[K] L) (hs : (restrictNormalHom M) s = σ) (a : { x // x ∈ ((restrictNormalHom (K₁ := L) M) ⁻¹' {σ}).toFinset }) (ha : a ∈ (⇑(restrictNormalHom M) ⁻¹' {σ}).toFinset.attach) : L ≃ₐ[M] L where
   toFun x := (s⁻¹ * a) x
@@ -238,6 +204,7 @@ theorem aux_10 (σ : M ≃ₐ[K] M) (s : L ≃ₐ[K] L) (hs : (restrictNormalHom
     rw [← eq_symm_apply, eq_symm_apply, ← symm_symm s, eq_symm_apply]
     rfl
 
+set_option maxHeartbeats 0
 theorem algEquiv_PowerBasis_mem_valuationSubring (x : PowerBasis 𝒪[K] 𝒪[L]) : ∀ t : (L ≃ₐ[M] L), t x.gen ∈ 𝒪[L] := by
   intro t
   rw [mem_integer_iff, val_map_le_one_iff, ← mem_integer_iff]
@@ -306,6 +273,7 @@ def i4 (x : PowerBasis 𝒪[K] 𝒪[L]) (a : L ≃ₐ[M] L) (ha : a ∈ (⊤ : S
 def i5 (x : PowerBasis 𝒪[K] 𝒪[L]) (n : ℕ) (σ : L ≃ₐ[M] L) (a : Multiset L) (ha : a ∈ Multiset.powersetCard ((∏ x ∈ @Finset.image (L ≃ₐ[M] L) L _ (fun t ↦ t x.gen) (@Finset.univ (L ≃ₐ[M] L) (fintype M L)), (X - C x)).natDegree - n) (Multiset.map (fun t ↦ t ↑x.gen) (@Finset.univ (L ≃ₐ[M] L) (fintype M L)).val).dedup) : Multiset L :=
   Multiset.map (fun t => σ.symm t) a
 
+omit [Algebra.IsSeparable ↥𝒪[M] ↥𝒪[L]] [Normal M L] in
 theorem PowerBasis.algHom_ext_aux {a1 a2 : L ≃ₐ[M] L} (x : PowerBasis 𝒪[K] 𝒪[L]) (ha : (⟨⟨a1 x.gen.1, algEquiv_PowerBasis_mem_valuationSubring x a1⟩, algEquiv_PowerBasis_mem_aroots_aux x a1⟩ : { y // y ∈ (Polynomial.map (algebraMap ↥𝒪[M] ↥𝒪[L]) (minpoly (↥𝒪[M]) x.gen)).roots }) = (⟨⟨a2 x.gen.1, algEquiv_PowerBasis_mem_valuationSubring x a2⟩, algEquiv_PowerBasis_mem_aroots_aux x a2⟩ : { y // y ∈ (Polynomial.map (algebraMap ↥𝒪[M] ↥𝒪[L]) (minpoly (↥𝒪[M]) x.gen)).roots })) : a1 = a2 := by
   rw [eq_iff_ValuationSubring]
   apply_fun restrictScalars 𝒪[K]
@@ -315,6 +283,7 @@ theorem PowerBasis.algHom_ext_aux {a1 a2 : L ≃ₐ[M] L} (x : PowerBasis 𝒪[K
   exact ha
   exact restrictScalarsHom_injective ↥𝒪[K]
 
+omit [Normal K M] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K M] [Algebra.IsSeparable K L] [Algebra.IsSeparable M L] [Algebra.IsSeparable K M] [CompleteSpace K] [Algebra.IsSeparable ↥𝒪[M] ↥𝒪[L]] [Normal M L] in
 theorem aux_15 (x : PowerBasis 𝒪[K] 𝒪[L]) : ∏ t ∈ (⊤ : Set (L ≃ₐ[M] L)).toFinset, (X - C (t x.gen)) = ∏ t ∈ ((fun a ↦ a ↑x.gen) '' (@Set.univ (L ≃ₐ[M] L))).toFinset, (X - C t) := by
   apply Finset.prod_bij (i4 x)
   · intro a ha

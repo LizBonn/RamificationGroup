@@ -1,5 +1,7 @@
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import RamificationGroup.ForMathlib.LocalRing.Basic
+import Mathlib.Topology.Algebra.Valued.ValuationTopology
+import RamificationGroup.Valued.Hom.Discrete
 
 namespace IsDiscreteValuationRing
 
@@ -55,3 +57,26 @@ theorem ideal_le_iff {m n : ℕ} :
     exact Ideal.pow_le_pow_right
 
 end uniformiser
+
+end IsDiscreteValuationRing
+
+section uniform_dvd
+
+open DiscreteValuation Valued Valuation
+variable {L : Type*} [Field L] [vL : Valued L ℤₘ₀] [vL.v.IsDiscrete]
+
+theorem DiscreteValuationRing.uniformizer_dvd_iff_le {n1 n2 : ℕ} {π : vL.v.valuationSubring} (hpi : vL.v.IsUniformizer π) : π ^ n1 ∣ π ^ n2 ↔ n1 ≤ n2 := by
+  constructor <;> intro h
+  · have hnezero : π ≠ 0 := by
+      apply_mod_cast uniformizer_ne_zero ⟨π, hpi⟩
+    have hneunit : ¬ IsUnit π := by
+      apply isUniformizer_not_isUnit hpi
+    apply (pow_dvd_pow_iff hnezero hneunit).1
+    obtain ⟨u1, hu1⟩ := h
+    use u1
+  · apply pow_dvd_pow
+    exact h
+
+theorem IsDiscreteValuationRing.irreducible_of_uniformizer' (π : vL.v.valuationSubring) (hpi : vL.v.IsUniformizer π) : Irreducible π := (IsDiscreteValuationRing.irreducible_iff_uniformizer π).2  (DiscreteValuation.isUniformizer_is_generator v hpi)
+
+end uniform_dvd

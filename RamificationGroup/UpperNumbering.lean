@@ -60,6 +60,10 @@ variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] 
 variable (σ : K' ≃ₐ[K] K')
 
 open Classical
+
+#synth Fintype ↑(⇑(AlgEquiv.restrictNormalHom K' (K₁ := L)) ⁻¹' {σ})
+#check Subtype.fintype (Membership.mem (⇑(AlgEquiv.restrictNormalHom K') ⁻¹' {σ}))
+
 -- Lemma 4
 theorem preimage_singleton_nonempty {σ : K' ≃ₐ[K] K'} : ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}).toFinset.Nonempty := by
   apply Finset.coe_nonempty.mp
@@ -102,7 +106,8 @@ theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K')
       intro y hy
       have hy1 : ∃ b ∈ (AlgEquiv.restrictNormalHom K') ⁻¹' {σ}, i_[L/K]ₜ u b - 1 = y := by
         convert Finset.mem_image.1 hy
-        sorry --apply Set.mem_toFinset.symm
+        ext
+        apply Set.mem_toFinset.symm
       obtain ⟨b, hb1, hb2⟩ := hy1
       rw [← hb2]
       apply hs2
@@ -163,40 +168,9 @@ theorem restrictNormal_restrictNormalHom (s : L ≃ₐ[K] L) : s.restrictNormal 
 theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ truncatedJ L r σ ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
   constructor
   · apply mem_lowerRamificationGroup_of_le_truncatedJ_sub_one
-  · --simp only [Subgroup.mem_map]
-    rintro hx
+  · rintro hx
     obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ (L := L) r σ
     simp at s_in
-    -- let f : (L ≃ₐ[K'] L) → (AlgEquiv.restrictNormalHom K')⁻¹' {σ} :=
-    --   fun x => ⟨s * (x.restrictScalars K), by
-    --     rw [Set.mem_preimage, MonoidHom.map_mul, s_in, Set.mem_singleton_iff, resNormal_resScalar_aux, mul_one]⟩
-    -- have hbij : Function.Bijective f := by
-    --   constructor
-    --   · rintro a1 a2 h
-    --     dsimp [f] at h
-    --     have h' : s * AlgEquiv.restrictScalars K a1 = s * AlgEquiv.restrictScalars K a2 := by
-    --       apply Subtype.val_inj.2 h
-    --     apply mul_left_cancel at h'
-    --     apply (AlgEquiv.restrictScalars_injective K) h'
-    --   · rintro ⟨b, hb⟩
-    --     dsimp [f]
-    --     let a₀ : L ≃ₐ[K'] L :=
-    --     {
-    --       s⁻¹ * b with
-    --       commutes' := by
-    --         dsimp
-    --         intro r
-    --         apply (EquivLike.apply_eq_iff_eq s).1
-    --         have : s⁻¹ = s.invFun := by exact rfl
-    --         rw [this, ← Function.comp_apply (f := s) (g := s.invFun)]
-    --         simp only [AlgEquiv.toEquiv_eq_coe, Equiv.invFun_as_coe, AlgEquiv.symm_toEquiv_eq_symm, EquivLike.coe_coe, Function.comp_apply, AlgEquiv.apply_symm_apply]
-    --         rw [Set.mem_preimage, Set.mem_singleton_iff] at hb
-    --         rw [← AlgEquiv.restrictNormal_commutes, ← AlgEquiv.restrictNormal_commutes, restrictNormal_restrictNormalHom s, restrictNormal_restrictNormalHom b, s_in, hb]
-    --     }
-    --     have h : AlgEquiv.restrictScalars K a₀ = s⁻¹ * b := rfl
-    --     use a₀
-    --     rw [Subtype.mk.injEq, h, ← mul_assoc, mul_inv_self, one_mul]
-    --have hi : ∀ x : (L ≃ₐ[K'] L), AlgEquiv.truncatedLowerIndex K' L u x = AlgEquiv.truncatedLowerIndex K L u (f x) := sorry -- u need to change
     have hs' : s ∈ G(L/K)_[⌈u⌉] := by
       obtain ⟨k, hk1, hk2⟩ := Subgroup.mem_map.1 hx
       have h1 : i_[L/K]ₜ r k - 1 ≤ i_[L/K]ₜ r s - 1 := by
@@ -355,8 +329,8 @@ end
 
 section
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [Algebra K L] [FiniteDimensional K L] [IsValExtension vK.v vL.v] [CompleteSpace K]
-[Algebra.IsSeparable K L] [Algebra (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [vL : Valued L ℤₘ₀] [IsDiscrete vL.v][Algebra K L] [FiniteDimensional K L] [IsValExtension vK.v vL.v] [CompleteSpace K]
+[Algebra.IsSeparable K L] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])]
 
 --should in Herbrand
 theorem psi_phi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := by
@@ -366,12 +340,12 @@ theorem psi_phi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := by
   rfl; apply (phi_Bijective R S).injective
 
 -- this uses local fields and bichang's work, check if the condition is too strong...
-theorem UpperRamificationGroup_aux.exist_eq_bot [LocalField K] [LocalField L] [IsValExtension vK.v vL.v] : ∃ v : ℚ, G(L/K)^[v] = ⊥ := by sorry
-  -- obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
-  -- use (phi K L u)
-  -- simp [upperRamificationGroup_aux]
-  -- --rw [psi_phi_eq_self K L, Int.ceil_intCast u]
-  -- exact hu
+theorem UpperRamificationGroup_aux.exist_eq_bot [LocalField K] [LocalField L] [IsValExtension vK.v vL.v] : ∃ v : ℚ, G(L/K)^[v] = ⊥ := by
+  obtain ⟨u, hu⟩ := exist_lowerRamificationGroup_eq_bot (K := K) (L := L)
+  use (phi K L u)
+  simp [upperRamificationGroup_aux]
+  --rw [psi_phi_eq_self K L, Int.ceil_intCast u]
+  exact hu
 
 end
 
@@ -405,9 +379,8 @@ def completeSpaceIsValExtension (K F : Type*) [Field K] [vK : Valued K ℤₘ₀
     rw [← isEquiv_iff_eq]
     exact extension_valuation_equiv_extendedValuation_of_discrete h
   have ueq: vF.toUniformSpace = (DiscreteValuation.Extension.valued K F).toUniformSpace := Valued.toUniformSpace_eq_of_v_eq veq
-  sorry
-  -- erw [ueq]
-  -- exact DiscreteValuation.Extension.completeSpace K F
+  erw [ueq]
+  exact DiscreteValuation.Extension.completeSpace K F
 
 open AlgEquiv
 
@@ -515,32 +488,32 @@ theorem mem_iff_mem_UpperRamificationGroup_aux {s : L ≃ₐ[K] L} {v : ℚ} : s
 --   · intro h1 h2
 --     exact h F ⟨h1,h2⟩
 
-
+set_option maxHeartbeats 0
 -- theorem compatible with quotient, finite quotient
 @[simp]
-theorem map_restrictNormalHom {K'} [Field K'] [vK' : Valued K' ℤₘ₀] [IsDiscrete vK'.v] [Algebra K K'] [Algebra K' L] [FiniteDimensional K K'] [IsScalarTower K K' L] [Normal K K'] [Normal K L] [IsValExtension vK.v vK'.v] [IsValExtension vK'.v vL.v] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
+theorem map_restrictNormalHom {K'} [Field K'] [vK' : Valued K' ℤₘ₀] [IsDiscrete vK'.v] [Algebra K K'] [Algebra K' L] [Algebra.IsSeparable K' L] [FiniteDimensional K K'] [IsScalarTower K K' L] [Normal K K'] [Normal K L] [IsValExtension vK.v vK'.v] [IsValExtension vK'.v vL.v] [CompleteSpace K'] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] (v : ℚ) : G(L/K)^[v].map (AlgEquiv.restrictNormalHom K') = G(K'/K)^[v] := by
   have : FiniteDimensional K' L:= by exact Module.Finite.of_restrictScalars_finite K K' L
   rw [eq_UpperRamificationGroup_aux, eq_UpperRamificationGroup_aux, upperRamificationGroup_aux, upperRamificationGroup_aux]
+  apply herbrand'
+  ext s
   repeat sorry
-
-  --apply herbrand'
-  -- ext s
   -- calc
   -- _ ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
-  --     s ∈ ((upperRamificationGroup_aux K F v).comap (restrictNormalHom (K₁ := L) F)).map (restrictNormalHom K') := by
-  --   simp [mem_iff_mem_UpperRamificationGroup_aux]
-  --   sorry
+  --     s ∈ ((upperRamificationGroup_aux K F v).comap (restrictNormalHom (K₁ := L) F)).map (restrictNormalHom K') := by sorry
+    -- simp [mem_iff_mem_UpperRamificationGroup_aux]
   -- _ ↔ ∀ (F : IntermediateField K L) [Normal K F] [FiniteDimensional K F],
   --     letI : FiniteDimensional K (F.comap (IsScalarTower.toAlgHom K K' L)) := sorry
   --     letI : Normal K (F.comap (IsScalarTower.toAlgHom K K' L)) := sorry
-  --     s ∈ (upperRamificationGroup_aux K (F.comap (IsScalarTower.toAlgHom K K' L)) v).comap (restrictNormalHom (K₁ := K') (F.comap (IsScalarTower.toAlgHom K K' L))) := by
-  --       constructor <;> intro h F _ _
-  --       simp at h ⊢
-  --       sorry
-  --       sorry
+  --     s ∈ (upperRamificationGroup_aux K (F.comap (IsScalarTower.toAlgHom K K' L)) v).comap (restrictNormalHom (K₁ := K') (F.comap (IsScalarTower.toAlgHom K K' L))) := by sorry
+        -- constructor <;> intro h F _ _
+        -- simp at h ⊢
+        -- sorry
+        -- sorry
   -- _ ↔ ∀ (F : IntermediateField K K') [Normal K F] [FiniteDimensional K F],
   --     s ∈ (upperRamificationGroup_aux K F v).comap (restrictNormalHom (K₁ := K') F) := sorry
-  -- _ ↔ _ := by exact mem_iff_mem_UpperRamificationGroup_aux
+  -- _ ↔ _ := by sorry
+    -- exact mem_iff_mem_UpperRamificationGroup_aux
+
 
   -- ext s
   -- -- simp [upperRamificationGroup]
@@ -581,37 +554,37 @@ end autCongr
 -- theorems about exhausive and separated
 -- under what condition this is correct? this is too strong?
 theorem eq_decompositionGroup [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) :
-G(L/K)^[v] = decompositionGroup K L := by sorry
-  -- rw [eq_UpperRamificationGroup_aux]
-  -- exact UpperRamificationGroup_aux.eq_decompositionGroup h
-  -- repeat sorry
+G(L/K)^[v] = decompositionGroup K L := by
+  rw [eq_UpperRamificationGroup_aux (vL := vL)]
+  exact UpperRamificationGroup_aux.eq_decompositionGroup h
+  repeat sorry
 
-theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by sorry
-  -- rw [eq_UpperRamificationGroup_aux]
-  -- exact UpperRamificationGroup_aux.eq_top h
-  -- repeat sorry
+theorem eq_top [vL : Valued L ℤₘ₀] [IsDiscrete vL.v] [IsValExtension vK.v vL.v] [FiniteDimensional K L] [Normal K L] {v : ℚ} (h : v ≤ -1) : G(L/K)^[v] = ⊤ := by
+  rw [eq_UpperRamificationGroup_aux (vL := vL)]
+  exact UpperRamificationGroup_aux.eq_top h
+  repeat sorry
 
 end UpperRamificationGroup
 
 namespace UpperRamificationGroup
 
-variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [Algebra K L] [FiniteDimensional K L] [LocalField K] [LocalField L] [IsValExtension vK.v vL.v] [IsDiscrete vL.v] [Normal K L] [Algebra.IsSeparable K L] [Algebra (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
+variable {K L : Type*} [Field K] [Field L] [vK : Valued K ℤₘ₀]  [vL : Valued L ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [Algebra K L] [FiniteDimensional K L] [LocalField K] [LocalField L] [IsValExtension vK.v vL.v] [IsDiscrete vL.v] [Normal K L] [Algebra.IsSeparable K L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
 
 set_option synthInstance.maxHeartbeats 0
 #synth Algebra K L
 
 theorem inf_eq_bot (s : L ≃ₐ[K] L) : (∀ v, s ∈ G(L/K)^[v]) ↔ s = 1 := by
-  sorry
-  -- constructor
-  -- · intro h
-  --   obtain ⟨v, hv⟩ := UpperRamificationGroup_aux.exist_eq_bot (K := K) (L := L)
-  --   rw [← eq_UpperRamificationGroup_aux] at hv
-  --   have h1 : s ∈ G(L/K)^[v] := h v
-  --   rw [hv] at h1
-  --   apply Subgroup.mem_bot.1 h1
-  -- · intro hs v
-  --   simp only [hs]
-  --   apply Subgroup.one_mem
+  constructor
+  · intro h
+    obtain ⟨v, hv⟩ := UpperRamificationGroup_aux.exist_eq_bot (K := K) (L := L)
+    rw [← eq_UpperRamificationGroup_aux] at hv
+    have h1 : s ∈ G(L/K)^[v] := h v
+    rw [hv] at h1
+    apply Subgroup.mem_bot.1 h1
+    repeat sorry
+  · intro hs v
+    simp only [hs]
+    apply Subgroup.one_mem
 
 
 /-

@@ -1,18 +1,68 @@
-import RamificationGroup.UpperNumbering
-import RamificationGroup.Upper_phiComp
+import RamificationGroup.LowerNumbering.prop_3
+import Mathlib.RingTheory.Valuation.Basic
+import Mathlib.FieldTheory.KrullTopology
+import Mathlib.Algebra.Algebra.Tower
+import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.MeasureTheory.Integral.FundThmCalculus
+import RamificationGroup.HerbrandFunction.Psi
+import RamificationGroup.ForMathlib.AlgEquiv.Basic
+import RamificationGroup.ForMathlib.Unknow
+-- import RamificationGroup.Valued.Hom.Discrete'
 
-open AlgEquiv DiscreteValuation Valuation Valued HerbrandFunction
+/-!
 
-variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra.IsSeparable K L] [Algebra K K'] [Algebra.IsSeparable K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK'.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L] [Algebra.IsSeparable K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField (Valued.integer K')) (IsLocalRing.ResidueField (Valued.integer L))] [CompleteSpace K']
+## TODO
+rename theorems into UpperRamificationGroup.xxx
+-/
+
+open QuotientGroup IntermediateField DiscreteValuation Valued Valuation HerbrandFunction Classical AlgEquiv
+
+noncomputable
+section
+
+section upperRamificationGroup_aux
+
+section definition_aux
+-- principle : first try to state a theorem in IsScalarTower, then try IntermediateField
+variable {K L : Type*} {ΓK : outParam Type*} [Field K] [Field L] [LinearOrderedCommGroupWithZero ΓK] [vK : Valued K ΓK] [vL : Valued L ℤₘ₀] [Algebra K L]
+
+variable {K' : Type*} [Field K'] [vK' : Valued K' ℤₘ₀] [Algebra K K'] [Algebra K L] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK'.v vL.v] -- `I hope this is enough`
+
+variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
+
+-- aux construction of upper numbering ramification group, correct for finite extension of local fields only. later we define a more general version on all algebraic extensions of local fields.
+
+def upperRamificationGroup_aux (v : ℚ): (Subgroup (S ≃ₐ[R] S)) := lowerRamificationGroup R S ⌈psi R S v⌉
+
+end definition_aux
+
+local notation:max " G(" L:max "/" K:max ")^[" v:max "] " => upperRamificationGroup_aux K L v
+
+section autCongr
+
+variable {K L L': Type*} {ΓK : outParam Type*} [Field K] [Field L] [Field L'] [vL : Valued L ℤₘ₀] [vL' : Valued L' ℤₘ₀] [IsDiscrete vL.v] [IsDiscrete vL'.v] [Algebra K L] [Algebra K L'] [Finite (L ≃ₐ[K] L)]
+
+theorem autCongr_mem_upperRamificationGroup_aux_iff {f : L ≃ₐ[K] L'} (hf : ∀ a : L, v a = v (f a)) (s : L ≃ₐ[K] L) (v : ℚ) : s ∈ G(L/K)^[v] ↔ (AlgEquiv.autCongr f s : L' ≃ₐ[K] L') ∈ G(L'/K)^[v] := by
+  convert autCongr_mem_lowerRamificationGroup_iff hf s ⌈psi K L v⌉
+  simp only [upperRamificationGroup_aux]
+  congr 2
+  exact (psi_eq_ofEquiv _ _ _ hf v).symm
+
+end autCongr
+
+variable {K K' L : Type*} {ΓK : outParam Type*} [Field K] [Field K'] [Field L] [vK' : Valued K' ℤₘ₀] [vL : Valued L ℤₘ₀] [IsDiscrete vK'.v] [IsDiscrete vL.v] [Algebra K L] [Algebra K K'] [Algebra K' L] [IsScalarTower K K' L] [IsValExtension vK'.v vL.v] [Normal K K'] [Normal K L] [FiniteDimensional K L] [FiniteDimensional K K'] [FiniteDimensional K' L]
 
 variable [vK : Valued K ℤₘ₀] [IsDiscrete vK.v] [CompleteSpace K] [IsValExtension vK.v vK'.v] [IsValExtension vK.v vL.v]
 
+
 variable (σ : K' ≃ₐ[K] K')
 
+variable (L) in
+def HerbrandFunction.FuncJ (σ : K' ≃ₐ[K] K') : ℕ∞ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => AlgEquiv.lowerIndex K L x)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
+variable (L) in
+def HerbrandFunction.truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ℚ := Finset.max' (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) (Finset.Nonempty.image preimage_singleton_nonempty _)
 
-#check restrictNormalHom
-#check truncatedLowerIndex_refl
 theorem truncatedJ_refl {u : ℚ} : truncatedJ (K := K) (K' := K') L u .refl = u - 1:= by
   simp only [truncatedJ]
   apply le_antisymm
@@ -30,7 +80,6 @@ theorem truncatedJ_refl {u : ℚ} : truncatedJ (K := K) (K' := K') L u .refl = u
     · apply (restrictNormalHom K').map_one
     · rw [truncatedLowerIndex_refl]
 
-
 theorem FuncJ_refl (h : σ = .refl) : FuncJ L σ = ⊤ := by
   unfold FuncJ
   apply le_antisymm
@@ -43,11 +92,44 @@ theorem FuncJ_refl (h : σ = .refl) : FuncJ L σ = ⊤ := by
       apply (restrictNormalHom K').map_one
     · rw [lowerIndex_refl]
 
+omit vK' [vK'.v.IsDiscrete] [IsValExtension vK'.v vL.v] [FiniteDimensional K K'] [FiniteDimensional K' L] in
+theorem exist_truncatedLowerIndex_eq_truncatedJ (u : ℚ) (σ : K' ≃ₐ[K] K') : ∃ s : L ≃ₐ[K] L, s ∈ (AlgEquiv.restrictNormalHom K')⁻¹' {σ} ∧  AlgEquiv.truncatedLowerIndex K L u s - 1 = HerbrandFunction.truncatedJ L u σ := by
+  have hnem : ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}).Nonempty := by
+    have h1 : Set.SurjOn (AlgEquiv.restrictNormalHom K' (K₁ := L)) ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) {σ} := by
+      simp only [Set.surjOn_singleton, Set.mem_image, Set.mem_preimage, Set.mem_singleton_iff, and_self]
+      apply AlgEquiv.restrictNormalHom_surjective
+    apply Set.SurjOn.comap_nonempty h1 (by simp)
+  have hfin : Finite ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) := by
+    have hfin' : (⊤ : Set (L ≃ₐ[K] L)).Finite := by
+      exact Set.toFinite ⊤
+    apply Set.Finite.subset hfin' (by simp only [Set.top_eq_univ, Set.subset_univ])
+  obtain ⟨s, hs⟩ := Set.exists_max_image ((AlgEquiv.restrictNormalHom K' (K₁ := L))⁻¹' {σ}) (fun x => AlgEquiv.truncatedLowerIndex K L u x - 1) hfin hnem
+  use s
+  rcases hs with ⟨hs1, hs2⟩
+  constructor
+  · exact hs1
+  · unfold truncatedJ
+    apply le_antisymm
+    · apply Finset.le_max'
+      apply Finset.mem_image.2
+      use s
+      constructor
+      apply Set.mem_toFinset.2 hs1; rfl
+    · have hnem' : (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)).Nonempty := by
+        apply Finset.Nonempty.image
+        apply Set.toFinset_nonempty.2 hnem
+      apply (Finset.max'_le_iff (((AlgEquiv.restrictNormalHom K')⁻¹' {σ}).toFinset.image (fun (x : L ≃ₐ[K] L) => x.truncatedLowerIndex K L u - 1)) hnem').2
+      intro y hy
+      have hy1 : ∃ b ∈ (AlgEquiv.restrictNormalHom K') ⁻¹' {σ}, i_[L/K]ₜ u b - 1 = y := by
+        convert Finset.mem_image.1 hy
+        ext
+        apply Set.mem_toFinset.symm
+      obtain ⟨b, hb1, hb2⟩ := hy1
+      rw [← hb2]
+      apply hs2
+      exact hb1
 
-
---check if this is right
-#check lowerIndex_ne_refl
-theorem FuncJ_untop_of_nerefl (h : σ ≠ .refl) : FuncJ L σ ≠ ⊤ := by
+theorem FuncJ_untop_of_nerefl [Algebra.IsSeparable K L] (h : σ ≠ .refl) : FuncJ L σ ≠ ⊤ := by
   unfold FuncJ
   apply lt_top_iff_ne_top.1
   apply (Finset.max'_lt_iff _ _).2
@@ -65,19 +147,13 @@ theorem FuncJ_untop_of_nerefl (h : σ ≠ .refl) : FuncJ L σ ≠ ⊤ := by
     apply (restrictNormalHom K').map_one
   apply h h2
 
-theorem FuncJ_untop_iff_nerefl : σ ≠ .refl ↔ FuncJ L σ ≠ ⊤ := by
+theorem FuncJ_untop_iff_nerefl [Algebra.IsSeparable K L] : σ ≠ .refl ↔ FuncJ L σ ≠ ⊤ := by
   constructor
   · exact fun a ↦ FuncJ_untop_of_nerefl σ a
   · intro h
     by_contra hc
     absurd h
     exact FuncJ_refl σ hc
-
--- theorem aux9 (h : σ ≠ .refl) : i_[K'/K] σ ≠ ⊤ := by sorry
-
--- theorem lemma3_untop' (h : σ ≠ .refl) : phi K' L ((FuncJ L σ).untop (FuncJ_untop_iff_nerefl σ h)) = (1 / Nat.card G(L/K)_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K] L)) (AlgEquiv.truncatedLowerIndex K L (((FuncJ L σ).untop (FuncJ_untop_iff_nerefl σ h)) + 1) ·))) - 1 := by sorry
-open Classical
-
 
 theorem preimage_lowerIndex_eq_FuncJ (hsig : σ ≠ .refl) : ∃ x : (L ≃ₐ[K] L), x ∈ ((restrictNormalHom K')⁻¹' {σ}) ∧ i_[L/K] x = FuncJ L σ := by
   simp only [Set.mem_preimage, Set.mem_singleton_iff]
@@ -103,19 +179,13 @@ theorem preimage_lowerIndex_eq_FuncJ (hsig : σ ≠ .refl) : ∃ x : (L ≃ₐ[K
     use a
   exact (lt_self_iff_false (FuncJ L σ)).mp h
 
-
-#check ((⊤ \ {.refl}) : Finset (L ≃ₐ[K] L))
-
-theorem WithTop.untop_add_one (x : WithTop ℕ) (h : x ≠ ⊤) : WithTop.untop x h + 1 = WithTop.untop (x + 1) (WithTop.add_ne_top.2 ⟨h, WithTop.one_ne_top⟩) := by
-  symm
-  apply (WithTop.untop_eq_iff _).2
-  simp only [coe_add, coe_untop, coe_one]
-
 theorem preimage_lowerIndex_le_FuncJ {a : L ≃ₐ[K] L} (ha : restrictNormalHom K' a = σ) : i_[L/K] a ≤ FuncJ L σ := by
   unfold FuncJ
   apply Finset.le_max'
   simp only [Finset.mem_image, Set.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff]
   use a
+
+variable [Algebra.IsSeparable K L]
 
 theorem truncatedJ_eq_truncated_FuncJ (u : ℚ) : truncatedJ L u σ =
   if h : FuncJ L σ = ⊤ then u - 1
@@ -220,41 +290,7 @@ theorem truncatedJ_eq_truncated_FuncJ (u : ℚ) : truncatedJ L u σ =
         · apply le_of_lt
           push_neg at hc
           exact hc
-        -- · symm
-        --   apply le_antisymm
-        --   · apply Finset.max'_le
-        --     simp only [Finset.mem_image, Set.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂, tsub_le_iff_right, sub_add_cancel]
-        --     intro a ha
-        --     unfold truncatedLowerIndex
-        --     by_cases hc' : i_[L/K] a = ⊤
-        --     · simp only [hc', ↓reduceDIte, le_refl]
-        --     · simp only [hc', ↓reduceDIte, min_le_iff, le_refl, true_or]
-        --   · apply Finset.le_max'
-        --     simp only [Finset.mem_image, Set.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, sub_left_inj]
-        --     have hsig : σ ≠ .refl := by
-        --       by_contra hcon
-        --       have h'' : FuncJ L σ = ⊤ := FuncJ_refl (K := K) (K' := K') (L := L) σ hcon
-        --       apply h' h''
-        --     obtain ⟨a, ha1, ha2⟩ :=  preimage_lowerIndex_eq_FuncJ (K := K) (K' := K') (L := L) σ hsig
-        --     use a
-        --     constructor
-        --     · simp only [Set.mem_preimage, Set.mem_singleton_iff] at ha1
-        --       exact ha1
-        --     · push_neg at hc
-        --       unfold truncatedLowerIndex
-        --       by_cases hcase : i_[L/K] a = ⊤
-        --       · simp only [hcase, ↓reduceDIte]
-        --       · simp only [hcase, ↓reduceDIte, min_eq_left_iff]
-        --         simp only [ha2]
-        --         rw [← WithTop.untop_add_one _ h']
-        --         apply le_of_lt
-        --         simp only [Nat.cast_add, Nat.cast_one]
-        --         linarith [hc]
-        -- · linarith [hc]
 
-#check eq_false
-#check of_eq_false
-#check lowerIndex_ne_refl
 theorem preimage_restrictNormalHom_untop (hsig : σ ≠ .refl) (s : L ≃ₐ[K] L) (hs : s ∈ ((restrictNormalHom K')⁻¹' {σ})) : i_[L/K] s ≠ ⊤ := by
   by_contra hc
   have hs' : s = .refl := by
@@ -266,13 +302,6 @@ theorem preimage_restrictNormalHom_untop (hsig : σ ≠ .refl) (s : L ≃ₐ[K] 
     rw [← hs]
     apply (restrictNormalHom K').map_one
   apply hsig hsig'
-
-
--- theorem sum_lt_top_of_sigma_ne_refl (hsig : σ ≠ .refl) : (∑ s ∈ ((restrictNormalHom K')⁻¹' {σ}), i_[L/K] s) ≠ ⊤ := by
---   apply ne_of_lt
---   apply WithTop.sum_lt_top.2
---   intro i hi
---   sorry
 
 theorem preimage_untop (hsig : σ ≠ .refl) {x : L ≃ₐ[K'] L} {s : L ≃ₐ[K] L} (h1 : s ∈ ((restrictNormalHom K')⁻¹' {σ})) : i_[L/K] ((restrictScalarsHom K x) * s) ≠ ⊤ := by
   apply lowerIndex_ne_one
@@ -291,7 +320,6 @@ theorem preimage_untop (hsig : σ ≠ .refl) {x : L ≃ₐ[K'] L} {s : L ≃ₐ[
       rw [restrictNormalHom_restrictScalarsHom, h1, one_mul]
   apply hsig hsig'
 
-#check AlgEquiv
 theorem preimage_mul_preimage_inv_mem_subgroup (i s : L ≃ₐ[K] L) (hi : i ∈ ((restrictNormalHom K')⁻¹' {σ})) (hs : s ∈ ((restrictNormalHom K')⁻¹' {σ})) : ∃ x : L ≃ₐ[K'] L, restrictScalarsHom K x = i * s⁻¹ := by
   let x : L ≃ₐ[K'] L :=
   {
@@ -303,8 +331,6 @@ theorem preimage_mul_preimage_inv_mem_subgroup (i s : L ≃ₐ[K] L) (hi : i ∈
       have hi' : i⁻¹ = i.invFun := by exact rfl
       rw [hi', ← Function.comp_apply (f := i.invFun) (g := i)]
       simp only [toEquiv_eq_coe, Equiv.invFun_as_coe, symm_toEquiv_eq_symm, EquivLike.coe_coe, Function.comp_apply, symm_apply_apply]
---         simp only [AlgEquiv.toEquiv_eq_coe, Equiv.invFun_as_coe, AlgEquiv.symm_toEquiv_eq_symm, EquivLike.coe_coe, Function.comp_apply, AlgEquiv.apply_symm_apply]
---         rw [Set.mem_preimage, Set.mem_singleton_iff] at hb
       simp at hi hs
       have hs' : restrictNormalHom K' s⁻¹ = restrictNormalHom K' i.symm := by
         rw [MonoidHom.map_inv (restrictNormalHom K') s, hs, ← hi, ← MonoidHom.map_inv (restrictNormalHom K') i]
@@ -315,7 +341,6 @@ theorem preimage_mul_preimage_inv_mem_subgroup (i s : L ≃ₐ[K] L) (hi : i ∈
   simp only [toEquiv_eq_coe, x]
   exact rfl
 
-#check Finset.sum_of_injOn
 theorem sum_preimage_eq_sum_subgroup (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ ((restrictNormalHom K')⁻¹' {σ})) : ∑ x : ((restrictNormalHom K')⁻¹' {σ}), ((i_[L/K] x).untop (preimage_restrictNormalHom_untop (L := L) σ hsig x.1 x.2)) = ∑ x : (L ≃ₐ[K'] L), ((i_[L/K] ((restrictScalarsHom K x) * s)).untop (preimage_untop σ hsig h1)) := by
   let e : (L ≃ₐ[K'] L) → ((restrictNormalHom K' (K₁ := L))⁻¹' {σ}) := fun t => ⟨(AlgEquiv.restrictScalarsHom K t) * s, by
     simp only [Set.mem_preimage, _root_.map_mul, _root_.map_inv, Set.mem_singleton_iff, AlgEquiv.restrictNormalHom_restrictScalarsHom, one_mul]
@@ -338,30 +363,15 @@ theorem sum_preimage_eq_sum_subgroup (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (
   · intro i hi
     rfl
 
-
-#check restrictScalarsHom
-
-theorem Finset.sum_untop {α : Type*} {s : Finset α} {β : Type*} [AddCommMonoid β] [LT β] {f : α → WithTop β} (h : ∑ x : s, f x ≠ ⊤) : ∑ x : s, ((f x).untop (WithTop.lt_top_iff_ne_top.1 ((WithTop.sum_lt_top).1 (WithTop.lt_top_iff_ne_top.2
-h) x (mem_univ x)))) = (∑ x : s, f x).untop h := by
-  symm
-  apply (WithTop.untop_eq_iff h).2
-  simp only [univ_eq_attach, WithTop.coe_sum, WithTop.coe_untop]
-
-
---for lower
-theorem prop3' (σ : K' ≃ₐ[K] K') (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K'] 𝒪[L]) : ∑ s ∈ ((restrictNormalHom K')⁻¹' {σ}), i_[L/K] s = (LocalField.ramificationIdx K' L) * i_[K'/K] σ := by
-  sorry
-
-set_option maxHeartbeats 0
-#check WithTop.untop_eq_iff
-theorem prop3_aux (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ ((restrictNormalHom K')⁻¹' {σ})) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K'] 𝒪[L]) : (LocalField.ramificationIdx K' L) * (lowerIndex K K' σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig) = (∑ x : (L ≃ₐ[K'] L), (i_[L/K] ((restrictScalarsHom K x) * s)).untop (preimage_untop σ hsig h1)) := by
+variable [Algebra.IsSeparable K K'] [Algebra.IsSeparable K' L][CompleteSpace K'] [Algebra.IsSeparable ↥𝒪[K'] ↥𝒪[L]] [Normal K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] in
+theorem prop3_aux (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ ((restrictNormalHom K')⁻¹' {σ})) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[K']) : (LocalField.ramificationIdx K' L) * (lowerIndex K K' σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig) = (∑ x : (L ≃ₐ[K'] L), (i_[L/K] ((restrictScalarsHom K x) * s)).untop (preimage_untop σ hsig h1)) := by
   calc
     _ = ((LocalField.ramificationIdx K' L) * (lowerIndex K K' σ)).untop ?_ := by
       rw [← WithTop.coe_eq_coe, WithTop.coe_mul, WithTop.coe_untop, WithTop.coe_untop]
       rfl
       apply ne_of_lt (WithTop.mul_lt_top _ _)
     _ = (∑ x : ((restrictNormalHom K' (K₁ := L))⁻¹' {σ}), i_[L/K] x).untop ?_:= by
-      rw [← WithTop.coe_eq_coe, WithTop.coe_untop, WithTop.coe_untop, ← prop3' (K := K) (K' := K') (L := L) σ x y]
+      rw [← WithTop.coe_eq_coe, WithTop.coe_untop, WithTop.coe_untop, ← prop3 (K := K) (M := K') (L := L) σ x y]
       exact Eq.symm (Finset.sum_set_coe (⇑(restrictNormalHom K') ⁻¹' {σ}))
       exact Batteries.compareOfLessAndEq_eq_lt.mp rfl
       apply WithTop.lt_top_iff_ne_top.2 (lowerIndex_ne_one (mem_decompositionGroup σ) hsig)
@@ -386,53 +396,6 @@ theorem prop3_aux (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ ((restri
     _ = _ := by
       exact sum_preimage_eq_sum_subgroup σ hsig h1
 
---for lower
-theorem lowerIndex_inf_le_mul (s t : L ≃ₐ[K] L) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : min (i_[L/K] s) (i_[L/K] t) ≤ i_[L/K] (s * t) := by
-  by_cases hc : i_[L/K] (s * t) = ⊤
-  · rw [hc]
-    exact le_top
-  · have h1 : ∃ n : ℕ, i_[L/K] (s * t) = n := by
-      use (WithTop.untop (i_[L/K] (s * t)) hc)
-      symm
-      apply WithTop.coe_untop
-    obtain ⟨n, hn⟩ := h1
-    have h2 : s * t ∉ G(L/K)_[n] := by
-      by_contra hc'
-      absurd hn
-      have hn' : n + 1 ≤ i_[L/K] (s * t) := by
-        apply (mem_lowerRamificationGroup_iff_of_generator hgen _ _).1 hc'
-        exact mem_decompositionGroup (s * t)
-      absurd hn
-      apply ne_of_gt
-      apply (ENat.add_one_le_iff (ENat.coe_ne_top n)).1 hn'
-    by_contra hc'
-    absurd h2
-    push_neg at hc'
-    rw [lt_min_iff, hn] at hc'
-    have h3 : s ∈ G(L/K)_[n] := by
-      apply (mem_lowerRamificationGroup_iff_of_generator hgen _ _).2
-      exact Order.add_one_le_of_lt hc'.1
-      exact mem_decompositionGroup s
-    have h4 : t ∈ G(L/K)_[n] := by
-      apply (mem_lowerRamificationGroup_iff_of_generator hgen _ _).2
-      exact Order.add_one_le_of_lt hc'.2
-      exact mem_decompositionGroup t
-    exact (Subgroup.mul_mem_cancel_right G(L/K)_[↑n] h4).mpr h3
-
-theorem WithTop.untop_lt_untop {a b : WithTop ℕ} (ha : a ≠ ⊤) (hb : b ≠ ⊤) : WithTop.untop a ha < WithTop.untop b hb ↔ a < b := by
-  constructor<;>intro h
-  · by_contra hc
-    absurd h
-    push_neg at hc ⊢
-    apply (WithTop.le_untop_iff _).2
-    simp only [WithTop.coe_untop]
-    exact hc
-  · apply (WithTop.lt_untop_iff _).2
-    simp only [WithTop.coe_untop]
-    exact h
-
---for lower
-#check lowerIndex_restrictScalars
 theorem lowerIndex_mul_le {s : L ≃ₐ[K] L} {x : L ≃ₐ[K'] L} (hsig : σ ≠ .refl) (hs : i_[L/K] s = FuncJ L σ) (htop : ¬ i_[L/K'] x = ⊤) (hlt : (WithTop.untop ( i_[L/K'] x) (of_eq_false (eq_false htop))) < (WithTop.untop (FuncJ L σ) (FuncJ_untop_of_nerefl σ hsig))) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : i_[L/K] ((restrictScalarsHom K) x * s) ≤ i_[L/K] ((restrictScalarsHom K) x) := by
   have h : i_[L/K'] x = i_[L/K] ((restrictScalarsHom K) x) := rfl
   have h1 : ∃ n : ℕ, i_[L/K] ((restrictScalarsHom K) x) = n := by
@@ -464,10 +427,7 @@ theorem lowerIndex_mul_le {s : L ≃ₐ[K] L} {x : L ≃ₐ[K'] L} (hsig : σ �
   absurd h2
   exact (Subgroup.mul_mem_cancel_right G(L/K)_[n] h4).mp h3
 
-
-
---this is hard!!
---yeah
+variable [CompleteSpace K'] in
 theorem lowerIndex_eq_inf (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ ((restrictNormalHom K')⁻¹' {σ})) (h2 : i_[L/K] s = FuncJ L σ) {x : L ≃ₐ[K'] L} {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : (i_[L/K] ((restrictScalarsHom K x) * s)).untop (preimage_untop (K := K) (K' := K') (L := L) σ hsig (s := s) (x := x) h1) = i_[L/K']ₜ ↑(WithTop.untop (FuncJ L σ) (FuncJ_untop_of_nerefl σ hsig)) x := by
   simp only [truncatedLowerIndex]
   by_cases htop : i_[L/K'] x = ⊤
@@ -507,9 +467,7 @@ theorem lowerIndex_eq_inf (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ 
         apply le_trans _ (lowerIndex_inf_le_mul _ _ hgen)
         apply le_min_iff.2
         constructor
-        ·
-          --rw [← WithTop.coe_untop (FuncJ L σ ) (FuncJ_untop_of_nerefl σ hsig), ← WithTop.coe_untop (i_[L/K] ((restrictScalarsHom K) x)) (of_eq_false (eq_false htop))]
-          rw [h]
+        · rw [h]
           by_contra hc'
           absurd hc
           push_neg at hc' ⊢
@@ -540,33 +498,31 @@ theorem lowerIndex_eq_inf (hsig : σ ≠ .refl) {s : L ≃ₐ[K] L} (h1 : s ∈ 
       push_neg at hc
       apply le_of_lt hc
 
-#check Ideal.ramificationIdx_ne_zero
-theorem lowerIndex_eq_phi_FuncJ_of_ne_refl (hsig : σ ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K'] 𝒪[L]) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : (lowerIndex K K' σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig) = phi K' L ((FuncJ L σ).untop ((FuncJ_untop_of_nerefl σ hsig)) - 1) + 1 := by
+theorem RamificationIdx_eq_card_of_inertia_group : (Nat.card G(L/K')_[0]) = (LocalField.ramificationIdx K' L) := by
+  simp only [lowerRamificationGroup, LocalField.ramificationIdx, IsLocalRing.ramificationIdx]
+  sorry
+
+set_option maxHeartbeats 0
+variable [Algebra.IsSeparable K K'] [Algebra.IsSeparable K' L][CompleteSpace K'] [Algebra.IsSeparable ↥𝒪[K'] ↥𝒪[L]] [Normal K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] in
+theorem lowerIndex_eq_phi_FuncJ_of_ne_refl (hsig : σ ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[K']) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K'] {gen'} = ⊤) : (lowerIndex K K' σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig) = phi K' L ((FuncJ L σ).untop ((FuncJ_untop_of_nerefl σ hsig)) - 1) + 1 := by
   obtain ⟨s, hs1, hs2⟩ := preimage_lowerIndex_eq_FuncJ (K' := K') (L := L) σ hsig
   suffices h : (LocalField.ramificationIdx K' L) * (lowerIndex K K' σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig) = (LocalField.ramificationIdx K' L) * (phi K' L ((FuncJ L σ).untop (FuncJ_untop_of_nerefl σ hsig) - 1) + 1) from by
     apply mul_left_cancel₀ at h
     exact h
     norm_cast
     apply ramificationIdx_ne_zero
-  rw [← Nat.cast_mul, prop3_aux (K := K) (K' := K') (L := L) σ hsig hs1 x y, phi_eq_sum_inf_aux, RamificationIdx_eq_card_of_inertia_group, sub_add_cancel, ← mul_assoc, mul_one_div_cancel, one_mul, Nat.cast_sum]
+  rw [← Nat.cast_mul, prop3_aux (K := K) (K' := K') (L := L) σ hsig hs1 x y, phi_eq_sum_inf_aux K' L (hgen := hgen'), RamificationIdx_eq_card_of_inertia_group, sub_add_cancel, ← mul_assoc, mul_one_div_cancel, one_mul, Nat.cast_sum]
   apply Finset.sum_congr rfl
   intro x hx
   simp only [sub_add_cancel]
   apply lowerIndex_eq_inf σ hsig hs1 hs2 hgen
   norm_cast
   apply ramificationIdx_ne_zero
-  repeat sorry
-  -- let e : (L ≃ₐ[K'] L) → ↑(⇑(restrictNormalHom K' (K₁ := L)) ⁻¹' {σ}) := fun x => ⟨(AlgEquiv.restrictScalarsHom K x) * s⁻¹, by
-  --   simp only [Set.mem_preimage, _root_.map_mul, _root_.map_inv, Set.mem_singleton_iff, AlgEquiv.restrictNormalHom_restrictScalarsHom, one_mul]
-  --   simp only [Set.mem_preimage, Set.mem_singleton_iff] at hs1
-  --   sorry⟩
-  -- suffices h : (LocalField.ramificationIdx K L) * (lowerIndex K K' σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig) = (LocalField.ramificationIdx K L) * (phi K' L ((FuncJ L σ).untop (FuncJ_untop_of_nerefl σ hsig)) + 1) from by
-  -- rw [prop3_aux (L := L) σ hsig, phi_eq_sum_inf, RamificationIdx_eq_card_of_inertia_group, sub_add_cancel, Nat.cast_div, div_eq_mul_one_div, mul_comm]
-  -- simp only [one_div, Finset.top_eq_univ, mul_eq_mul_left_iff, inv_eq_zero, Nat.cast_eq_zero]
-  -- left
-  -- repeat sorry
+  simp only [neg_le_sub_iff_le_add, le_add_iff_nonneg_left, Nat.cast_nonneg]
 
-theorem truncatedJ_eq_trunc_iff_lowerIdx_le_phi {u : ℚ} (hsig : σ ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K'] 𝒪[L]) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : min (phi K' L u + 1) ((i_[K'/K] σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig)) = phi K' L u + 1 ↔ truncatedJ L (u + 1) σ = u := by
+variable [Algebra.IsSeparable K K'] [Algebra.IsSeparable K' L] [CompleteSpace K'] [Algebra.IsSeparable ↥𝒪[K'] ↥𝒪[L]] [Normal K' L] in
+variable [Algebra.IsSeparable K K'] [Algebra.IsSeparable K' L] [CompleteSpace K'] [Algebra.IsSeparable ↥𝒪[K'] ↥𝒪[L]] [Normal K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K K'] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] in
+theorem truncatedJ_eq_trunc_iff_lowerIdx_le_phi {u : ℚ} (hsig : σ ≠ .refl) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[K']) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K'] {gen'} = ⊤) : min (phi K' L u + 1) ((i_[K'/K] σ).untop (lowerIndex_ne_one (mem_decompositionGroup σ) hsig)) = phi K' L u + 1 ↔ truncatedJ L (u + 1) σ = u := by
   constructor
   · intro hu
     simp only [truncatedJ_eq_truncated_FuncJ, (FuncJ_untop_of_nerefl σ hsig), ↓reduceDIte]
@@ -574,17 +530,19 @@ theorem truncatedJ_eq_trunc_iff_lowerIdx_le_phi {u : ℚ} (hsig : σ ≠ .refl) 
     simp only [add_sub_cancel_right]
     suffices h : phi K' L u ≤ phi K' L ((FuncJ L σ).untop (FuncJ_untop_of_nerefl σ hsig) - 1) from by
       linarith [(StrictMono.le_iff_le (phi_strictMono K' L)).1 h]
-    rw [← add_le_add_iff_right (a := 1), ← lowerIndex_eq_phi_FuncJ_of_ne_refl σ hsig x y hgen, ← hu]
+    rw [← add_le_add_iff_right (a := 1), ← lowerIndex_eq_phi_FuncJ_of_ne_refl σ hsig x y hgen hgen', ← hu]
     apply min_le_right
   · intro hu
     rw [min_eq_left]
     simp only [truncatedJ_eq_truncated_FuncJ, (FuncJ_untop_of_nerefl σ hsig), ↓reduceDIte] at hu
-    rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen, add_le_add_iff_right]
+    rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen hgen', add_le_add_iff_right]
     apply (phi_strictMono K' L).monotone
     rw [← hu]
     simp only [tsub_le_iff_right, sub_add_cancel, min_le_iff, le_refl, true_or]
 
-theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K'] 𝒪[L]) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) (hgen' : Algebra.adjoin 𝒪[K'] {gen} = ⊤) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L (u + 1) σ + 1) (AlgEquiv.restrictScalars K s))) := by
+
+variable [Algebra.IsSeparable K K'] [Algebra.IsSeparable K' L] [CompleteSpace K'] [Algebra.IsSeparable ↥𝒪[K'] ↥𝒪[L]] [Normal K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K K'] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] in
+theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[K']) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K'] {gen'} = ⊤) : σ.truncatedLowerIndex K K' (phi K' L u + 1) = (1 / LocalField.ramificationIdx K' L) * (∑ s in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L (u + 1) σ + 1) (AlgEquiv.restrictScalars K s))) := by
   by_cases hsig : σ = .refl
   · conv =>
       left
@@ -592,7 +550,7 @@ theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y
     conv =>
       right
       simp only [hsig, truncatedJ_refl]
-    rw [phi_eq_sum_inf_aux K' L _ h' hgen', RamificationIdx_eq_card_of_inertia_group]
+    rw [phi_eq_sum_inf_aux K' L _ (by linarith) hgen', RamificationIdx_eq_card_of_inertia_group]
     simp only [sub_add_cancel, truncatedLowerIndex_restrictScalars]
   · have h : ¬ lowerIndex K K' σ = ⊤ := by
       apply lowerIndex_ne_one ?_ hsig
@@ -607,8 +565,8 @@ theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y
     rw [hunion, Finset.sum_union, hrefl]
     by_cases hu : min (phi K' L u + 1) ↑(WithTop.untop ( i_[K'/K] σ) h) = phi K' L u + 1
     · have hu' : truncatedJ L (u + 1) σ = u := by
-        apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen).1 hu
-      rw [hu, hu', phi_eq_sum_inf_aux K' L _ h' hgen', RamificationIdx_eq_card_of_inertia_group]
+        apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen hgen').1 hu
+      rw [hu, hu', phi_eq_sum_inf_aux K' L _ (by linarith) hgen', RamificationIdx_eq_card_of_inertia_group]
       simp only [one_div, Finset.top_eq_univ, sub_add_cancel, truncatedLowerIndex_restrictScalars, Finset.subset_univ, Finset.sum_sdiff_eq_sub, Finset.sum_singleton, truncatedLowerIndex_refl]
     · have hu' : truncatedJ L (u + 1) σ = ((WithTop.untop (FuncJ L σ) (FuncJ_untop_of_nerefl σ hsig))) - 1 := by
         suffices h : ¬ truncatedJ L (u + 1) σ = u from by
@@ -621,11 +579,88 @@ theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y
           apply min_eq_right (le_of_lt hc)
         by_contra hc
         absurd hu
-        apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen).2 hc
+        apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen hgen').2 hc
       simp only [Classical.or_iff_not_imp_left.1 (min_choice (phi K' L u + 1) (↑(WithTop.untop ( i_[K'/K] σ) h))) hu, hu']
-      rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen, phi_eq_sum_inf_aux K' L _ _ hgen', RamificationIdx_eq_card_of_inertia_group, sub_add_cancel]
+      rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen hgen', phi_eq_sum_inf_aux K' L _ _ hgen', RamificationIdx_eq_card_of_inertia_group, sub_add_cancel]
       simp only [one_div, Finset.top_eq_univ, truncatedLowerIndex_restrictScalars, Finset.subset_univ, Finset.sum_sdiff_eq_sub, Finset.sum_singleton, truncatedLowerIndex_refl, sub_add_cancel]
-      repeat sorry
+      simp only [neg_le_sub_iff_le_add, le_add_iff_nonneg_left, Nat.cast_nonneg]
     exact Finset.sdiff_disjoint
 
+variable [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K' L] [CompleteSpace K'] [Algebra.IsSeparable K K'] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[K'])] [Algebra.IsSeparable ↥𝒪[K'] ↥𝒪[L]] [Normal K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]
 
+theorem phi_truncatedJ_sub_one (u : ℚ) (hu : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[K']) (σ : K' ≃ₐ[K] K') {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K'] {gen} = ⊤) : phi K' L (truncatedJ L (u + 1) σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
+  calc
+  _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
+    rw [phi_eq_sum_inf_aux K' L _ _ hgen']
+    simp
+    unfold truncatedJ
+    apply Finset.le_max'
+    simp only [Finset.mem_image, Set.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, sub_eq_neg_self]
+    repeat sorry
+  _ = (1 / LocalField.ramificationIdx K' L) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
+    congr
+    apply RamificationIdx_eq_card_of_inertia_group
+  _ = (1 / LocalField.ramificationIdx K' L) * ((∑ x in (⊤ : Finset (L ≃ₐ[K'] L)), (AlgEquiv.truncatedLowerIndex K L (truncatedJ L (u + 1) σ + 1) (AlgEquiv.restrictScalars K x)))) := by
+    congr
+  _ = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
+    rw [lemma3_aux' σ u hu x y hgen hgen']
+
+
+theorem mem_lowerRamificationGroup_of_le_truncatedJ_sub_one {u r : ℚ} (h : u ≤ truncatedJ L r σ) {gen : ↥𝒪[L]} (hgen : Algebra.adjoin ↥𝒪[K] {gen} = ⊤) : σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
+  simp only [Subgroup.mem_map]
+  obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ (L := L) r σ
+  simp at s_in
+  have hs : s ∈ G(L/K)_[⌈u⌉] := by
+    apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one (r := r) ?_ hgen
+    rw [hs]
+    linarith [h]
+    rw [decompositionGroup_eq_top]
+    apply Subgroup.mem_top
+  use s
+
+theorem le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup {u : ℚ} {r : ℚ} (h : u + 1 ≤ r) {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) : u ≤ truncatedJ L r σ ↔ σ ∈ (G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K')) := by
+  constructor
+  · intro hu
+    apply mem_lowerRamificationGroup_of_le_truncatedJ_sub_one _ hu hgen
+  · rintro hx
+    obtain ⟨s, s_in, hs⟩ := exist_truncatedLowerIndex_eq_truncatedJ (L := L) r σ
+    simp at s_in
+    have hs' : s ∈ G(L/K)_[⌈u⌉] := by
+      obtain ⟨k, hk1, hk2⟩ := Subgroup.mem_map.1 hx
+      have h1 : i_[L/K]ₜ r k - 1 ≤ i_[L/K]ₜ r s - 1 := by
+        have h1' : k ∈ (⇑(AlgEquiv.restrictNormalHom K') ⁻¹' {σ}) := by simp only [Set.mem_preimage,
+          hk2, Set.mem_singleton_iff]
+        rw [hs]
+        unfold truncatedJ
+        apply Finset.le_max'
+        rw [Finset.mem_image]
+        use k
+        constructor
+        · simp only [Set.mem_toFinset, h1']
+        · rfl
+      have h2 : u ≤ i_[L/K]ₜ r k - 1 := by
+        apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup _ _ _ h hgen).2 hk1
+      have h3 : u ≤ i_[L/K]ₜ r s - 1 := by linarith [h1, h2]
+      apply mem_lowerRamificationGroup_of_le_truncatedLowerIndex_sub_one ?_ hgen h3
+      rw [decompositionGroup_eq_top]
+      apply Subgroup.mem_top
+    rw [← hs]
+    apply (le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup s u r h hgen).2 hs'
+
+variable [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable K L] [Algebra.IsSeparable K K'] [Algebra.IsSeparable K' L] [CompleteSpace K'] [CompleteSpace K] [Normal K' L] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRing.ResidueField ↥𝒪[L])] in
+@[simp]
+theorem herbrand (u : ℚ) {gen : 𝒪[K']} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K] {gen'} = ⊤) : G(L/K)_[⌈u⌉].map (AlgEquiv.restrictNormalHom K') = G(K'/K)_[⌈phi K' L u⌉] := by
+  ext σ
+  calc
+  _ ↔ truncatedJ L (u + 1) σ ≥ u :=
+    (le_truncatedJ_sub_one_iff_mem_lowerRamificationGroup σ (by linarith) hgen').symm
+  _ ↔ phi K' L (truncatedJ L (u + 1) σ) ≥ phi K' L u := (phi_strictMono K' L).le_iff_le.symm
+  _ ↔ σ.truncatedLowerIndex K K' (phi K' L u + 1) - 1 ≥ phi K' L u := by
+    have heq : phi K' L (truncatedJ L (u + 1) σ) + 1 = i_[K'/K]ₜ (phi K' L u + 1) σ := by sorry
+      -- simp only [phi_truncatedJ_sub_one]
+    have heq' : phi K' L (truncatedJ L (u + 1) σ) = i_[K'/K]ₜ (phi K' L u + 1) σ - 1 := by
+      linarith [heq]
+    rw [heq']
+  _ ↔ σ ∈ G(K'/K)_[⌈phi K' L u⌉] := by
+    apply le_truncatedLowerIndex_sub_one_iff_mem_lowerRamificationGroup (K := K) (L := K') σ (phi K' L u) _ ?_ hgen
+    linarith
