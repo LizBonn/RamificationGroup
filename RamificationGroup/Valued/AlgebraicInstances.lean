@@ -114,9 +114,9 @@ open LocalField ExtDVR
 
 #check exists_isUniformizer_of_isDiscrete
 set_option synthInstance.maxHeartbeats 0
-theorem ramificationIdx_ne_zero [CompleteSpace K] : ramificationIdx K L ≠ 0 := by
+theorem ramificationIdx_ne_zero [CompleteSpace K] [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L])]: ramificationIdx K L ≠ 0 := by
   letI : IsDiscreteValuationRing 𝒪[L] := aux6 K L
-  letI : Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L]) := sorry
+  -- letI : Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K]) (IsLocalRing.ResidueField ↥𝒪[L]) := sorry
   -- letI : Module.Finite ↥𝒪[K] ↥𝒪[L] := sorry
   apply ramificationIdx_ne_zero_of_injective_of_integral
   exact algebraMap_injective
@@ -127,10 +127,10 @@ theorem aux0 [CompleteSpace K] [IsDiscrete vL.v] : vL.v = extendedValuation K L 
   rw [← isEquiv_iff_eq]
   apply extension_valuation_equiv_extendedValuation_of_discrete val_isEquiv_comap
 
-variable {L} in
-theorem aux3 [IsDiscrete vK.v] [IsDiscrete vL.v]
-  (x : K) : vL.v (algebraMap K L x) = (vK.v x) ^ (ramificationIdx K L) := by
-  sorry
+-- variable {L} in
+-- theorem aux3 [IsDiscrete vK.v] [IsDiscrete vL.v]
+--   (x : K) : vL.v (algebraMap K L x) = (vK.v x) ^ (ramificationIdx K L) := by
+--   sorry
 
 
 end discrete

@@ -59,9 +59,24 @@ theorem psi_eq_self_of_le_neg_one {v : ℚ} (hv : v ≤ 0) {gen : 𝒪[L]} (hgen
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 variable (S' : Type*) [Ring S'] [vS' : Valued S' ℤₘ₀] [Algebra R S']
-theorem phi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phi R S u = phi R S' u := sorry
 
-theorem psi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : psi R S u = psi R S' u := sorry
+theorem phiDeriv_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phiDeriv R S u = phiDeriv R S' u := by
+  unfold phiDeriv
+  congr 2
+  repeat apply Nat.card_congr (lowerRamificationGroup_equiv_of_ring_equiv hf _).toEquiv
+
+theorem phi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phi R S u = phi R S' u := by
+  unfold phi
+  congr 2
+  rw [funext_iff]
+  intro i
+  repeat exact phiDeriv_eq_ofEquiv _ _ _ hf _
+
+
+theorem psi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : psi R S u = psi R S' u := by
+  apply congrArg₂ invFun
+  apply (funext_iff.mpr (phi_eq_ofEquiv _ _ _ hf))
+  rfl
 
 -- theorem psi_phi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := by
 --   rw [← Function.comp_apply (f := psi R S) (g := phi R S)]
