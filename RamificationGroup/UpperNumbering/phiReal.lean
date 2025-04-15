@@ -163,7 +163,7 @@ theorem RamificationGroup_card_comp_aux {x : ℝ} (hx : 0 ≤ x) {gen : 𝒪[L]}
       exact SetCoe.ext hy2
   haveI h2: (Subgroup.map (AlgEquiv.restrictNormalHom K') G(L/K)_[⌈x⌉]) ≃ (G(L/K)_[⌈x⌉] ⧸ (G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker).subgroupOf G(L/K)_[⌈x⌉]) := by
     apply Subgroup_map
-    exact AlgEquiv.restrictNormalHom_surjective L
+    -- exact AlgEquiv.restrictNormalHom_surjective L
   haveI h3 : (G(L/K')_[⌈x⌉].map (AlgEquiv.restrictScalarsHom K)) = (G(L/K)_[⌈x⌉] ⊓ (AlgEquiv.restrictNormalHom K').ker) := by
     ext t
     constructor
