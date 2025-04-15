@@ -1,1 +1,1 @@
-import RamificationGroup.UpperNumbering
+import RamificationGroup.UpperNumbering.phiComp

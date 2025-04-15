@@ -1,5 +1,5 @@
 import RamificationGroup.Valued.Hom.Discrete
-import RamificationGroup.DecompositionGroup
+import RamificationGroup.Valued.Hom.DecompositionGroup
 
 
 open DiscreteValuation Valued Valuation
