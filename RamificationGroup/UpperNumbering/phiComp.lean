@@ -458,18 +458,34 @@ theorem phiReal_comp_of_isVal_Extension_pos_aux {n : ℕ} {gen : ↥𝒪[L]} (hg
       exact hu
 
 @[simp]
-theorem phi_comp_of_isValExtension' (u : ℚ): (phi K K') ((phi K' L) u) = (phi K L) u := by
-  simp only [← Rat.cast_inj (α := ℝ)]
-  rw [← phiReal_eq_phi, ← phiReal_eq_phi, ← phiReal_eq_phi]
-  apply phiReal_comp_of_isVal_Extension_pos_aux
-  repeat sorry
+theorem phi_comp_of_isValExtension' (u : ℚ) {gen : ↥𝒪[L]} (hgen : Algebra.adjoin ↥𝒪[K] {gen} = ⊤) {gen' : ↥𝒪[L]} (hgen' : Algebra.adjoin ↥𝒪[K'] {gen'} = ⊤) {gen'' : ↥𝒪[K']} (hgen'' : Algebra.adjoin ↥𝒪[K] {gen''} = ⊤) {gen''' : ↥𝒪[L]} (hgen''' : Algebra.adjoin ↥𝒪[K] {gen'''} = ⊤) : (phi K K') ((phi K' L) u) = (phi K L) u := by
+  by_cases hu : 0 ≤ u
+  · simp only [← Rat.cast_inj (α := ℝ)]
+    rw [← phiReal_eq_phi K L hu, ← phiReal_eq_phi K K', ← phiReal_eq_phi K' L hu]
+    apply phiReal_comp_of_isVal_Extension_pos_aux K K' L hgen hgen' hgen'' hgen''' (n := ⌊u⌋.toNat)
+    simp only [Set.mem_Icc, Rat.natCast_le_cast]
+    have hu':= Int.floor_nonneg.2 hu
+    constructor <;> rw [← Int.cast_natCast, Int.toNat_of_nonneg hu']
+    · exact Int.floor_le u
+    · rw [← Rat.cast_one, ← Rat.cast_intCast, ← Rat.cast_add]
+      apply Rat.cast_mono
+      apply le_trans (Int.le_ceil u)
+      rw [← Int.cast_one, ← Int.cast_add]
+      apply Int.cast_mono
+      apply Int.ceil_le_floor_add_one u
+    apply phi_nonneg K' L hu
+  · push_neg at hu
+    let hu' := le_of_lt hu
+    rw [phi_eq_self_of_le_zero K' L hu', phi_eq_self_of_le_zero K K' hu', phi_eq_self_of_le_zero K L hu']
+
 
 @[simp]
 theorem phi_comp_of_isValExtension : (phi K K') ∘ (phi K' L) = phi K L := by
   ext u
   apply phi_comp_of_isValExtension'
+  repeat sorry
 
-instance : Finite (L ≃ₐ[K'] L) := sorry
+instance : Finite (L ≃ₐ[K'] L) := Finite.algEquiv
 
 @[simp]
 theorem psi_comp_of_isValExtension {gen : ↥𝒪[L]}

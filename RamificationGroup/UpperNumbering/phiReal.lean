@@ -77,7 +77,23 @@ theorem phiReal_nonneg {u : ℝ} (h : 0 ≤ u) : 0 ≤ phiReal K L u := by
   apply Nat.cast_nonneg
 
 --------------------------------for lower
-instance {u : ℤ} : Subgroup.Normal (lowerRamificationGroup K L u) := sorry
+#check mem_decompositionGroup
+variable [CompleteSpace K]
+instance {u : ℤ} : Subgroup.Normal (lowerRamificationGroup K L u) where
+  conj_mem := by
+    unfold lowerRamificationGroup
+    simp only [ofAdd_sub, ofAdd_neg, Subtype.forall, Subgroup.mem_mk, Set.mem_setOf_eq, mul_apply,and_imp]
+    intro n hd hn g
+    constructor
+    · apply mem_decompositionGroup
+    · intro a ha
+      have hg : g⁻¹ a ∈ v.integer := by
+        rw [mem_integer_iff, val_map_le_one_iff (mem_decompositionGroup g⁻¹)]
+        exact ha
+      let hn' := hn (g⁻¹ a) hg
+      have hg' := mem_decompositionGroup g
+
+      sorry
 
 
 ------------------------------for lower
@@ -220,6 +236,7 @@ theorem RamificationGroup_card_zero_comp_aux : (Nat.card G(K'/K)_[0] : ℝ) * (N
   have h : (IsLocalRing.maximalIdeal 𝒪[L]) ^ (e_K'K * e_LK') = (IsLocalRing.maximalIdeal 𝒪[L]) ^ (e_LK) := by
     dsimp [e_K'K, e_LK', e_LK]
     rw [← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K L), mul_comm, pow_mul, ← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K' L), ← Ideal.map_pow, ← maximalIdeal_map_eq_maximalIdeal_pow_ramificationIdx (IsValExtension.integerAlgebra_injective K K'), Ideal.map_map, ← IsScalarTower.algebraMap_eq]
+  
   sorry
 
 theorem phiDerivReal_integrableOn_section {k : ℤ} (hk : 0 ≤ k): IntegrableOn (phiDerivReal K L) (Set.Ioc (k : ℝ) (k + 1 : ℝ)) μ := by

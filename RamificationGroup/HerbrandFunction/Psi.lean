@@ -59,12 +59,13 @@ theorem psi_eq_self_of_le_neg_one {v : ℚ} (hv : v ≤ 0) {gen : 𝒪[L]} (hgen
 variable (R S : Type*) {ΓR : outParam Type*} [CommRing R] [Ring S] [LinearOrderedCommGroupWithZero ΓR] [vR : Valued R ΓR] [vS : Valued S ℤₘ₀] [Algebra R S]
 
 variable (S' : Type*) [Ring S'] [vS' : Valued S' ℤₘ₀] [Algebra R S']
-theorem phi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phi R S u = phi R S' u := sorry
+theorem phi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : phi R S u = phi R S' u := by
+  unfold phi phiDeriv lowerRamificationGroup
+  simp only [hf]
+  sorry
 
-theorem psi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : psi R S u = psi R S' u := sorry
-
--- theorem psi_phi_eq_self (u : ℚ) : (psi R S) ((phi R S) u) = u := by
---   rw [← Function.comp_apply (f := psi R S) (g := phi R S)]
---   unfold psi
---   rw [Function.invFun_comp (f := (phi R S))]
---   rfl; apply (phi_Bijective R S).injective
+theorem psi_eq_ofEquiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℚ) : psi R S u = psi R S' u := by
+  simp only [psi]
+  congr
+  ext u
+  rw [phi_eq_ofEquiv R S S' hf]

@@ -200,6 +200,8 @@ section lowerIndex_inequality
 variable {R S}
 
 /-- One of `val_map_sub_le_one` and `sub_self_mem_integer` should be thrown away.-/
+
+
 theorem sub_self_mem_integer {s : S ≃ₐ[R] S} (hs' : s ∈ decompositionGroup R S)
   (x : vS.v.integer) :
     s x - x ∈ vS.v.integer := by

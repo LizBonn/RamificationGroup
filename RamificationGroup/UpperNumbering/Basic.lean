@@ -550,7 +550,7 @@ theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y
     conv =>
       right
       simp only [hsig, truncatedJ_refl]
-    rw [phi_eq_sum_inf_aux K' L _ (by linarith) hgen', RamificationIdx_eq_card_of_inertia_group]
+    rw [phi_eq_sum_inf_aux K' L (by linarith) hgen', RamificationIdx_eq_card_of_inertia_group]
     simp only [sub_add_cancel, truncatedLowerIndex_restrictScalars]
   · have h : ¬ lowerIndex K K' σ = ⊤ := by
       apply lowerIndex_ne_one ?_ hsig
@@ -566,7 +566,7 @@ theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y
     by_cases hu : min (phi K' L u + 1) ↑(WithTop.untop ( i_[K'/K] σ) h) = phi K' L u + 1
     · have hu' : truncatedJ L (u + 1) σ = u := by
         apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen hgen').1 hu
-      rw [hu, hu', phi_eq_sum_inf_aux K' L _ (by linarith) hgen', RamificationIdx_eq_card_of_inertia_group]
+      rw [hu, hu', phi_eq_sum_inf_aux K' L (by linarith) hgen', RamificationIdx_eq_card_of_inertia_group]
       simp only [one_div, Finset.top_eq_univ, sub_add_cancel, truncatedLowerIndex_restrictScalars, Finset.subset_univ, Finset.sum_sdiff_eq_sub, Finset.sum_singleton, truncatedLowerIndex_refl]
     · have hu' : truncatedJ L (u + 1) σ = ((WithTop.untop (FuncJ L σ) (FuncJ_untop_of_nerefl σ hsig))) - 1 := by
         suffices h : ¬ truncatedJ L (u + 1) σ = u from by
@@ -581,7 +581,7 @@ theorem lemma3_aux' (u : ℚ) (h' : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y
         absurd hu
         apply (truncatedJ_eq_trunc_iff_lowerIdx_le_phi (K := K) (K' := K') (L := L) σ hsig x y hgen hgen').2 hc
       simp only [Classical.or_iff_not_imp_left.1 (min_choice (phi K' L u + 1) (↑(WithTop.untop ( i_[K'/K] σ) h))) hu, hu']
-      rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen hgen', phi_eq_sum_inf_aux K' L _ _ hgen', RamificationIdx_eq_card_of_inertia_group, sub_add_cancel]
+      rw [lowerIndex_eq_phi_FuncJ_of_ne_refl (L := L) σ hsig x y hgen hgen', phi_eq_sum_inf_aux K' L _ hgen', RamificationIdx_eq_card_of_inertia_group, sub_add_cancel]
       simp only [one_div, Finset.top_eq_univ, truncatedLowerIndex_restrictScalars, Finset.subset_univ, Finset.sum_sdiff_eq_sub, Finset.sum_singleton, truncatedLowerIndex_refl, sub_add_cancel]
       simp only [neg_le_sub_iff_le_add, le_add_iff_nonneg_left, Nat.cast_nonneg]
     exact Finset.sdiff_disjoint
@@ -591,7 +591,7 @@ variable [Algebra.IsSeparable (IsLocalRing.ResidueField ↥𝒪[K']) (IsLocalRin
 theorem phi_truncatedJ_sub_one (u : ℚ) (hu : 0 ≤ u) (x : PowerBasis 𝒪[K] 𝒪[L]) (y : PowerBasis 𝒪[K] 𝒪[K']) (σ : K' ≃ₐ[K] K') {gen : 𝒪[L]} (hgen : Algebra.adjoin 𝒪[K] {gen} = ⊤) {gen' : 𝒪[L]} (hgen' : Algebra.adjoin 𝒪[K'] {gen} = ⊤) : phi K' L (truncatedJ L (u + 1) σ) + 1 = σ.truncatedLowerIndex K K' ((phi K' L u) + 1) := by
   calc
   _ = (1 / Nat.card G(L/K')_[0]) * ((Finset.sum (⊤ : Finset (L ≃ₐ[K'] L)) (AlgEquiv.truncatedLowerIndex K' L (truncatedJ L (u + 1) σ + 1) ·))) := by
-    rw [phi_eq_sum_inf_aux K' L _ _ hgen']
+    rw [phi_eq_sum_inf_aux K' L _ hgen']
     simp
     unfold truncatedJ
     apply Finset.le_max'

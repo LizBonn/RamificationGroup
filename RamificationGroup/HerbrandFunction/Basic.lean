@@ -91,6 +91,12 @@ theorem phi_pos_of_pos {u : ℚ} (hu : 0 < u) : 0 < phi R S u := by
     exact phiDeriv_pos R S u
   linarith [h, h']
 
+theorem phi_nonneg {u : ℚ} (hu : 0 ≤ u) : 0 ≤ phi R S u := by
+  by_cases hu' : u = 0
+  · rw [hu', phi_zero_eq_zero]
+  · apply le_of_lt (phi_pos_of_pos R S (lt_of_le_of_ne hu _))
+    exact fun a ↦ hu' (id (Eq.symm a))
+
 theorem phi_pos_gt_nonpos {a b : ℚ} (hu1 : a ≤ 0) (hu2 : 0 < b) : phi R S a < phi R S b := by
   apply lt_of_le_of_lt (b := 0)
   rw [phi_eq_self_of_le_zero]
