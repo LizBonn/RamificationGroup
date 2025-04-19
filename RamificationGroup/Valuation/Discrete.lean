@@ -4,7 +4,6 @@
 
 import LocalClassFieldTheory.DiscreteValuationRing.Complete
 import LocalClassFieldTheory.DiscreteValuationRing.DiscreteNorm
-import RamificationGroup.ForMathlib.Henselian
 import Mathlib.Topology.Algebra.Valued.ValuedField
 import LocalClassFieldTheory.ForMathlib.RankOneValuation
 

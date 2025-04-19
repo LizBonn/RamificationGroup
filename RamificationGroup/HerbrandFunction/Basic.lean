@@ -25,6 +25,7 @@ noncomputable def phiDeriv (u : ℚ) : ℚ :=
 noncomputable def phi (u : ℚ) : ℚ :=
   ∑ x in Finset.Icc 1 (⌈u⌉ - 1), (phiDeriv R S x) + (u - (max 0 (⌈u⌉ - 1))) * (phiDeriv R S u)
 
+omit [Finite (S ≃ₐ[R] S)] in
 theorem phi_zero_eq_zero : phi R S 0 = 0 := by
   unfold phi
   simp

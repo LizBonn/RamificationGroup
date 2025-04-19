@@ -85,10 +85,26 @@ instance Valuation.instNonemptyToValuation {R Γ₀: Type*} [Ring R] [LinearOrde
 
 section autCongr
 
+/--
+Shouldn't be here.-/
+noncomputable def restrict_mulEquiv_to_subgroup {G : Type*} {G' : Type*} [Group G] [Group G'] (f : G ≃* G')
+{H : Subgroup G} {H' : Subgroup G'}
+(hf : ∀ x : G, x ∈ H ↔ f x ∈ H') :
+H ≃* H' := by
+  let f_H := Subgroup.equivMapOfInjective (G := G) (N := G') H f f.injective
+  have : H' = Subgroup.map f H := by
+    ext y
+    rw [Subgroup.mem_map]
+    let ⟨x, hx⟩ := f.surjective y
+    rw [← hx, ← hf x]
+    simp only [MonoidHom.coe_coe, EmbeddingLike.apply_eq_iff_eq, exists_eq_right]
+  rw [this]
+  apply f_H
+
 variable {R S S': Type*} {ΓR : outParam Type*} [CommRing R] [Ring S] [Ring S'] [vS : Valued S ℤₘ₀] [vS : Valued S' ℤₘ₀] [Algebra R S] [Algebra R S']
 
---if f is a R-algebra isom of S and S', f preserves the valuation, then s ∈ G(S/R)_[u] if and only if F s ∈ G(S'/R)_[u], where F : Gal(S/R) → Gal(S'/R), F(σ)(s') = σ(f⁻¹(s')).
---the u-th lower ramification groups of two isomorphic ring extensions are isomorphic for all u ∈ ℤ.
+
+/-- if f is a R-algebra isom of S and S', f preserves the valuation, then s ∈ G(S/R)_[u] if and only if F s ∈ G(S'/R)_[u], where F : Gal(S/R) → Gal(S'/R), F(σ)(s') = σ(f⁻¹(s')). -/
 theorem autCongr_mem_lowerRamificationGroup_iff {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (s : S ≃ₐ[R] S) (u : ℤ) : s ∈ G(S/R)_[u] ↔ (AlgEquiv.autCongr f s : S' ≃ₐ[R] S') ∈ G(S'/R)_[u] := by
   have hf' : ∀ a : S', v (f.symm a) = v a := by
     intro a
@@ -135,6 +151,11 @@ theorem autCongr_mem_lowerRamificationGroup_iff {f : S ≃ₐ[R] S'} (hf : ∀ a
     rw [← hf _]
     exact ha
 
+/-- the `u`-th lower ramification groups of two isomorphic ring extensions are isomorphic for all `u ∈ ℤ`. -/
+noncomputable def lowerRamificationGroup_equiv_of_ring_equiv {f : S ≃ₐ[R] S'} (hf : ∀ a : S, v a = v (f a)) (u : ℤ) : G(S/R)_[u] ≃* G(S'/R)_[u] := by
+  apply restrict_mulEquiv_to_subgroup f.autCongr
+  apply fun s ↦ autCongr_mem_lowerRamificationGroup_iff hf s u
+
 end autCongr
 
 section WithBot
@@ -142,7 +163,6 @@ section WithBot
 open Classical
 -- there is no `ConditionallyCompleteLinearOrderTop` in mathlib ...
 -- # The definition of `WithTop.instInfSet` have to be changed （done in latest version）
-#check WithBot.linearOrder
 noncomputable instance {α} [ConditionallyCompleteLinearOrder α] : ConditionallyCompleteLinearOrderBot (WithBot α) where
   toConditionallyCompleteLattice := WithBot.conditionallyCompleteLattice
   le_total := WithBot.linearOrder.le_total

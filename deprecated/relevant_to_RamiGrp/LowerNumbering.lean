@@ -605,7 +605,7 @@ instance : Module.Finite 𝒪[K] 𝒪[L] := Module.IsNoetherian.finite 𝒪[K] �
 
 set_option synthInstance.maxHeartbeats 1000000
 
-theorem AlgEquiv.Simple_Extension_of_CDVR [CompleteSpace K] [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := by
+theorem AlgEquiv.Simple_Extension_of_CDVR [Algebra.IsSeparable (IsLocalRing.ResidueField 𝒪[K]) (IsLocalRing.ResidueField 𝒪[L])] : ∃ gen : 𝒪[L], Algebra.adjoin 𝒪[K] {gen} = ⊤ := by
   apply ExtDVR.exists_primitive (A := 𝒪[K]) (B := 𝒪[L]) algebraMap_injective
 
 

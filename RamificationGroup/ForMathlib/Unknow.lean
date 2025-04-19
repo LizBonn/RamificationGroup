@@ -98,15 +98,25 @@ theorem sum_insert_left_aux' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℤ) : (∑ 
       rw [insert_Icc_left _ _ h]
     _ = (∑ x in Finset.Icc (a + 1) b, f x) := by simp
 
-theorem sum_insert_right_aux (a b : ℤ) (h : a ≤ b) (f : ℚ → ℚ) : (∑ x in Finset.Icc a b, f x) - f b = (∑ x in Finset.Icc a (b - 1), f x) := by sorry
-
 theorem sum_insert_right_aux' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℤ) : (∑ x in Finset.Icc a b, f x) = (∑ x in Finset.Icc a (b - 1), f x) + f b := by
   calc
     _ = ∑ x in insert b (Finset.Icc a (b - 1)), f x := by
       rw [insert_Icc_right _ _ h]
     _ = (∑ x in Finset.Icc a (b - 1), f x) + f b := by simp [add_comm]
 
-theorem sum_insert_right_aux'' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℚ) : (∑ x in Finset.Icc a b, f x) - f b = (∑ x in Finset.Icc a (b - 1), f x) := by sorry
+theorem sum_insert_right_aux (a b : ℤ) (h : a ≤ b) (f : ℚ → ℚ) : (∑ x in Finset.Icc a b, f x) - f b = (∑ x in Finset.Icc a (b - 1), f x) := by
+  apply tsub_eq_of_eq_add
+  calc
+    _ = ∑ x in insert b (Finset.Icc a (b - 1)), f x := by
+      rw [insert_Icc_right _ _ h]
+    _ = (∑ x in Finset.Icc a (b - 1), f x) + f b := by simp [add_comm]
+
+theorem sum_insert_right_aux'' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℚ) : (∑ x in Finset.Icc a b, f x) - f b = (∑ x in Finset.Icc a (b - 1), f x) := by
+  apply tsub_eq_of_eq_add
+  calc
+    _ = ∑ x in insert b (Finset.Icc a (b - 1)), f x := by
+      rw [insert_Icc_right _ _ h]
+    _ = (∑ x in Finset.Icc a (b - 1), f x) + f b := by simp [add_comm]
 
 theorem sum_insert_right_aux''' (a b : ℤ) (h : a ≤ b) (f : ℤ → ℕ) : (∑ x in Finset.Icc a b, f x) = (∑ x in Finset.Icc a (b - 1), f x) + f b := by
   calc
@@ -136,11 +146,11 @@ theorem Function.comp_left_cancel {α β γ: Type*} [Nonempty α] {f1 f2 : β �
 
 open QuotientGroup
 
-noncomputable def Subgroup_map {G H : Type*} [Group G] [Group H] {N : Subgroup G} {f : G →* H} (h : Function.Surjective f) : N.map f ≃ N ⧸ (N ⊓ f.ker).subgroupOf N := by
+noncomputable def Subgroup_map {G H : Type*} [Group G] [Group H] {N : Subgroup G} {f : G →* H} : N.map f ≃ N ⧸ (N ⊓ f.ker).subgroupOf N := by
   symm
   let φ : N →* (N.map f) := {
     toFun := fun x => ⟨f x, by
-      simp
+      simp only [Subgroup.mem_map]
       use x
       constructor
       · exact SetLike.coe_mem x
@@ -207,4 +217,3 @@ theorem Finset.Icc_union_Icc_eq_Icc {a b c : ℤ} (h : a ≤ b) (h' : b ≤ c) :
       refine ⟨hx.1, hx'⟩
     · right
       refine ⟨by linarith [hx'], hx.2⟩
-
