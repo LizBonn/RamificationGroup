@@ -54,3 +54,14 @@ The result about Herbrand functions.
 1. **phi_truncatedJ_sub_one** Lemma4 Chap4 sec3.
 2. **herbrand** The herbrand theorem.
 
+## PhiComp.lean
+### Main Theorem
+1. **psi_comp_of_isValExtension** the function phi is transitive.
+
+## phiReal.lean
+### Main Definition 
+1. **phiReal** The real version of function phi.
+
+## Upper.lean 
+### Main Definition 
+1. **upperRamificationGroup** The infinite extension version of uppernumbering ramification group.
