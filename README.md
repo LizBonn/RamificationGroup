@@ -2,7 +2,7 @@ This repository contains a formalization of Ramification group theory using the 
 and María Inés de Frutos-Fernández's relevant developments in [local class field theory](https://github.com/mariainesdff/LocalClassFieldTheory). Our formalization primarily follows Serre's treatise [Local Fields](Local Fields (Jean-Pierre Serre) (Z-Library).pdf) as the foundational
 reference. Currently, we have completed Chaper 4, section 1 and 3. Below is a concise overview of the file structure to facilitate navigation:
 
-Our work is contained in the RamificationGroup folder. The principal results are organized across the following four directories:
+Our work is contained in the RamificationGroup folder. The principal results are organized across the following three directories:
 
 # LowerNumbering
 The result about lowernumbering ramification group.
